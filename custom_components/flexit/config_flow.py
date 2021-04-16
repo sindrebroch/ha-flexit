@@ -3,8 +3,8 @@ import logging
 
 import voluptuous as vol
 
-from .pyFlexit import Flexit
-from .pyFlexit.exceptions import FlexitError
+from . import Flexit
+from .exceptions import FlexitError
 from homeassistant import config_entries
 from .const import (
     DEFAULT_NAME,
