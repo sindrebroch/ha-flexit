@@ -36,6 +36,10 @@ from .const import (
     CONF_HEATER_STATE
 )
 
+from .flexit import Flexit, FlexitConnectionError, FlexitError
+from .models import Token, FlexitInfo, DeviceInfo
+
+
 _LOGGER = logging.getLogger(__name__)
 
 FLEXIT_SCHEMA = vol.Schema(
