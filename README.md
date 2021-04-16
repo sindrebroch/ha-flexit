@@ -12,3 +12,4 @@ TODOs:
 - [ ] Move heater to switch
 - [ ] Change-filter binary_sensor
 - [ ] Cleanup code
+- [ ] Extract and publish pyFlexit library.
