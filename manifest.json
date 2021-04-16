@@ -1,7 +1,7 @@
 {
   "domain": "flexit",
   "name": "Flexit",
-  "documentation": "https://www.github.com/sindrebroch/pyflexit",
+  "documentation": "https://www.github.com/sindrebroch/flexit",
   "requirements": [],
   "codeowners": ["@sindrebroch"],
   "config_flow": true,
