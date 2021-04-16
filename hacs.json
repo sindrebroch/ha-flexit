@@ -1,0 +1,5 @@
+{
+    "name": "Flexit Integration",
+    "domains": ["sensor","climate"],
+    "iot_class": ["Cloud Polling"]
+}

@@ -1,0 +1,9 @@
+{
+  "domain": "flexit",
+  "name": "Flexit",
+  "documentation": "https://www.github.com/sindrebroch/pyflexit",
+  "requirements": [],
+  "codeowners": ["@sindrebroch"],
+  "config_flow": true,
+  "version": "1.0.0"
+}
