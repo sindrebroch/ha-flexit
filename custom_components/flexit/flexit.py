@@ -13,7 +13,6 @@ import aiohttp
 import async_timeout
 from yarl import URL
 
-from .__version__ import __version__
 from .exceptions import FlexitConnectionError, FlexitError
 from .models import Token, FlexitInfo, DeviceInfo
 from .const import (

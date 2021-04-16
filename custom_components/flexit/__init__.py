@@ -4,7 +4,7 @@ import logging
 
 import voluptuous as vol
 
-from . import Flexit
+from .flexit import Flexit
 from .exceptions import FlexitError
 
 from homeassistant.config_entries import SOURCE_IMPORT

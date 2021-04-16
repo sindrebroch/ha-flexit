@@ -1,22 +1,21 @@
 """Config flow to configure the Flexit integration."""
 import logging
-
 import voluptuous as vol
 
-from . import Flexit
+from .flexit import Flexit
 from .exceptions import FlexitError
-from homeassistant import config_entries
 from .const import (
     DEFAULT_NAME,
     DOMAIN,
 )
+from homeassistant import config_entries
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.const import (
     CONF_NAME,
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_API_KEY,
 )
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 _LOGGER = logging.getLogger(__name__)
 
