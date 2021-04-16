@@ -1,6 +1,6 @@
 # Flexit
 
-Custom integration for controlling your Flexit ventilation unit.
+Custom integration for HomeAssistant for controlling Flexit ventilation unit.
 
 Tested with Flexit Nordic S3.
 Unofficial API, use at own risk.
