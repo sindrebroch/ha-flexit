@@ -146,22 +146,11 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     @property
     def hvac_action(self) -> str:
         """Return the current running hvac operation if supported."""
-        #current = self.api.data["room_temperature"]
         if self.api.data["electric_heater"] == "on":
             heater = HVAC_MODE_HEAT
         else:
             heater = HVAC_MODE_FAN_ONLY
 
-        #if not current:
-        #    return CURRENT_HVAC_IDLE
-
-        #if self.api.data["ventilation_mode"] == "Away":
-        #    target = self.api.data["away_air_temperature"]
-        #else:
-        #    target = self.api.data["home_air_temperature"]
-
-        #if current < target and heater == HVAC_MODE_HEAT:
-        #    return CURRENT_HVAC_HEAT
         if heater == HVAC_MODE_HEAT:
             return CURRENT_HVAC_HEAT
         return CURRENT_HVAC_IDLE
@@ -186,7 +175,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     @property
     def preset_modes(self) -> Optional[List[str]]:
         """Return a list of available preset modes."""
-        return [PRESET_HOME, PRESET_AWAY, PRESET_BOOST] # TODO preset auto / calendar / schedule
+        return [PRESET_HOME, PRESET_AWAY, PRESET_BOOST]
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         current_preset = self.api.data["ventilation_mode"]

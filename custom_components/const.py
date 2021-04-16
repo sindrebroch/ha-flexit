@@ -40,7 +40,7 @@ SENSOR_DICT = {
 SENSOR_LIST = list(SENSOR_DICT)
 
 BINARY_SENSOR_DICT = {
-    "dirty_filter": ["Filter", "", "mdi:air-filter"], # dirty filter
+    "dirty_filter": ["Filter", "", "mdi:air-filter"],
     "electric_heater": ["Electric heater", "", "mdi:radiator"] 
 }
 BINARY_SENSOR_LIST = list(BINARY_SENSOR_DICT)

@@ -101,11 +101,11 @@ class Flexit:
             with async_timeout.timeout(self.request_timeout, loop=self._loop):
 
                 if method == "POST":
-                    response = await self._post_request(url, body) # POST
+                    response = await self._post_request(url, body)
                 elif method == "PUT":
-                    response = await self._put_request(url, body) # PUT
+                    response = await self._put_request(url, body) 
                 else:
-                    response = await self._get_request(url) # GET
+                    response = await self._get_request(url)
 
                 response.raise_for_status()
 
@@ -163,7 +163,7 @@ class Flexit:
                 host=HOST,
             ).join(URL(uri)), 
             data=body,
-            headers=self.get_token_headers(), # Uses token headers
+            headers=self.get_token_headers(),
         )
 
     async def token_request( self ) -> Any:
