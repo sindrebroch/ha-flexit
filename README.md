@@ -1,1 +1,1 @@
-# PyFlexit
+# Flexit
