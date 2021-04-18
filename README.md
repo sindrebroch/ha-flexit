@@ -32,7 +32,7 @@ Updates every 30 minutes, and assumes state on successful POST.
 - Ventilation mode
 
 ## TODOs
-- [ ] Add to HACS
+- [x] Add to HACS
 - [ ] Cleanup code
 - [ ] Create option to change update interval.
 - [ ] Fix filter-sensors
