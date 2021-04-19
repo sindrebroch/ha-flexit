@@ -40,3 +40,4 @@ Updates every 30 minutes, and assumes state on successful POST.
 - [ ] Move "electric_heater" to "switch"-domain
 - [ ] Move "filter" to "binary_sensor"-domain
 - [ ] Extract and publish pyFlexit library.
+- [ ] Move some of the sensor to attributes of climate-entity?
