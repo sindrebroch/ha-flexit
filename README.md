@@ -28,13 +28,13 @@ Updates every 30 minutes, and assumes state on successful POST.
 - Room temperature
 - Filter ( not working properly )
 - Filter time to exchange ( not working properly )
-- Electric heater
+- Electric heater (removed?)
 - Ventilation mode
 
 ## TODOs
 - [x] Add to HACS
 - [ ] Cleanup code
-- [ ] Create option to change update interval.
+- [x] Create option to change update interval.
 - [ ] Fix filter-sensors
 - [ ] Rename "Filter time to exchange"
 - [ ] Move "electric_heater" to "switch"-domain
