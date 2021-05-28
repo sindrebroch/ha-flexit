@@ -15,6 +15,23 @@
                     "api_key": "Subscription key"
                 }
             }
+        },
+        "flow_title": "Flexit Config"
+    },
+    "options": {
+        "flow_title": "Flexit Options",
+        "abort": {
+            "already_configured": "Service is already configured"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect"
+        },
+        "step": {
+            "init": {
+                "data": {
+                    "update_interval": "Update interval"
+                }
+            }
         }
     }
 }

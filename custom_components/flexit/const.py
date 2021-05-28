@@ -1,15 +1,12 @@
 """Constants for the flexit integration."""
 
-import voluptuous as vol
-from datetime import timedelta
-
-from homeassistant.helpers import config_validation as cv
 from homeassistant.const import TEMP_CELSIUS
 
 DEFAULT_NAME = "Flexit"
 DOMAIN = "flexit"
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=30)
+CONF_UPDATE_INTERVAL = "update_interval"
+DEFAULT_UPDATE_INTERVAL = 30
 
 DATA_KEY_API = "api"
 DATA_KEY_COORDINATOR = "coordinator"
@@ -35,13 +32,11 @@ SENSOR_DICT = {
     "room_temperature": ["Room temperature", TEMP_CELSIUS, "mdi:thermometer"],
     "filter": ["Filter", "", "mdi:air-filter"],
     "filter_time_for_exchange": ["Filter time for exchange", "", "mdi:air-filter"],
-    "electric_heater": ["Electric heater", "", "mdi:radiator"],
 }
 SENSOR_LIST = list(SENSOR_DICT)
 
 BINARY_SENSOR_DICT = {
-    "dirty_filter": ["Filter", "", "mdi:air-filter"],
-    "electric_heater": ["Electric heater", "", "mdi:radiator"] 
+    "dirty_filter": ["Filter", "", "mdi:air-filter"]
 }
 BINARY_SENSOR_LIST = list(BINARY_SENSOR_DICT)
 

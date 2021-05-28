@@ -6,6 +6,7 @@ import voluptuous as vol
 
 from .flexit import Flexit
 from .exceptions import FlexitError
+from datetime import timedelta
 
 from homeassistant.config_entries import SOURCE_IMPORT
 from homeassistant.const import (
@@ -27,18 +28,12 @@ from homeassistant.helpers.update_coordinator import (
 from .const import (
     DATA_KEY_API,
     DATA_KEY_COORDINATOR,
-    DEFAULT_NAME,
     DOMAIN,
-    MIN_TIME_BETWEEN_UPDATES,
-    CONF_VENTILATION_MODE, 
-    CONF_HOME_TEMP,
-    CONF_AWAY_TEMP,
-    CONF_HEATER_STATE
+    CONF_UPDATE_INTERVAL,
+    DEFAULT_UPDATE_INTERVAL,
 )
 
-from .flexit import Flexit, FlexitConnectionError, FlexitError
-from .models import Token, FlexitInfo, DeviceInfo
-
+from .flexit import Flexit, FlexitError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -72,6 +67,15 @@ async def async_setup(hass, config):
 
 async def async_setup_entry(hass, entry):
     """Set up Flexit entry."""    
+
+    if not entry.options:
+        options = {
+            CONF_UPDATE_INTERVAL: entry.data.get(
+                CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+            ),
+        }
+        hass.config_entries.async_update_entry(entry, options=options)
+
     name = entry.data[CONF_NAME]
     username = entry.data[CONF_USERNAME]
     password = entry.data[CONF_PASSWORD]
@@ -97,7 +101,7 @@ async def async_setup_entry(hass, entry):
 
     async def async_update_data():
         """Fetch data from API endpoint."""
-        _LOGGER.debug("Updating data from Flexit")
+        _LOGGER.info("Polling Flexit ( update interval = %s min )", entry.options[CONF_UPDATE_INTERVAL])
         try:
             await api.set_token()
             await api.update_data()
@@ -110,7 +114,7 @@ async def async_setup_entry(hass, entry):
         _LOGGER,
         name=name,
         update_method=async_update_data,
-        update_interval=MIN_TIME_BETWEEN_UPDATES,
+        update_interval=timedelta(minutes=entry.options[CONF_UPDATE_INTERVAL]),
     )
     hass.data[DOMAIN][entry.entry_id] = {
         DATA_KEY_API: api,
@@ -154,6 +158,11 @@ class FlexitEntity(CoordinatorEntity):
         self.api = api
         self._name = name
         self._server_unique_id = server_unique_id
+
+    @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        return dict()
 
     @property
     def icon(self):

@@ -2,14 +2,15 @@
 import logging
 import voluptuous as vol
 
-from .flexit import Flexit
 from .exceptions import FlexitError
 from .const import (
     DEFAULT_NAME,
     DOMAIN,
+    CONF_UPDATE_INTERVAL, 
+    DEFAULT_UPDATE_INTERVAL,
 )
-from homeassistant import config_entries
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.core import callback
+from homeassistant.config_entries import ConfigFlow, OptionsFlow
 from homeassistant.const import (
     CONF_NAME,
     CONF_USERNAME,
@@ -19,11 +20,14 @@ from homeassistant.const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-class FlexitFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
+class FlexitFlowHandler(ConfigFlow, domain=DOMAIN):
     """Handle a Flexit config flow."""
 
-    VERSION = 1
-    CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        """Get the options flow for this handler."""
+        return FlexitOptionsFlowHandler(config_entry)
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initiated by the user."""
@@ -73,3 +77,26 @@ class FlexitFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             ),
             errors=errors,
         )
+
+class FlexitOptionsFlowHandler(OptionsFlow):
+    """Handle Flexit client options."""
+
+    def __init__(self, config_entry):
+        """Initialize options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(self, user_input = None):
+        """Manage Flexit options."""
+        if user_input is not None:
+            return self.async_create_entry(title="Skriv inn options", data=user_input)
+
+        options = {
+            vol.Optional(
+                CONF_UPDATE_INTERVAL,
+                default=self.config_entry.options.get(
+                    CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+                ),
+            ): int,
+        }
+
+        return self.async_show_form(step_id="init", data_schema=vol.Schema(options))

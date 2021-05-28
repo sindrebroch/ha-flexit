@@ -7,14 +7,14 @@ import logging
 import urllib.parse
 from datetime import date, timedelta
 
-from typing import Any, Optional, Dict
+from typing import Any, Dict
 
 import aiohttp
 import async_timeout
 from yarl import URL
 
 from .exceptions import FlexitConnectionError, FlexitError
-from .models import Token, FlexitInfo, DeviceInfo
+from .models import FlexitInfo, DeviceInfo
 from .const import (
     VENTILATION_MODE_PATH,
     VENTILATION_MODE_PUT_PATH,
@@ -175,9 +175,7 @@ class Flexit:
         )
 
     async def set_token(self) -> None: 
-        if self.token_refreshdate == date.today():
-            _LOGGER.debug( "Updating flexit token" )
-            
+        if self.token_refreshdate == date.today():            
             response = await self.token_request()
             self.token = response["access_token"]
             self.token_refreshdate = date.today() + timedelta(days = 1)
@@ -232,7 +230,6 @@ class Flexit:
             url=self.get_escaped_datapoints_url( HOME_AIR_TEMPERATURE_PATH ), 
             body=self.put_body(temp)
         )
-
         if response["stateTexts"][HOME_AIR_TEMPERATURE_PATH] == 'Success':
             self.data["home_air_temperature"] = float(temp)
 
@@ -242,7 +239,6 @@ class Flexit:
             url=self.get_escaped_datapoints_url( AWAY_AIR_TEMPERATURE_PATH ), 
             body=self.put_body(temp)
         )
-        _LOGGER.debug("set_away temp response %s", response)
         if response["stateTexts"][AWAY_AIR_TEMPERATURE_PATH] == 'Success':
             self.data["away_air_temperature"] = float(temp)
 
@@ -251,14 +247,11 @@ class Flexit:
         mode_int = switcher.get(mode, -1)
         if mode_int == -1:
             return
-
-        _LOGGER.debug("Setting ventilation-mode to %s: %s", mode, mode_int)
         response = await self._generic_request(
             method="PUT",
             url=self.get_escaped_datapoints_url( VENTILATION_MODE_PUT_PATH ), 
             body=self.put_body(str(mode_int))
         )
-        _LOGGER.debug("set_mode response %s", response)
         if response["stateTexts"][VENTILATION_MODE_PUT_PATH] == 'Success':
             self.data["ventilation_mode"] = mode
     
@@ -267,14 +260,11 @@ class Flexit:
         state_int = switcher.get(state, -1)
         if state_int == -1:
             return
-
-        _LOGGER.debug("Setting heater state to %s: %s", state, state_int)
         response = await self._generic_request(
             method="PUT",
             url=self.get_escaped_datapoints_url( ELECTRIC_HEATER_PATH ), 
             body=self.put_body(str(state_int))
         )
-        _LOGGER.debug("set_heater state response %s", response)
         if response["stateTexts"][ELECTRIC_HEATER_PATH] == 'Success':
             self.data["electric_heater"] = state
 

@@ -1,9 +1,9 @@
 """Platform for Flexit AC units with CI66 Modbus adapter."""
 import logging
-from typing import Any, Dict, List, Optional
-import voluptuous as vol
+from typing import List, Optional
 
-import homeassistant.helpers.config_validation as cv
+from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME, TEMP_CELSIUS, ATTR_TEMPERATURE
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
@@ -26,25 +26,45 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup_entry(hass, entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities
+) -> None:
     """Set up the Flexit sensor."""
-    name = entry.data[CONF_NAME]
-    flexit_data = hass.data[FLEXIT_DOMAIN][entry.entry_id]
+    name = config_entry.data[CONF_NAME]
+    flexit_data = hass.data[FLEXIT_DOMAIN][config_entry.entry_id]
 
     async_add_entities([
         ClimateFlexit(
             flexit_data[DATA_KEY_API],
             flexit_data[DATA_KEY_COORDINATOR],
             name,
-            entry.entry_id,
-        )])
+            config_entry.entry_id,
+        )], update_before_add=True)
 
 class ClimateFlexit(FlexitEntity, ClimateEntity):
-    """Representation of a Flexit AC unit."""
+    """Representation of a Flexit ventilation unit."""
 
     def __init__(self, api, coordinator, name, server_unique_id):
         """Initialize a Flexit sensor."""
         super().__init__(api, coordinator, name, server_unique_id)
+
+    @property
+    def assumed_state(self):
+        return True
+
+    @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        return {
+            "outside_air_temperature": self.api.data["outside_air_temperature"],
+            "supply_air_temperature": self.api.data["supply_air_temperature"],
+            "exhaust_air_temperature": self.api.data["exhaust_air_temperature"],
+            "extract_air_temperature": self.api.data["extract_air_temperature"],
+            "home_air_temperature": self.api.data["home_air_temperature"],
+            "away_air_temperature": self.api.data["away_air_temperature"],
+            "filter": self.api.data["filter"],
+            "filter_time_for_exchange": self.api.data["filter_time_for_exchange"],
+        }
 
     @property
     def supported_features(self):
@@ -53,6 +73,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     async def async_update(self):
         """Update unit attributes."""
+        _LOGGER.info("Async update climate")
         await self.api.set_token()
         await self.api.update_data()
 
@@ -105,7 +126,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
             if temperature == self.api.data["home_air_temperature"]:
                 return
             else:
-                await self.api.set_home_temp(str(temperature))                
+                await self.api.set_home_temp(str(temperature))
 
         self.async_write_ha_state()
 
