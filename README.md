@@ -31,15 +31,13 @@ Needs username, passord as well as a subscription-key. I sniffed the packet usin
 - Outside temperature
 - Supply temperature
 - Room temperature
-- Filter ( not working properly )
-- Filter time to exchange ( not working properly )
+- Filter ( TODO )
+- Filter time to exchange ( TODO )
 - Ventilation mode
 
 ## TODOs
-- [x] Add to HACS
-- [x] Create option to change update interval.
-- [ ] Cleanup code
 - [ ] Fix filter-sensors
 - [ ] Rename "Filter time to exchange"
 - [ ] Move "filter" to "binary_sensor"-domain
-- [ ] Extract and publish pyFlexit library.
+- [ ] Add fields for statistics in HA
+- [ ] Add Select-entity for changing climate-mode
