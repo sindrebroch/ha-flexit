@@ -42,8 +42,8 @@ class FlexitNumber(FlexitEntity):
         
         self._condition = number_name
         self._condition_name = info[0]
-        self._icon = info[1]
-        self._unit_of_measurement = info[2]
+        self._unit_of_measurement = info[1]
+        self._icon = info[2]
 
     @property
     def name(self):
@@ -79,7 +79,7 @@ class FlexitNumber(FlexitEntity):
 
         self.async_write_ha_state()
 
-    def is_away() -> bool:
+    def is_away(self) -> bool:
       return self._condition == "away_air_temperature"
-    def is_home() -> bool:
+    def is_home(self) -> bool:
       return self._condition == "home_air_temperature"
