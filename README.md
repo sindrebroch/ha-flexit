@@ -31,13 +31,9 @@ Needs username, passord as well as a subscription-key. I sniffed the packet usin
 - Outside temperature
 - Supply temperature
 - Room temperature
-- Filter ( TODO )
-- Filter time to exchange ( TODO )
 - Ventilation mode
 
 ## TODOs
-- [ ] Fix filter-sensors
-- [ ] Rename "Filter time to exchange"
-- [ ] Move "filter" to "binary_sensor"-domain
-- [ ] Add fields for statistics in HA
-- [ ] Add Select-entity for changing climate-mode
+- [ ] Add filter-sensor
+- [ ] Statistics for sensors ?
+- [ ] Select-entity for choosing climate-mode
