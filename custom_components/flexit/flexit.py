@@ -24,14 +24,14 @@ from .const import (
     EXHAUST_AIR_TEMPERATURE_PATH,
     HOME_AIR_TEMPERATURE_PATH,
     AWAY_AIR_TEMPERATURE_PATH,
-    FILTER_STATE_PATH,
+    FILTER_OPERATING_TIME,
     FILTER_TIME_FOR_EXCHANGE_PATH,
     ROOM_TEMPERATURE_PATH,
     ELECTRIC_HEATER_PATH,
-    SCHEME,
-    HOST,
+    API_URL,
     TOKEN_PATH,
     DATAPOINTS_PATH,
+    PLANTS_PATH,
     APPLICATION_SOFTWARE_VERSION_PATH,
     DEVICE_DESCRIPTION_PATH,
     MODEL_NAME_PATH,
@@ -65,6 +65,7 @@ class Flexit:
         self.password:str = password
         self.api_key:str = api_key
         self.token:str = ""
+        self.plant_id:str = ""
         self.token_refreshdate = date.today()
         self.data:dict = {}
         self.device_info:dict = {}
@@ -139,8 +140,8 @@ class Flexit:
         return await self._session.request(
             method="GET", 
             url=URL.build(
-                scheme=SCHEME, 
-                host=HOST,
+                scheme="https", 
+                host=API_URL,
             ).join(URL(uri)), 
             headers=self.get_headers(),
         ) 
@@ -149,8 +150,8 @@ class Flexit:
         return await self._session.request(
             method="PUT", 
             url=URL.build(
-                scheme=SCHEME, 
-                host=HOST,
+                scheme="https", 
+                host=API_URL,
             ).join(URL(uri)), 
             data=body,
             headers=self.get_headers(),
@@ -160,8 +161,8 @@ class Flexit:
         return await self._session.request(
             method="POST", 
             url=URL.build(
-                scheme=SCHEME, 
-                host=HOST,
+                scheme="https", 
+                host=API_URL,
             ).join(URL(uri)), 
             data=body,
             headers=self.get_token_headers(),
@@ -173,6 +174,17 @@ class Flexit:
             url=TOKEN_PATH,
             body=self.get_token_body()
         )
+
+    async def set_plant_id(self) -> None:
+        response = await self.plant_request()
+        numberOfPlants = response["totalCount"]
+        if numberOfPlants > 0:
+            if numberOfPlants > 1:
+                _LOGGER.info("You have more than one Plant assigned to your account. Multiple plants are not yet supported, select first Plant.")
+
+            self.plant_id = response["items"][0]["id"]
+        else:
+            raise FlexitError("You have no plants assigned to your account")
 
     async def set_token(self) -> None: 
         if self.token_refreshdate == date.today():            
@@ -187,6 +199,7 @@ class Flexit:
         return DATAPOINTS_PATH + urllib.parse.quote(id)
 
     async def update_data(self) -> None:
+        await self.set_token()
         filterPath = "/DataPoints/Values?filterId="
         pathVariables = f"""[
         {{"DataPoints":"{VENTILATION_MODE_PATH}"}},
@@ -196,17 +209,18 @@ class Flexit:
         {{"DataPoints":"{EXHAUST_AIR_TEMPERATURE_PATH}"}},
         {{"DataPoints":"{HOME_AIR_TEMPERATURE_PATH}"}},
         {{"DataPoints":"{AWAY_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{FILTER_STATE_PATH}"}},
-        {{"DataPoints":"{FILTER_TIME_FOR_EXCHANGE_PATH}"}},
         {{"DataPoints":"{ROOM_TEMPERATURE_PATH}"}},
         {{"DataPoints":"{ELECTRIC_HEATER_PATH}"}}]"""
 
         response = await self._generic_request( 
             method="GET", 
             url=filterPath + urllib.parse.quote(pathVariables) )
-        self.data = FlexitInfo.format_dict( response )
+        _LOGGER.debug("Updating data %s", response)
+        self.data = FlexitInfo.format_dict( response, self.plant_id )
 
     async def update_device_info(self) -> None:
+        await self.set_plant_id()
+        
         filterPath = "/DataPoints/Values?filterId="
         pathVariables = f"""[
         {{"DataPoints":"{APPLICATION_SOFTWARE_VERSION_PATH}"}},
@@ -222,7 +236,8 @@ class Flexit:
         response = await self._generic_request( 
             method="GET", 
             url=filterPath + urllib.parse.quote(pathVariables) )
-        self.device_info = DeviceInfo.format_dict( response )
+        _LOGGER.debug("Updating data %s", response)
+        self.device_info = DeviceInfo.format_dict( response, self.plant_id )
 
     async def set_home_temp(self, temp) -> None:
         response = await self._generic_request(

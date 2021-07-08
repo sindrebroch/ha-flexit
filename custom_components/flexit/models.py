@@ -10,8 +10,6 @@ from .const import (
     EXHAUST_AIR_TEMPERATURE_PATH,
     HOME_AIR_TEMPERATURE_PATH,
     AWAY_AIR_TEMPERATURE_PATH,
-    FILTER_STATE_PATH,
-    FILTER_TIME_FOR_EXCHANGE_PATH,
     ROOM_TEMPERATURE_PATH,
     ELECTRIC_HEATER_PATH,
     APPLICATION_SOFTWARE_VERSION_PATH,
@@ -56,19 +54,18 @@ class FlexitInfo:
     away_air_temperature: int
     home_air_temperature: int
     ventilation_mode: str
-    filter: str
-    filter_time_for_exchange: int
     room_temperature: str
     electric_heater: str
+    dirty_filter: bool
+    filter_operating_time: str
+    filter_time_for_exchange: str
 
     @staticmethod
     def get_ventilation_mode(ventilation_int) -> str:
-        if ventilation_int is 0:
+        if ventilation_int is 0 or ventilation_int is 3:
             return "Home"
         if ventilation_int is 2:
             return "Away"
-        elif ventilation_int is 3:
-            return "Home"
         elif ventilation_int is 4:
             return "High"
         elif ventilation_int is 5:
@@ -76,31 +73,28 @@ class FlexitInfo:
         return "Unknown mode: " + str(ventilation_int)
 
     @staticmethod
-    def get_filter_status(filter_int) -> str:
-        if filter_int is 1:
-            return "Dirty"
-        return "Clean"
-    
-    @staticmethod
-    def get_electric_heater_status(heater_int) -> str:
-        if heater_int is 1:
-            return "on"
-        return "off"
+    def get_filter_status(operating_time, exchange_time) -> str:
+        return 1 if operating_time >= exchange_time else 0
 
     @staticmethod
-    def format_dict(data):
+    def get_electric_heater_status(heater_int) -> str:
+        return "on" if heater_int is 1 else "off"
+
+    @staticmethod
+    def format_dict(data, plant_id):
         return dict(
-            home_air_temperature=data["values"][HOME_AIR_TEMPERATURE_PATH]["value"]["value"],
-            away_air_temperature=data["values"][AWAY_AIR_TEMPERATURE_PATH]["value"]["value"],
-            outside_air_temperature=data["values"][OUTSIDE_AIR_TEMPERATURE_PATH]["value"]["value"],
-            supply_air_temperature=data["values"][SUPPLY_AIR_TEMPERATURE_PATH]["value"]["value"],
-            exhaust_air_temperature=data["values"][EXHAUST_AIR_TEMPERATURE_PATH]["value"]["value"],
-            extract_air_temperature=data["values"][EXTRACT_AIR_TEMPERATURE_PATH]["value"]["value"],
-            ventilation_mode=FlexitInfo.get_ventilation_mode(data["values"][VENTILATION_MODE_PATH]["value"]["value"]),
-            filter=FlexitInfo.get_filter_status(data["values"][FILTER_STATE_PATH]["value"]["value"]),
-            filter_time_for_exchange=data["values"][FILTER_TIME_FOR_EXCHANGE_PATH]["value"]["value"],
-            room_temperature=data["values"][ROOM_TEMPERATURE_PATH]["value"]["value"],
-            electric_heater=FlexitInfo.get_electric_heater_status(data["values"][ELECTRIC_HEATER_PATH]["value"]["value"])
+            home_air_temperature=data["values"][plant_id + HOME_AIR_TEMPERATURE_PATH]["value"]["value"],
+            away_air_temperature=data["values"][plant_id + AWAY_AIR_TEMPERATURE_PATH]["value"]["value"],
+            outside_air_temperature=data["values"][plant_id + OUTSIDE_AIR_TEMPERATURE_PATH]["value"]["value"],
+            supply_air_temperature=data["values"][plant_id + SUPPLY_AIR_TEMPERATURE_PATH]["value"]["value"],
+            exhaust_air_temperature=data["values"][plant_id + EXHAUST_AIR_TEMPERATURE_PATH]["value"]["value"],
+            extract_air_temperature=data["values"][plant_id + EXTRACT_AIR_TEMPERATURE_PATH]["value"]["value"],
+            ventilation_mode=FlexitInfo.get_ventilation_mode(data["values"][plant_id + VENTILATION_MODE_PATH]["value"]["value"]),
+            room_temperature=data["values"][plant_id + ROOM_TEMPERATURE_PATH]["value"]["value"],
+            electric_heater=FlexitInfo.get_electric_heater_status(data["values"][plant_id + ELECTRIC_HEATER_PATH]["value"]["value"]),
+            dirty_filter=FlexitInfo.get_filter_status(data["values"][plant_id + FILTER_OPERATING_TIME]["value"]["value"], data["values"][plant_id + FILTER_TIME_FOR_EXCHANGE_PATH]["value"]["value"]),
+            filter_operating_time=data["values"][plant_id + FILTER_OPERATING_TIME]["value"]["value"],
+            filter_time_for_exchange=data["values"][plant_id + FILTER_TIME_FOR_EXCHANGE_PATH]["value"]["value"],
         )
 
 @attr.s(auto_attribs=True, frozen=True)
@@ -114,18 +108,18 @@ class DeviceInfo:
     applicationSoftwareVersion: str
     deviceDescription: str
     status: str
-    lastRestartReason: int # mapping -> "unknown*coldstart*warmstart*detected-power-lost*detected-powered-off*hardware-watchdog*software-watchdog*suspended",
+    lastRestartReason: int
 
     @staticmethod
-    def format_dict(data):
+    def format_dict(data, plant_id):
         return DeviceInfo(
-            fw=data["values"][FIRMWARE_REVISION_PATH]["value"],
-            modelName=data["values"][MODEL_NAME_PATH]["value"],
-            modelInfo=data["values"][MODEL_INFORMATION_PATH]["value"],
-            serialInfo=data["values"][SERIAL_NUMBER_PATH]["value"],
-            systemStatus=data["values"][SYSTEM_STATUS_PATH]["value"],
-            status=data["values"][OFFLINE_ONLINE_PATH]["value"],
-            deviceDescription=data["values"][DEVICE_DESCRIPTION_PATH]["value"],
-            applicationSoftwareVersion=data["values"][APPLICATION_SOFTWARE_VERSION_PATH]["value"],
-            lastRestartReason=data["values"][LAST_RESTART_REASON_PATH]["value"]
+            fw=data["values"][plant_id + FIRMWARE_REVISION_PATH]["value"],
+            modelName=data["values"][plant_id + MODEL_NAME_PATH]["value"],
+            modelInfo=data["values"][plant_id + MODEL_INFORMATION_PATH]["value"],
+            serialInfo=data["values"][plant_id + SERIAL_NUMBER_PATH]["value"],
+            systemStatus=data["values"][plant_id + SYSTEM_STATUS_PATH]["value"],
+            status=data["values"][plant_id + OFFLINE_ONLINE_PATH]["value"],
+            deviceDescription=data["values"][plant_id + DEVICE_DESCRIPTION_PATH]["value"],
+            applicationSoftwareVersion=data["values"][plant_id + APPLICATION_SOFTWARE_VERSION_PATH]["value"],
+            lastRestartReason=data["values"][plant_id + LAST_RESTART_REASON_PATH]["value"]
         )

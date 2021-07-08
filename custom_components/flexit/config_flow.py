@@ -6,8 +6,8 @@ from .exceptions import FlexitError
 from .const import (
     DEFAULT_NAME,
     DOMAIN,
-    CONF_UPDATE_INTERVAL, 
-    DEFAULT_UPDATE_INTERVAL,
+    CONF_UPDATE_INTERVAL_MINUTES, 
+    DEFAULT_UPDATE_INTERVAL_MINUTES,
 )
 from homeassistant.core import callback
 from homeassistant.config_entries import ConfigFlow, OptionsFlow
@@ -92,9 +92,9 @@ class FlexitOptionsFlowHandler(OptionsFlow):
 
         options = {
             vol.Optional(
-                CONF_UPDATE_INTERVAL,
+                CONF_UPDATE_INTERVAL_MINUTES,
                 default=self.config_entry.options.get(
-                    CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+                    CONF_UPDATE_INTERVAL_MINUTES, DEFAULT_UPDATE_INTERVAL_MINUTES
                 ),
             ): int,
         }

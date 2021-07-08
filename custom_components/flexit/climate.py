@@ -62,8 +62,6 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
             "extract_air_temperature": self.api.data["extract_air_temperature"],
             "home_air_temperature": self.api.data["home_air_temperature"],
             "away_air_temperature": self.api.data["away_air_temperature"],
-            "filter": self.api.data["filter"],
-            "filter_time_for_exchange": self.api.data["filter_time_for_exchange"],
         }
 
     @property
@@ -74,7 +72,6 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     async def async_update(self):
         """Update unit attributes."""
         _LOGGER.info("Async update climate")
-        await self.api.set_token()
         await self.api.update_data()
 
     @property
@@ -190,6 +187,8 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
             return PRESET_BOOST
         elif current_mode == "Cooker hood":
             return PRESET_BOOST
+
+        _LOGGER.debug("Unknown preset mode %s", current_mode)
 
         return current_mode
 

@@ -29,8 +29,8 @@ from .const import (
     DATA_KEY_API,
     DATA_KEY_COORDINATOR,
     DOMAIN,
-    CONF_UPDATE_INTERVAL,
-    DEFAULT_UPDATE_INTERVAL,
+    CONF_UPDATE_INTERVAL_MINUTES,
+    DEFAULT_UPDATE_INTERVAL_MINUTES,
 )
 
 from .flexit import Flexit, FlexitError
@@ -70,8 +70,8 @@ async def async_setup_entry(hass, entry):
 
     if not entry.options:
         options = {
-            CONF_UPDATE_INTERVAL: entry.data.get(
-                CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+            CONF_UPDATE_INTERVAL_MINUTES: entry.data.get(
+                CONF_UPDATE_INTERVAL_MINUTES, DEFAULT_UPDATE_INTERVAL_MINUTES
             ),
         }
         hass.config_entries.async_update_entry(entry, options=options)
@@ -92,18 +92,16 @@ async def async_setup_entry(hass, entry):
             loop=hass.loop,
             session=session,
         )
-        await api.set_token()
-        await api.update_data()
         await api.update_device_info()
+        await api.update_data()
     except FlexitError as ex:
         _LOGGER.warning("Failed to connect: %s", ex)
         raise ConfigEntryNotReady from ex
 
     async def async_update_data():
         """Fetch data from API endpoint."""
-        _LOGGER.info("Polling Flexit ( update interval = %s min )", entry.options[CONF_UPDATE_INTERVAL])
+        _LOGGER.info("Polling Flexit ( update interval = %s min )", entry.options[CONF_UPDATE_INTERVAL_MINUTES])
         try:
-            await api.set_token()
             await api.update_data()
         except FlexitError as err:
             _LOGGER.warning("Flexit error on update: %s", err)
@@ -114,7 +112,7 @@ async def async_setup_entry(hass, entry):
         _LOGGER,
         name=name,
         update_method=async_update_data,
-        update_interval=timedelta(minutes=entry.options[CONF_UPDATE_INTERVAL]),
+        update_interval=timedelta(minutes=entry.options[CONF_UPDATE_INTERVAL_MINUTES]),
     )
     hass.data[DOMAIN][entry.entry_id] = {
         DATA_KEY_API: api,
@@ -146,7 +144,7 @@ async def async_unload_entry(hass, entry):
 @callback
 def _async_platforms(entry):
     """Return platforms to be loaded / unloaded."""
-    return ["sensor", "climate"]
+    return ["binary_sensor", "climate", "sensor"]
 
 
 class FlexitEntity(CoordinatorEntity):
