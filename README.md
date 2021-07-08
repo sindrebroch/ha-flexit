@@ -34,6 +34,5 @@ The integration requires username, password and subscription-key. You can get th
 - Ventilation mode
 
 ## TODOs
-- [ ] Statistics for sensors
-- [ ] Add attributes for filter-operating-time and filter-time-for-exchange
 - [ ] Add link to config-flow for finding subscription-key
+- [ ] Only add attributes to filter-binary_sensor
