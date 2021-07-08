@@ -38,4 +38,4 @@ The integration requires username, password and subscription-key. You can get th
 
 ## TODOs
 - [ ] Add link to config-flow for finding subscription-key
-- [ ] Convert home_temperature and away_temperature to Number-entity
+- [ ] Extract code to helper files
