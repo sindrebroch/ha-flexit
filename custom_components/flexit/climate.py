@@ -53,18 +53,6 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
         return True
 
     @property
-    def extra_state_attributes(self):
-        """Return the state attributes."""
-        return {
-            "outside_air_temperature": self.api.data["outside_air_temperature"],
-            "supply_air_temperature": self.api.data["supply_air_temperature"],
-            "exhaust_air_temperature": self.api.data["exhaust_air_temperature"],
-            "extract_air_temperature": self.api.data["extract_air_temperature"],
-            "home_air_temperature": self.api.data["home_air_temperature"],
-            "away_air_temperature": self.api.data["away_air_temperature"],
-        }
-
-    @property
     def supported_features(self):
         """Return the list of supported features."""
         return SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
