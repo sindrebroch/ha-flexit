@@ -10,7 +10,7 @@ Defaults to polling every 30 minutes, this can be configured but be aware of API
 
 Connect Flexit-unit to internet, and register in FlexitGo-app.
 
-Needs username, passord as well as a subscription-key. I sniffed the packet using this [guide](https://docs.telerik.com/fiddler/configure-fiddler/tasks/configureforios) (iOS). Should be able to get one from [here](https://portal.api.climatixic.com/), but I haven't tested this myself.
+The integration requires username, password and subscription-key. You can get the latter if you register [here](https://portal.api.climatixic.com/)
 
 
 ## Features
