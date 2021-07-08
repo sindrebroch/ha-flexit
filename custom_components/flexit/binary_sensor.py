@@ -40,10 +40,8 @@ class FlexitBinarySensor(FlexitEntity):
 
         self._condition = binary_sensor_name
 
-        variable_info = BINARY_SENSOR_DICT[binary_sensor_name]
-        self._condition_name = variable_info[0]
-        self._unit_of_measurement = variable_info[1]
-        self._icon = variable_info[2]
+        info = BINARY_SENSOR_DICT[binary_sensor_name]
+        self._condition_name = info[0]
 
     @property
     def name(self):
@@ -54,16 +52,6 @@ class FlexitBinarySensor(FlexitEntity):
     def unique_id(self):
         """Return the unique id of the binary sensor."""
         return f"{self._server_unique_id}/{self._condition_name}"
-
-    @property
-    def icon(self):
-        """Icon to use in the frontend, if any."""
-        return self._icon
-
-    @property
-    def unit_of_measurement(self):
-        """Return the unit the value is expressed in."""
-        return self._unit_of_measurement
 
     @property
     def state(self):
