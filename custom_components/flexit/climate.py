@@ -168,7 +168,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
         elif self.is_high() or self.is_cooker_hood():
             return PRESET_BOOST
         else:
-            _LOGGER.debug("Unknown preset mode %s", current_mode)
+            _LOGGER.warning("Unknown preset mode %s", current_mode)
             return current_mode
 
     @property
@@ -191,7 +191,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
             return
         self.async_write_ha_state()
 
-    def is_heating() -> bool:
+    def is_heating(self) -> bool:
         return self.api.data["electric_heater"] == "on"
 
     def is_mode(self, mode) -> bool:
