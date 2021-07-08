@@ -34,6 +34,6 @@ The integration requires username, password and subscription-key. You can get th
 - Ventilation mode
 
 ## TODOs
-- [ ] Add filter-sensor
-- [ ] Statistics for sensors ?
-- [ ] Select-entity for choosing climate-mode
+- [ ] Statistics for sensors
+- [ ] Add attributes for filter-operating-time and filter-time-for-exchange
+- [ ] Add link to config-flow for finding subscription-key
