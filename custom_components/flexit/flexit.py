@@ -175,17 +175,20 @@ class Flexit:
             body=self.get_token_body()
         )
 
-    async def plant_request( self ) -> Any:
-        return await self._get_request(url=PLANT_PATH)
+    async def plants_request( self ) -> Any:
+        return await self._generic_request(url=PLANTS_PATH)
 
     async def set_plant_id(self) -> None:
-        response = await self.plant_request()
+        response = await self.plants_request()
+        _LOGGER.debug("Response from /Plants, %s", response)
         numberOfPlants = response["totalCount"]
+        _LOGGER.debug("NumberOfPlants %s", numberOfPlants)
         if numberOfPlants > 0:
             if numberOfPlants > 1:
                 _LOGGER.info("You have more than one Plant assigned to your account. Multiple plants are not yet supported, select first Plant.")
 
             self.plant_id = response["items"][0]["id"]
+            _LOGGER.debug("plant_id %s", self.plant_id)
         else:
             raise FlexitError("You have no plants assigned to your account")
 
