@@ -181,14 +181,12 @@ class Flexit:
 
     async def set_plant_id(self) -> None:
         response = await self.plants_request()
-        _LOGGER.debug("Response from /Plants, %s", response)
+
         numberOfPlants = response["totalCount"]
-        _LOGGER.debug("NumberOfPlants %s", numberOfPlants)
         if numberOfPlants > 0:
             self.plant_id = response["items"][0]["id"]
-            _LOGGER.debug("plant_id %s", self.plant_id)
             if numberOfPlants > 1:
-                _LOGGER.debug("You have more than one Plant assigned to your account. Multiple plants are not yet supported, select first Plant.")
+                _LOGGER.warning("You have more than one Plant assigned to your account. Multiple plants are not yet supported, select first Plant.")
         else:
             raise FlexitError("You have no plants assigned to your account")
 
@@ -248,19 +246,20 @@ class Flexit:
     async def set_home_temp(self, temp) -> None:
         response = await self._generic_request(
             method="PUT",
-            url=self.get_escaped_datapoints_url( HOME_AIR_TEMPERATURE_PATH ), 
+            url=self.get_escaped_datapoints_url( self.plant_path(HOME_AIR_TEMPERATURE_PATH) ), 
             body=self.put_body(temp)
         )
-        if response["stateTexts"][HOME_AIR_TEMPERATURE_PATH] == 'Success':
+        if self.is_success(response, self.plant_path(HOME_AIR_TEMPERATURE_PATH)):
+
             self.data["home_air_temperature"] = float(temp)
 
     async def set_away_temp(self, temp) -> None:
         response = await self._generic_request(
             method="PUT",
-            url=self.get_escaped_datapoints_url( AWAY_AIR_TEMPERATURE_PATH ), 
+            url=self.get_escaped_datapoints_url( self.plant_path(AWAY_AIR_TEMPERATURE_PATH) ), 
             body=self.put_body(temp)
         )
-        if response["stateTexts"][AWAY_AIR_TEMPERATURE_PATH] == 'Success':
+        if self.is_success(response, self.plant_path(AWAY_AIR_TEMPERATURE_PATH)):
             self.data["away_air_temperature"] = float(temp)
 
     async def set_mode(self, mode) -> None:
@@ -270,10 +269,10 @@ class Flexit:
             return
         response = await self._generic_request(
             method="PUT",
-            url=self.get_escaped_datapoints_url( VENTILATION_MODE_PUT_PATH ), 
+            url=self.get_escaped_datapoints_url( self.plant_path(VENTILATION_MODE_PUT_PATH) ), 
             body=self.put_body(str(mode_int))
         )
-        if response["stateTexts"][VENTILATION_MODE_PUT_PATH] == 'Success':
+        if self.is_success(response, self.plant_path(VENTILATION_MODE_PUT_PATH)):
             self.data["ventilation_mode"] = mode
     
     async def set_heater_state(self, state) -> None:
@@ -283,12 +282,17 @@ class Flexit:
             return
         response = await self._generic_request(
             method="PUT",
-            url=self.get_escaped_datapoints_url( ELECTRIC_HEATER_PATH ), 
+            url=self.get_escaped_datapoints_url( self.plant_path(ELECTRIC_HEATER_PATH) ), 
             body=self.put_body(str(state_int))
         )
-        if response["stateTexts"][ELECTRIC_HEATER_PATH] == 'Success':
+        if self.is_success(response, self.plant_path(ELECTRIC_HEATER_PATH)):
             self.data["electric_heater"] = state
 
+    def plant_path(self, path) -> str:
+        return self.plant_id + path
+
+    def is_success(self, response, path) -> bool:
+        return response["stateTexts"][path] == 'Success':
 
     async def close(self) -> None:
         """Close open client session."""
