@@ -54,10 +54,15 @@ class FlexitBinarySensor(FlexitEntity):
         return f"{self._server_unique_id}/{self._condition_name}"
 
     @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        # TODO
+        return {
+            "Filter operating time": self.api.data["filter_operating_time"],
+            "Filter time for exchange": self.api.data["filter_time_for_exchange"],
+        }
+
+    @property
     def state(self):
         """Return the state of the device."""
-
-        try:
-            return round(self.api.data[self._condition], 2)
-        except TypeError:
-            return self.api.data[self._condition]
+        return self.api.data[self._condition]
