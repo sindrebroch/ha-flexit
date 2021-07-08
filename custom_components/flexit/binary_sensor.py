@@ -38,9 +38,9 @@ class FlexitBinarySensor(FlexitEntity):
         """Initialize a Flexit binary sensor."""
         super().__init__(api, coordinator, name, server_unique_id)
 
-        self._condition = binary_sensor_name
-
         info = BINARY_SENSOR_DICT[binary_sensor_name]
+        
+        self._condition = binary_sensor_name
         self._condition_name = info[0]
 
     @property

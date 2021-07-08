@@ -84,15 +84,16 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     @property
     def current_temperature(self):
-        """Return the current temperature."""
+        """Return the current_hvac_mode temperature."""
         return self.api.data["room_temperature"]
 
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        if self.api.data["ventilation_mode"] == "Away":
+        if self.is_away():
             return self.api.data["away_air_temperature"]
-        return self.api.data["home_air_temperature"]
+        else:
+            return self.api.data["home_air_temperature"]
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
@@ -101,7 +102,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
         if temperature is None:
             return
 
-        elif self.api.data["ventilation_mode"] == "Away":
+        elif self.is_away():
             if temperature == self.api.data["away_air_temperature"]:
                 return
             else:
@@ -117,10 +118,11 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     @property
     def hvac_mode(self):
-        """Return current operation ie. heat, cool, idle."""
-        if self.api.data["electric_heater"] == "on": # TODO extract function
+        """Return current_hvac_mode operation ie. heat, fan_only."""
+        if self.is_heating():
             return HVAC_MODE_HEAT
-        return HVAC_MODE_FAN_ONLY
+        else:
+            return HVAC_MODE_FAN_ONLY
 
     @property
     def hvac_modes(self) -> List[str]:
@@ -130,19 +132,18 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         """Set new target hvac mode."""
 
-        if self.api.data["electric_heater"] == "on":
-            current = HVAC_MODE_HEAT
+        if self.is_heating():
+            current_hvac_mode = HVAC_MODE_HEAT
         else:
-            current = HVAC_MODE_FAN_ONLY
+            current_hvac_mode = HVAC_MODE_FAN_ONLY
 
-        if hvac_mode == current:
+        if hvac_mode == current_hvac_mode:
             return
         elif hvac_mode == HVAC_MODE_HEAT:
             await self.api.set_heater_state("on")
         elif hvac_mode == HVAC_MODE_FAN_ONLY:
             await self.api.set_heater_state("off")
         self.async_write_ha_state()
-
 
     @property
     def should_poll(self):
@@ -151,34 +152,24 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     @property
     def hvac_action(self) -> str:
-        """Return the current running hvac operation if supported."""
-        if self.api.data["electric_heater"] == "on":
-            heater = HVAC_MODE_HEAT
-        else:
-            heater = HVAC_MODE_FAN_ONLY
-
-        if heater == HVAC_MODE_HEAT:
+        """Return the current_hvac_mode running hvac operation if supported."""
+        if self.is_heating():
             return CURRENT_HVAC_HEAT
-        return CURRENT_HVAC_IDLE
+        else:
+            return CURRENT_HVAC_IDLE
 
     @property
     def preset_mode(self) -> Optional[str]:
-        """Return the current preset mode."""
-
-        current_mode = self.api.data["ventilation_mode"]
-
-        if current_mode == "Home": # TODO extract
+        """Return the current_hvac_mode preset mode."""
+        if self.is_home():
             return PRESET_HOME
-        elif current_mode == "Away":
+        elif self.is_away():
             return PRESET_AWAY
-        elif current_mode == "High":
+        elif self.is_high() or self.is_cooker_hood():
             return PRESET_BOOST
-        elif current_mode == "Cooker hood":
-            return PRESET_BOOST
-
-        _LOGGER.debug("Unknown preset mode %s", current_mode)
-
-        return current_mode
+        else:
+            _LOGGER.debug("Unknown preset mode %s", current_mode)
+            return current_mode
 
     @property
     def preset_modes(self) -> Optional[List[str]]:
@@ -199,3 +190,21 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
         else:
             return
         self.async_write_ha_state()
+
+    def is_heating() -> bool:
+        return self.api.data["electric_heater"] == "on"
+
+    def is_mode(self, mode) -> bool:
+        return self.api.data["ventilation_mode"] == mode
+
+    def is_away(self) -> bool:
+        return self.is_mode("Away")
+
+    def is_home(self) -> bool:
+        return self.is_mode("Home")
+
+    def is_high(self) -> bool:
+        return self.is_mode("High")
+
+    def is_cooker_hood(self) -> bool:
+        return self.is_mode("Cooker hood")

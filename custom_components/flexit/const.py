@@ -31,9 +31,7 @@ SENSOR_DICT = {
 }
 SENSOR_LIST = list(SENSOR_DICT)
 
-BINARY_SENSOR_DICT = {
-    "dirty_filter": ["Dirty filter"]
-}
+BINARY_SENSOR_DICT = { "dirty_filter": ["Dirty filter"] }
 BINARY_SENSOR_LIST = list(BINARY_SENSOR_DICT)
 
 # API

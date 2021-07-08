@@ -186,11 +186,10 @@ class Flexit:
         numberOfPlants = response["totalCount"]
         _LOGGER.debug("NumberOfPlants %s", numberOfPlants)
         if numberOfPlants > 0:
-            if numberOfPlants > 1:
-                _LOGGER.debug("You have more than one Plant assigned to your account. Multiple plants are not yet supported, select first Plant.")
-
             self.plant_id = response["items"][0]["id"]
             _LOGGER.debug("plant_id %s", self.plant_id)
+            if numberOfPlants > 1:
+                _LOGGER.debug("You have more than one Plant assigned to your account. Multiple plants are not yet supported, select first Plant.")
         else:
             raise FlexitError("You have no plants assigned to your account")
 
@@ -243,9 +242,7 @@ class Flexit:
         {{"DataPoints":"{PLANT_ID}{SYSTEM_STATUS_PATH}"}},
         {{"DataPoints":"{PLANT_ID}{LAST_RESTART_REASON_PATH}"}}]"""
 
-        response = await self._generic_request( 
-            method="GET", 
-            url=filterPath + urllib.parse.quote(pathVariables) )
+        response = await self._generic_request( url=filterPath + urllib.parse.quote(pathVariables) )
         _LOGGER.debug("Updating data %s", response)
         self.device_info = DeviceInfo.format_dict( response, self.plant_id )
 
