@@ -1,6 +1,9 @@
 """Constants for the flexit integration."""
 
-from homeassistant.const import TEMP_CELSIUS
+from homeassistant.const import (
+    TEMP_CELSIUS,
+    DEVICE_CLASS_TEMPERATURE,
+)
 
 DEFAULT_NAME = "Flexit"
 DOMAIN = "flexit"
@@ -11,28 +14,35 @@ DEFAULT_UPDATE_INTERVAL_MINUTES = 30
 DATA_KEY_API = "api"
 DATA_KEY_COORDINATOR = "coordinator"
 
-TYPE_HOME = "Home"
-TYPE_AWAY = "Away"
-TYPE_HIGH = "High"
-VALID_MODES = [TYPE_HOME, TYPE_AWAY, TYPE_HIGH]
+VALID_MODES = ["Home", "Away", "High"]
 
+# ENTITY LISTS
 SENSOR_DICT = {
-    "outside_air_temperature": ["Outside temperature", TEMP_CELSIUS, "mdi:thermometer"],
-    "supply_air_temperature": ["Supply temperature", TEMP_CELSIUS, "mdi:thermometer"],
-    "exhaust_air_temperature": ["Exhaust temperature", TEMP_CELSIUS, "mdi:thermometer"],
-    "extract_air_temperature": ["Extract temperature", TEMP_CELSIUS, "mdi:thermometer"],
-    "home_air_temperature": ["Home temperature", TEMP_CELSIUS, "mdi:home-thermometer"],
-    "away_air_temperature": ["Away temperature", TEMP_CELSIUS, "mdi:home-thermometer-outline"],
-    "ventilation_mode": ["Ventilation mode", "", "mdi:hvac"],
-    "room_temperature": ["Room temperature", TEMP_CELSIUS, "mdi:thermometer"],
+    "home_air_temperature":    ["Home temperature", TEMP_CELSIUS, "mdi:home-thermometer", DEVICE_CLASS_TEMPERATURE, None],
+    "away_air_temperature":    ["Away temperature", TEMP_CELSIUS, "mdi:home-thermometer-outline", DEVICE_CLASS_TEMPERATURE, None],
+
+    "room_temperature":        ["Room temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
+    "outside_air_temperature": ["Outside temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
+    "supply_air_temperature":  ["Supply temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
+    "exhaust_air_temperature": ["Exhaust temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
+    "extract_air_temperature": ["Extract temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
+    
+    "ventilation_mode":        ["Ventilation mode", None, "mdi:hvac", None, None],
 }
 SENSOR_LIST = list(SENSOR_DICT)
 
 BINARY_SENSOR_DICT = {
-    "dirty_filter": ["Dirty filter", "", "mdi:home-thermometer"] # TODO icon
+    "dirty_filter": ["Dirty filter"]
 }
 BINARY_SENSOR_LIST = list(BINARY_SENSOR_DICT)
 
+# API
+API_URL="api.climatixic.com"
+TOKEN_PATH="/Token"
+DATAPOINTS_PATH="/DataPoints/"
+PLANTS_PATH="/Plants"
+
+# PATHS
 VENTILATION_MODE_PATH = ";1!013000169000055"
 VENTILATION_MODE_PUT_PATH = ";1!01300002A000055"
 OUTSIDE_AIR_TEMPERATURE_PATH = ";1!000000001000055"
@@ -58,8 +68,3 @@ DEVICE_FEATURES_PATH = ";0!0083FFFFF0013F4"
 
 FILTER_OPERATING_TIME_PATH = ";1!00200011D000055"
 FILTER_TIME_FOR_EXCHANGE_PATH = ";1!00200011E000055"
-
-API_URL="api.climatixic.com"
-TOKEN_PATH="/Token"
-DATAPOINTS_PATH="/DataPoints/"
-PLANTS_PATH="/Plants"

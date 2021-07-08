@@ -38,12 +38,14 @@ class FlexitSensor(FlexitEntity):
         """Initialize a Flexit sensor."""
         super().__init__(api, coordinator, name, server_unique_id)
 
-        self._condition = sensor_name
+        info = SENSOR_DICT[sensor_name]
 
-        variable_info = SENSOR_DICT[sensor_name]
-        self._condition_name = variable_info[0]
-        self._unit_of_measurement = variable_info[1]
-        self._icon = variable_info[2]
+        self._condition = sensor_name
+        self._condition_name = info[0]
+        self._unit_of_measurement = info[1]
+        self._icon = info[2]
+        self._device_class = info[3]
+        self._state_class = info[4]
 
     @property
     def name(self):
@@ -64,6 +66,14 @@ class FlexitSensor(FlexitEntity):
     def unit_of_measurement(self):
         """Return the unit the value is expressed in."""
         return self._unit_of_measurement
+
+    @property
+    def device_class(self):
+        return self._device_class
+
+    @property
+    def state_class(self):
+        return self._state_class
 
     @property
     def state(self):
