@@ -23,9 +23,7 @@ SENSOR_DICT = {
     "outside_air_temperature": ["Outside temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
     "supply_air_temperature":  ["Supply temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
     "exhaust_air_temperature": ["Exhaust temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
-    "extract_air_temperature": ["Extract temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
-    
-    "ventilation_mode":        ["Ventilation mode", None, "mdi:hvac", None, None],
+    "extract_air_temperature": ["Extract temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],    
 }
 NUMBER_DICT = {
     "home_air_temperature":    ["Home temperature", TEMP_CELSIUS, "mdi:home-thermometer"],
