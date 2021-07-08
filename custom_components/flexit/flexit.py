@@ -175,6 +175,9 @@ class Flexit:
             body=self.get_token_body()
         )
 
+    async def plant_request( self ) -> Any:
+        return await self._get_request(url=PLANT_PATH)
+
     async def set_plant_id(self) -> None:
         response = await self.plant_request()
         numberOfPlants = response["totalCount"]
