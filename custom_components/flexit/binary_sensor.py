@@ -56,13 +56,17 @@ class FlexitBinarySensor(FlexitEntity):
     @property
     def extra_state_attributes(self):
         """Return the state attributes."""
-        # TODO
-        return {
-            "Filter operating time": self.api.data["filter_operating_time"],
-            "Filter time for exchange": self.api.data["filter_time_for_exchange"],
-        }
+
+        if self.is_filter_sensor():
+            return {
+                "operating_time_hours": self.api.data["filter_operating_time"],
+                "time_to_change_hours": self.api.data["filter_time_for_exchange"],
+            }
 
     @property
     def state(self):
         """Return the state of the device."""
         return self.api.data[self._condition]
+
+    def is_filter_sensor(self) -> bool:
+        return self._condition == "dirty_filter"
