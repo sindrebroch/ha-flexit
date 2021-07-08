@@ -33,6 +33,9 @@ The integration requires username, password and subscription-key. You can get th
 - Room temperature
 - Ventilation mode
 
+### Binary sensors
+- Dirty filter
+
 ## TODOs
 - [ ] Add link to config-flow for finding subscription-key
-- [ ] Only add attributes to filter-binary_sensor
+- [ ] Convert home_temperature and away_temperature to Number-entity
