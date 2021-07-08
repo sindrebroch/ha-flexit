@@ -17,10 +17,8 @@ DATA_KEY_COORDINATOR = "coordinator"
 VALID_MODES = ["Home", "Away", "High"]
 
 # ENTITY LISTS
+BINARY_SENSOR_DICT = { "dirty_filter": ["Dirty filter"] }
 SENSOR_DICT = {
-    "home_air_temperature":    ["Home temperature", TEMP_CELSIUS, "mdi:home-thermometer", DEVICE_CLASS_TEMPERATURE, None],
-    "away_air_temperature":    ["Away temperature", TEMP_CELSIUS, "mdi:home-thermometer-outline", DEVICE_CLASS_TEMPERATURE, None],
-
     "room_temperature":        ["Room temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
     "outside_air_temperature": ["Outside temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
     "supply_air_temperature":  ["Supply temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
@@ -29,10 +27,14 @@ SENSOR_DICT = {
     
     "ventilation_mode":        ["Ventilation mode", None, "mdi:hvac", None, None],
 }
-SENSOR_LIST = list(SENSOR_DICT)
+NUMBER_DICT = {
+    "home_air_temperature":    ["Home temperature", TEMP_CELSIUS, "mdi:home-thermometer"],
+    "away_air_temperature":    ["Away temperature", TEMP_CELSIUS, "mdi:home-thermometer-outline"],
+}
 
-BINARY_SENSOR_DICT = { "dirty_filter": ["Dirty filter"] }
 BINARY_SENSOR_LIST = list(BINARY_SENSOR_DICT)
+SENSOR_LIST = list(SENSOR_DICT)
+NUMBER_LIST = list(NUMBER_DICT)
 
 # API
 API_URL="api.climatixic.com"
@@ -41,15 +43,17 @@ DATAPOINTS_PATH="/DataPoints/"
 PLANTS_PATH="/Plants"
 
 # PATHS
+HOME_AIR_TEMPERATURE_PATH = ";1!0020007CA000055"
+AWAY_AIR_TEMPERATURE_PATH = ";1!0020007C1000055"
+
+ROOM_TEMPERATURE_PATH = ";1!00000004B000055"
 VENTILATION_MODE_PATH = ";1!013000169000055"
 VENTILATION_MODE_PUT_PATH = ";1!01300002A000055"
 OUTSIDE_AIR_TEMPERATURE_PATH = ";1!000000001000055"
 SUPPLY_AIR_TEMPERATURE_PATH = ";1!000000004000055"
 EXTRACT_AIR_TEMPERATURE_PATH = ";1!00000003B000055"
 EXHAUST_AIR_TEMPERATURE_PATH = ";1!00000000B000055"
-HOME_AIR_TEMPERATURE_PATH = ";1!0020007CA000055"
-AWAY_AIR_TEMPERATURE_PATH = ";1!0020007C1000055"
-ROOM_TEMPERATURE_PATH = ";1!00000004B000055"
+
 ELECTRIC_HEATER_PATH = ";1!0050001BD000055"
 
 APPLICATION_SOFTWARE_VERSION_PATH = ";0!0083FFFFF00000C"
