@@ -71,7 +71,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     async def async_update(self):
         """Update unit attributes."""
-        _LOGGER.info("Async update climate")
+        _LOGGER.debug("Async update climate")
         await self.api.update_data()
 
     @property
@@ -130,7 +130,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     @property
     def hvac_mode(self):
         """Return current operation ie. heat, cool, idle."""
-        if self.api.data["electric_heater"] == "on":
+        if self.api.data["electric_heater"] == "on": # TODO extract function
             return HVAC_MODE_HEAT
         return HVAC_MODE_FAN_ONLY
 
@@ -179,7 +179,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
         current_mode = self.api.data["ventilation_mode"]
 
-        if current_mode == "Home":
+        if current_mode == "Home": # TODO extract
             return PRESET_HOME
         elif current_mode == "Away":
             return PRESET_AWAY

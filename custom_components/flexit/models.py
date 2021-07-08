@@ -12,6 +12,8 @@ from .const import (
     AWAY_AIR_TEMPERATURE_PATH,
     ROOM_TEMPERATURE_PATH,
     ELECTRIC_HEATER_PATH,
+    FILTER_OPERATING_TIME_PATH,
+    FILTER_TIME_FOR_EXCHANGE_PATH,
     APPLICATION_SOFTWARE_VERSION_PATH,
     DEVICE_DESCRIPTION_PATH,
     MODEL_NAME_PATH,
@@ -56,7 +58,7 @@ class FlexitInfo:
     ventilation_mode: str
     room_temperature: str
     electric_heater: str
-    dirty_filter: bool
+    dirty_filter: str
     filter_operating_time: str
     filter_time_for_exchange: str
 
@@ -74,7 +76,7 @@ class FlexitInfo:
 
     @staticmethod
     def get_filter_status(operating_time, exchange_time) -> str:
-        return 1 if operating_time >= exchange_time else 0
+        return "on" if operating_time >= exchange_time else "off"
 
     @staticmethod
     def get_electric_heater_status(heater_int) -> str:
@@ -92,8 +94,8 @@ class FlexitInfo:
             ventilation_mode=FlexitInfo.get_ventilation_mode(data["values"][plant_id + VENTILATION_MODE_PATH]["value"]["value"]),
             room_temperature=data["values"][plant_id + ROOM_TEMPERATURE_PATH]["value"]["value"],
             electric_heater=FlexitInfo.get_electric_heater_status(data["values"][plant_id + ELECTRIC_HEATER_PATH]["value"]["value"]),
-            dirty_filter=FlexitInfo.get_filter_status(data["values"][plant_id + FILTER_OPERATING_TIME]["value"]["value"], data["values"][plant_id + FILTER_TIME_FOR_EXCHANGE_PATH]["value"]["value"]),
-            filter_operating_time=data["values"][plant_id + FILTER_OPERATING_TIME]["value"]["value"],
+            dirty_filter=FlexitInfo.get_filter_status(data["values"][plant_id + FILTER_OPERATING_TIME_PATH]["value"]["value"], data["values"][plant_id + FILTER_TIME_FOR_EXCHANGE_PATH]["value"]["value"]),
+            filter_operating_time=data["values"][plant_id + FILTER_OPERATING_TIME_PATH]["value"]["value"],
             filter_time_for_exchange=data["values"][plant_id + FILTER_TIME_FOR_EXCHANGE_PATH]["value"]["value"],
         )
 

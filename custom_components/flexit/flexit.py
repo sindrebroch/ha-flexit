@@ -24,7 +24,7 @@ from .const import (
     EXHAUST_AIR_TEMPERATURE_PATH,
     HOME_AIR_TEMPERATURE_PATH,
     AWAY_AIR_TEMPERATURE_PATH,
-    FILTER_OPERATING_TIME,
+    FILTER_OPERATING_TIME_PATH,
     FILTER_TIME_FOR_EXCHANGE_PATH,
     ROOM_TEMPERATURE_PATH,
     ELECTRIC_HEATER_PATH,
@@ -94,6 +94,8 @@ class Flexit:
         url: str = "",
         body = None,
     ) -> Any:
+
+        _LOGGER.debug("%s Request to %s. %s", method, url, body)
 
         if self._session is None:
             self._session = aiohttp.ClientSession()
@@ -185,7 +187,7 @@ class Flexit:
         _LOGGER.debug("NumberOfPlants %s", numberOfPlants)
         if numberOfPlants > 0:
             if numberOfPlants > 1:
-                _LOGGER.info("You have more than one Plant assigned to your account. Multiple plants are not yet supported, select first Plant.")
+                _LOGGER.debug("You have more than one Plant assigned to your account. Multiple plants are not yet supported, select first Plant.")
 
             self.plant_id = response["items"][0]["id"]
             _LOGGER.debug("plant_id %s", self.plant_id)
@@ -193,7 +195,7 @@ class Flexit:
             raise FlexitError("You have no plants assigned to your account")
 
     async def set_token(self) -> None: 
-        if self.token_refreshdate == date.today():            
+        if self.token_refreshdate == date.today():
             response = await self.token_request()
             self.token = response["access_token"]
             self.token_refreshdate = date.today() + timedelta(days = 1)
@@ -206,38 +208,40 @@ class Flexit:
 
     async def update_data(self) -> None:
         await self.set_token()
+        PLANT_ID = self.plant_id
         filterPath = "/DataPoints/Values?filterId="
         pathVariables = f"""[
-        {{"DataPoints":"{VENTILATION_MODE_PATH}"}},
-        {{"DataPoints":"{OUTSIDE_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{SUPPLY_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{EXTRACT_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{EXHAUST_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{HOME_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{AWAY_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{ROOM_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{ELECTRIC_HEATER_PATH}"}}]"""
+        {{"DataPoints":"{PLANT_ID}{VENTILATION_MODE_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{OUTSIDE_AIR_TEMPERATURE_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{SUPPLY_AIR_TEMPERATURE_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{EXTRACT_AIR_TEMPERATURE_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{EXHAUST_AIR_TEMPERATURE_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{HOME_AIR_TEMPERATURE_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{AWAY_AIR_TEMPERATURE_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{ROOM_TEMPERATURE_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{FILTER_OPERATING_TIME_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{FILTER_TIME_FOR_EXCHANGE_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{ELECTRIC_HEATER_PATH}"}}]"""
 
-        response = await self._generic_request( 
-            method="GET", 
-            url=filterPath + urllib.parse.quote(pathVariables) )
+        response = await self._generic_request( url=filterPath + urllib.parse.quote(pathVariables) )
         _LOGGER.debug("Updating data %s", response)
         self.data = FlexitInfo.format_dict( response, self.plant_id )
 
     async def update_device_info(self) -> None:
+        await self.set_token()
         await self.set_plant_id()
-        
+        PLANT_ID = self.plant_id
         filterPath = "/DataPoints/Values?filterId="
         pathVariables = f"""[
-        {{"DataPoints":"{APPLICATION_SOFTWARE_VERSION_PATH}"}},
-        {{"DataPoints":"{DEVICE_DESCRIPTION_PATH}"}},
-        {{"DataPoints":"{MODEL_NAME_PATH}"}},
-        {{"DataPoints":"{MODEL_INFORMATION_PATH}"}},
-        {{"DataPoints":"{SERIAL_NUMBER_PATH}"}},
-        {{"DataPoints":"{FIRMWARE_REVISION_PATH}"}},
-        {{"DataPoints":"{OFFLINE_ONLINE_PATH}"}},
-        {{"DataPoints":"{SYSTEM_STATUS_PATH}"}},
-        {{"DataPoints":"{LAST_RESTART_REASON_PATH}"}}]"""
+        {{"DataPoints":"{PLANT_ID}{APPLICATION_SOFTWARE_VERSION_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{DEVICE_DESCRIPTION_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{MODEL_NAME_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{MODEL_INFORMATION_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{SERIAL_NUMBER_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{FIRMWARE_REVISION_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{OFFLINE_ONLINE_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{SYSTEM_STATUS_PATH}"}},
+        {{"DataPoints":"{PLANT_ID}{LAST_RESTART_REASON_PATH}"}}]"""
 
         response = await self._generic_request( 
             method="GET", 

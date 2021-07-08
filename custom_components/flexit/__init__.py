@@ -100,7 +100,7 @@ async def async_setup_entry(hass, entry):
 
     async def async_update_data():
         """Fetch data from API endpoint."""
-        _LOGGER.info("Polling Flexit ( update interval = %s min )", entry.options[CONF_UPDATE_INTERVAL_MINUTES])
+        _LOGGER.debug("Polling Flexit ( update interval = %s min )", entry.options[CONF_UPDATE_INTERVAL_MINUTES])
         try:
             await api.update_data()
         except FlexitError as err:
