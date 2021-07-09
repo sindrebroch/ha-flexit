@@ -63,6 +63,13 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
         await self.api.update_data()
 
     @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        return {
+            "ventilation_mode": self.api.data["ventilation_mode"],
+        }
+
+    @property
     def name(self):
         """Return the name of the climate device."""
         return self._name
