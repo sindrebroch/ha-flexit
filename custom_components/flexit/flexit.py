@@ -12,7 +12,7 @@ import aiohttp
 import async_timeout
 from yarl import URL
 
-from .http import (
+from .helpers.http import (
     get_token_body,
     get_headers_with_token,
     get_headers,
@@ -248,7 +248,7 @@ class Flexit:
             self.data["away_air_temperature"] = float(temp)
 
     async def set_mode(self, mode) -> None:
-        switcher = { "home": 0, "away": 2, "boost": 4 }
+        switcher = { "Home": 0, "Away": 2, "High": 4 }
         mode_int = switcher.get(mode, -1)
         if mode_int == -1:
             return
