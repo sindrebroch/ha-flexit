@@ -25,14 +25,18 @@ SENSOR_DICT = {
     "exhaust_air_temperature": ["Exhaust temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
     "extract_air_temperature": ["Extract temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],    
 }
+SELECT_DICT = {
+    "ventilation_mode":        ["Ventilation mode"],
+}
 NUMBER_DICT = {
     "home_air_temperature":    ["Home temperature", TEMP_CELSIUS, "mdi:home-thermometer"],
     "away_air_temperature":    ["Away temperature", TEMP_CELSIUS, "mdi:home-thermometer-outline"],
 }
 
 BINARY_SENSOR_LIST = list(BINARY_SENSOR_DICT)
-SENSOR_LIST = list(SENSOR_DICT)
 NUMBER_LIST = list(NUMBER_DICT)
+SELECT_LIST = list(SELECT_DICT)
+SENSOR_LIST = list(SENSOR_DICT)
 
 # API
 API_URL="api.climatixic.com"

@@ -144,7 +144,7 @@ async def async_unload_entry(hass, entry):
 @callback
 def _async_platforms(entry):
     """Return platforms to be loaded / unloaded."""
-    return ["binary_sensor", "climate", "number", "sensor"]
+    return ["binary_sensor", "climate", "number", "select", "sensor"]
 
 
 class FlexitEntity(CoordinatorEntity):
