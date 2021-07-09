@@ -79,6 +79,11 @@ class FlexitNumber(FlexitEntity):
 
         self.async_write_ha_state()
 
+    async def async_update(self):
+        """Update unit attributes."""
+        _LOGGER.debug("Async update Number")
+        await self.api.update_data()
+
     def is_away(self) -> bool:
       return self._condition == "away_air_temperature"
     def is_home(self) -> bool:
