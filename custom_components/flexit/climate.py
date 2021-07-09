@@ -97,22 +97,17 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
         temperature = kwargs.get(ATTR_TEMPERATURE)
+        away_temp = self.api.data["away_air_temperature"]
+        home_temp = self.api.data["home_air_temperature"]
+        current_temp = away_temp if self.is_away() else home_temp
         
-        if temperature is None:
-            return
+        assert temperature is not None
+        assert temperature != current_temp
 
         if self.is_away():
-            current_temp = self.api.data["away_air_temperature"]
-            if temperature != current_temp:
-                await self.api.set_away_temp(str(temperature)) 
-            else:
-                return
+            await self.api.set_away_temp(str(temperature)) 
         else:
-            current_temp = self.api.data["home_air_temperature"]
-            if temperature != current_temp:
-                await self.api.set_home_temp(str(temperature))
-            else:
-                return
+            await self.api.set_home_temp(str(temperature))
 
         self.async_write_ha_state()
 
@@ -128,7 +123,6 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         """Set new target hvac mode."""
-
         current_hvac_mode = HVAC_MODE_HEAT if self.is_heating() else HVAC_MODE_FAN_ONLY
         assert hvac_mode != current_hvac_mode
 
@@ -170,7 +164,14 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         current_preset = self.api.data["ventilation_mode"]
         assert current_preset != preset_mode
-        await self.api.set_mode(preset_mode)
+
+        if preset_mode == PRESET_HOME:
+            await self.api.set_mode("Home")
+        elif preset_mode == PRESET_AWAY:
+            await self.api.set_mode("Away")
+        elif preset_mode == PRESET_BOOST:
+            await self.api.set_mode("High")
+
         self.async_write_ha_state()
 
     def is_heating(self) -> bool:
