@@ -204,20 +204,19 @@ class Flexit:
 
     async def update_data(self) -> None:
         await self.set_token()
-        PLANT_ID = self.plant_id
         filterPath = "/DataPoints/Values?filterId="
         pathVariables = f"""[
-        {{"DataPoints":"{PLANT_ID}{VENTILATION_MODE_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{OUTSIDE_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{SUPPLY_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{EXTRACT_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{EXHAUST_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{HOME_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{AWAY_AIR_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{ROOM_TEMPERATURE_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{FILTER_OPERATING_TIME_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{FILTER_TIME_FOR_EXCHANGE_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{ELECTRIC_HEATER_PATH}"}}]"""
+        {{"DataPoints":"{self.plant_path(VENTILATION_MODE_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(OUTSIDE_AIR_TEMPERATURE_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(SUPPLY_AIR_TEMPERATURE_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(EXTRACT_AIR_TEMPERATURE_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(EXHAUST_AIR_TEMPERATURE_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(HOME_AIR_TEMPERATURE_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(AWAY_AIR_TEMPERATURE_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(ROOM_TEMPERATURE_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(FILTER_OPERATING_TIME_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(FILTER_TIME_FOR_EXCHANGE_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(ELECTRIC_HEATER_PATH)}"}}]"""
 
         response = await self._generic_request( url=filterPath + urllib.parse.quote(pathVariables) )
         _LOGGER.debug("Updating data %s", response)
@@ -229,15 +228,15 @@ class Flexit:
         PLANT_ID = self.plant_id
         filterPath = "/DataPoints/Values?filterId="
         pathVariables = f"""[
-        {{"DataPoints":"{PLANT_ID}{APPLICATION_SOFTWARE_VERSION_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{DEVICE_DESCRIPTION_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{MODEL_NAME_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{MODEL_INFORMATION_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{SERIAL_NUMBER_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{FIRMWARE_REVISION_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{OFFLINE_ONLINE_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{SYSTEM_STATUS_PATH}"}},
-        {{"DataPoints":"{PLANT_ID}{LAST_RESTART_REASON_PATH}"}}]"""
+        {{"DataPoints":"{self.plant_path(APPLICATION_SOFTWARE_VERSION_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(DEVICE_DESCRIPTION_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(MODEL_NAME_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(MODEL_INFORMATION_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(SERIAL_NUMBER_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(FIRMWARE_REVISION_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(OFFLINE_ONLINE_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(SYSTEM_STATUS_PATH)}"}},
+        {{"DataPoints":"{self.plant_path(LAST_RESTART_REASON_PATH)}"}}]"""
 
         response = await self._generic_request( url=filterPath + urllib.parse.quote(pathVariables) )
         _LOGGER.debug("Updating data %s", response)
@@ -292,7 +291,7 @@ class Flexit:
         return self.plant_id + path
 
     def is_success(self, response, path) -> bool:
-        return response["stateTexts"][path] == 'Success':
+        return response["stateTexts"][path] == 'Success'
 
     async def close(self) -> None:
         """Close open client session."""
