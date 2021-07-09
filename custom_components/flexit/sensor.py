@@ -78,7 +78,6 @@ class FlexitSensor(FlexitEntity):
     @property
     def state(self):
         """Return the state of the device."""
-
         try:
             return round(self.api.data[self._condition], 2)
         except TypeError:
