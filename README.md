@@ -4,7 +4,7 @@ Custom integration for HomeAssistant for controlling your Flexit ventilation uni
 
 ## Installation
 
-### INSTALLATION VIA HACS
+### HACS (Recommended)
 
 1. Ensure that [HACS](https://hacs.xyz/) is installed.
 2. Add this repository as a custom repository
