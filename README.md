@@ -36,6 +36,8 @@ API is restricted to 50 calls/min or 500 calls/week. Defaults to polling every 3
 - Does not support multiple Flexit units
 
 ## Todo
+- [ ] Add tests
+- [ ] Trigger update on home- and away_air_temperature across Number and Climate-entities 
 - [ ] Improve debug-logging
 - [ ] Add link to config-flow for finding subscription-key
 - [ ] Add support for multiple Flexit units
