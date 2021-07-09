@@ -70,7 +70,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     @property
     def icon(self):
         """Icon to use in the frontend, if any."""
-        return 'mdi:thermostat'
+        return "mdi:thermostat"
 
     @property
     def unique_id(self):
@@ -90,10 +90,9 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        if self.is_away():
-            return self.api.data["away_air_temperature"]
-        else:
-            return self.api.data["home_air_temperature"]
+        home_temp = self.api.data["home_air_temperature"]
+        away_temp = self.api.data["away_air_temperature"]
+        return away_temp if self.is_away() else home_temp
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
@@ -102,47 +101,42 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
         if temperature is None:
             return
 
-        elif self.is_away():
-            if temperature == self.api.data["away_air_temperature"]:
-                return
-            else:
+        if self.is_away():
+            current_temp = self.api.data["away_air_temperature"]
+            if temperature != current_temp:
                 await self.api.set_away_temp(str(temperature)) 
-
-        else:
-            if temperature == self.api.data["home_air_temperature"]:
-                return
             else:
+                return
+        else:
+            current_temp = self.api.data["home_air_temperature"]
+            if temperature != current_temp:
                 await self.api.set_home_temp(str(temperature))
+            else:
+                return
 
         self.async_write_ha_state()
-
-    @property
-    def hvac_mode(self):
-        """Return current_hvac_mode operation ie. heat, fan_only."""
-        if self.is_heating():
-            return HVAC_MODE_HEAT
-        else:
-            return HVAC_MODE_FAN_ONLY
 
     @property
     def hvac_modes(self) -> List[str]:
         """Return the list of available hvac operation modes. Need to be a subset of HVAC_MODES."""
         return [HVAC_MODE_HEAT, HVAC_MODE_FAN_ONLY]
 
+    @property
+    def hvac_mode(self):
+        """Return current_hvac_mode operation ie. heat, fan_only."""
+        return HVAC_MODE_HEAT if self.is_heating() else HVAC_MODE_FAN_ONLY
+
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         """Set new target hvac mode."""
 
-        if self.is_heating():
-            current_hvac_mode = HVAC_MODE_HEAT
-        else:
-            current_hvac_mode = HVAC_MODE_FAN_ONLY
+        current_hvac_mode = HVAC_MODE_HEAT if self.is_heating() else HVAC_MODE_FAN_ONLY
+        assert hvac_mode != current_hvac_mode
 
-        if hvac_mode == current_hvac_mode:
-            return
-        elif hvac_mode == HVAC_MODE_HEAT:
+        if hvac_mode == HVAC_MODE_HEAT:
             await self.api.set_heater_state("on")
         elif hvac_mode == HVAC_MODE_FAN_ONLY:
             await self.api.set_heater_state("off")
+    
         self.async_write_ha_state()
 
     @property
@@ -153,10 +147,7 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     @property
     def hvac_action(self) -> str:
         """Return the current_hvac_mode running hvac operation if supported."""
-        if self.is_heating():
-            return CURRENT_HVAC_HEAT
-        else:
-            return CURRENT_HVAC_IDLE
+        return CURRENT_HVAC_HEAT if self.is_heating() else CURRENT_HVAC_IDLE
 
     @property
     def preset_mode(self) -> Optional[str]:
@@ -178,17 +169,8 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         current_preset = self.api.data["ventilation_mode"]
-
-        if current_preset == preset_mode:
-            return
-        elif preset_mode == PRESET_HOME:
-            await self.api.set_mode("Home")
-        elif preset_mode == PRESET_AWAY:
-            await self.api.set_mode("Away")
-        elif preset_mode == PRESET_BOOST:
-            await self.api.set_mode("High")
-        else:
-            return
+        assert current_preset != preset_mode
+        await self.api.set_mode(preset_mode)
         self.async_write_ha_state()
 
     def is_heating(self) -> bool:
@@ -196,15 +178,11 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     def is_mode(self, mode) -> bool:
         return self.api.data["ventilation_mode"] == mode
-
     def is_away(self) -> bool:
         return self.is_mode("Away")
-
     def is_home(self) -> bool:
         return self.is_mode("Home")
-
     def is_high(self) -> bool:
         return self.is_mode("High")
-
     def is_cooker_hood(self) -> bool:
         return self.is_mode("Cooker hood")

@@ -12,6 +12,11 @@ import aiohttp
 import async_timeout
 from yarl import URL
 
+from .http import (
+    get_token_body,
+    get_headers_with_token,
+    get_headers,
+)
 from .exceptions import FlexitConnectionError, FlexitError
 from .models import FlexitInfo, DeviceInfo
 from .const import (
@@ -68,24 +73,6 @@ class Flexit:
         self.token_refreshdate = date.today()
         self.data:dict = {}
         self.device_info:dict = {}
-
-    def get_token_body(self):
-        return "grant_type=password&username=" + self.username + "&password=" + self.password 
-
-    def get_token_headers(self) -> dict:
-        return {
-            "Accept": "application/json",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Accept-Language": "en-us",
-            "Content-Type": "application/json; charset=utf-8",
-            "User-Agent": "Flexit%20GO/2.0.6 CFNetwork/1128.0.1 Darwin/19.6.0",
-            "Ocp-Apim-Subscription-Key": self.api_key
-        }
-    
-    def get_headers(self) -> dict:
-        headers = self.get_token_headers()
-        headers['Authorization'] = "Bearer " + self.token
-        return headers
 
     async def _generic_request(
         self, 
@@ -144,7 +131,7 @@ class Flexit:
                 scheme="https", 
                 host=API_URL,
             ).join(URL(uri)), 
-            headers=self.get_headers(),
+            headers=get_headers_with_token(self.api_key, self.token),
         ) 
 
     async def _put_request(self, uri, body):
@@ -155,7 +142,7 @@ class Flexit:
                 host=API_URL,
             ).join(URL(uri)), 
             data=body,
-            headers=self.get_headers(),
+            headers=get_headers_with_token(self.api_key, self.token),
         )
 
     async def _post_request(self, uri, body): 
@@ -166,14 +153,14 @@ class Flexit:
                 host=API_URL,
             ).join(URL(uri)), 
             data=body,
-            headers=self.get_token_headers(),
+            headers=get_headers(self.api_key),
         )
 
     async def token_request( self ) -> Any:
         return await self._generic_request(
             method="POST",
             url=TOKEN_PATH,
-            body=self.get_token_body()
+            body=get_token_body(self.username, self.password)
         )
 
     async def plants_request( self ) -> Any:
@@ -249,7 +236,6 @@ class Flexit:
             body=self.put_body(temp)
         )
         if self.is_success(response, self.plant_path(HOME_AIR_TEMPERATURE_PATH)):
-
             self.data["home_air_temperature"] = float(temp)
 
     async def set_away_temp(self, temp) -> None:
@@ -262,7 +248,7 @@ class Flexit:
             self.data["away_air_temperature"] = float(temp)
 
     async def set_mode(self, mode) -> None:
-        switcher = { "Home": 0, "Away": 2, "High": 4 }
+        switcher = { "home": 0, "away": 2, "boost": 4 }
         mode_int = switcher.get(mode, -1)
         if mode_int == -1:
             return
