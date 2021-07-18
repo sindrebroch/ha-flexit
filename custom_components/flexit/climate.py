@@ -103,16 +103,13 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
-        temperature = kwargs.get(ATTR_TEMPERATURE)
-        away_temp = self.api.data["away_air_temperature"]
-        home_temp = self.api.data["home_air_temperature"]
-        current_temp = away_temp if self.is_away() else home_temp
+        temperature = kwargs.get(ATTR_TEMPERATURE)        
+        current = self.target_temperature()
         
         assert temperature is not None
-        if temperature != current_temp:
+        if temperature == current:
             return
-
-        if self.is_away():
+        elif self.is_away():
             await self.api.set_away_temp(str(temperature)) 
         else:
             await self.api.set_home_temp(str(temperature))
@@ -132,10 +129,9 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         """Set new target hvac mode."""
         current_hvac_mode = HVAC_MODE_HEAT if self.is_heating() else HVAC_MODE_FAN_ONLY
-        if hvac_mode != current_hvac_mode:
+        if hvac_mode == current_hvac_mode:
             return
-
-        if hvac_mode == HVAC_MODE_HEAT:
+        elif hvac_mode == HVAC_MODE_HEAT:
             await self.api.set_heater_state("on")
         elif hvac_mode == HVAC_MODE_FAN_ONLY:
             await self.api.set_heater_state("off")
@@ -172,10 +168,9 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         current_preset = self.api.data["ventilation_mode"]
-        if current_preset != preset_mode:
+        if current_preset == preset_mode:
             return
-
-        if preset_mode == PRESET_HOME:
+        elif preset_mode == PRESET_HOME:
             await self.api.set_mode("Home")
         elif preset_mode == PRESET_AWAY:
             await self.api.set_mode("Away")
@@ -189,10 +184,10 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     def is_mode(self, mode) -> bool:
         return self.api.data["ventilation_mode"] == mode
-    def is_away(self) -> bool:
-        return self.is_mode("Away")
     def is_home(self) -> bool:
         return self.is_mode("Home")
+    def is_away(self) -> bool:
+        return self.is_mode("Away")
     def is_high(self) -> bool:
         return self.is_mode("High")
     def is_cooker_hood(self) -> bool:
