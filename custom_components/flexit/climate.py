@@ -109,7 +109,8 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
         current_temp = away_temp if self.is_away() else home_temp
         
         assert temperature is not None
-        assert temperature != current_temp
+        if temperature != current_temp:
+            return
 
         if self.is_away():
             await self.api.set_away_temp(str(temperature)) 
@@ -131,7 +132,8 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         """Set new target hvac mode."""
         current_hvac_mode = HVAC_MODE_HEAT if self.is_heating() else HVAC_MODE_FAN_ONLY
-        assert hvac_mode != current_hvac_mode
+        if hvac_mode != current_hvac_mode:
+            return
 
         if hvac_mode == HVAC_MODE_HEAT:
             await self.api.set_heater_state("on")
@@ -170,7 +172,8 @@ class ClimateFlexit(FlexitEntity, ClimateEntity):
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         current_preset = self.api.data["ventilation_mode"]
-        assert current_preset != preset_mode
+        if current_preset != preset_mode:
+            return
 
         if preset_mode == PRESET_HOME:
             await self.api.set_mode("Home")
