@@ -17,7 +17,7 @@ DATA_KEY_COORDINATOR = "coordinator"
 VALID_MODES = ["Home", "Away", "High"]
 
 # ENTITY LISTS
-BINARY_SENSOR_DICT = { "dirty_filter": ["Dirty filter"] }
+BINARY_SENSOR_DICT = { "dirty_filter": ["Dirty filter", "mdi:hvac"] }
 SENSOR_DICT = {
     "room_temperature":        ["Room temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
     "outside_air_temperature": ["Outside temperature", TEMP_CELSIUS, "mdi:thermometer", DEVICE_CLASS_TEMPERATURE, "measurement"],
