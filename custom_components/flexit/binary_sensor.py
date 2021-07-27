@@ -42,6 +42,7 @@ class FlexitBinarySensor(FlexitEntity):
         
         self._condition = binary_sensor_name
         self._condition_name = info[0]
+        self._icon = info[1]
 
     @property
     def name(self):
@@ -53,6 +54,11 @@ class FlexitBinarySensor(FlexitEntity):
         """Return the unique id of the binary sensor."""
         return f"{self._server_unique_id}/{self._condition_name}"
 
+    @property
+    def icon(self):
+        """Icon to use in the frontend, if any."""
+        return self._icon
+    
     @property
     def extra_state_attributes(self):
         """Return the state attributes."""
