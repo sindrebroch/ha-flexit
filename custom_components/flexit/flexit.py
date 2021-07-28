@@ -50,7 +50,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 class Flexit:
-    """Main class for handling connections with an Flexit."""
+    """Main class for handling connections with a Flexit unit."""
 
     def __init__(
         self, 
