@@ -1,7 +1,7 @@
 {
     "name": "Flexit",
     "render_readme": true,
-    "domains": ["binary_sensor", "climate", "number", "sensor"],
+    "domains": ["binary_sensor", "climate", "sensor"],
     "homeassistant": "2021.6.0",
     "iot_class": ["Assumed State", "Cloud Polling"]
 }
