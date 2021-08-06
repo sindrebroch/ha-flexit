@@ -1,78 +1,92 @@
 """Support for getting statistical data from a Flexit system."""
 
 import logging
-from homeassistant.const import CONF_NAME
+from typing import Final, List, Tuple, cast
 
-from . import FlexitEntity
-from .const import (
-    DATA_KEY_API,
-    DATA_KEY_COORDINATOR,
-    DOMAIN as FLEXIT_DOMAIN,
-    BINARY_SENSOR_DICT,
-    BINARY_SENSOR_LIST,
+from homeassistant.components.binary_sensor import (
+    BinarySensorEntity,
+    BinarySensorEntityDescription,
+)
+from homeassistant.components.flexit import FlexitDataUpdateCoordinator
+from homeassistant.components.flexit.const import DOMAIN as FLEXIT_DOMAIN
+from homeassistant.components.flexit.models import Entity, FlexitSensorsResponse
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+BINARY_SENSORS: Final[Tuple[BinarySensorEntityDescription, ...]] = (
+    BinarySensorEntityDescription(
+        name="Dirty filter",
+        icon="mdi:hvac",
+        key=Entity.DIRTY_FILTER.value,
+    ),
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+):
     """Set up the Flexit sensor."""
-    name = entry.data[CONF_NAME]
-    flexit_data = hass.data[FLEXIT_DOMAIN][entry.entry_id]
-    binary_sensors = [
-        FlexitBinarySensor(
-            flexit_data[DATA_KEY_API],
-            flexit_data[DATA_KEY_COORDINATOR],
-            name,
-            binary_sensor_name,
-            entry.entry_id,
-        )
-        for binary_sensor_name in BINARY_SENSOR_LIST
-    ]
-    async_add_entities(binary_sensors, True)
 
-class FlexitBinarySensor(FlexitEntity):
+    coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
+
+    binary_sensors: List[FlexitBinarySensor] = []
+
+    for description in BINARY_SENSORS:
+        binary_sensors.append(FlexitBinarySensor(coordinator, description))
+
+    async_add_entities(binary_sensors)
+
+
+class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
     """Representation of a Flexit binary sensor."""
 
-    def __init__(self, api, coordinator, name, binary_sensor_name, server_unique_id):
+    coordinator: FlexitDataUpdateCoordinator
+
+    def __init__(
+        self,
+        coordinator: FlexitDataUpdateCoordinator,
+        description: BinarySensorEntityDescription,
+    ) -> None:
         """Initialize a Flexit binary sensor."""
-        super().__init__(api, coordinator, name, server_unique_id)
 
-        info = BINARY_SENSOR_DICT[binary_sensor_name]
-        
-        self._condition = binary_sensor_name
-        self._condition_name = info[0]
-        self._icon = info[1]
+        super().__init__(coordinator)
 
-    @property
-    def name(self):
-        """Return the name of the binary sensor."""
-        return f"{self._condition_name}"
+        self.entity_description = description
+        self.coordinator = coordinator
 
-    @property
-    def unique_id(self):
-        """Return the unique id of the binary sensor."""
-        return f"{self._server_unique_id}/{self._condition_name}"
+        data: FlexitSensorsResponse = coordinator.data
+        self.sensor_data = _get_sensor_data(data, description.key)
 
-    @property
-    def icon(self):
-        """Icon to use in the frontend, if any."""
-        return self._icon
-    
-    @property
-    def extra_state_attributes(self):
-        """Return the state attributes."""
-        if self.is_filter_sensor():
-            return {
-                "operating_time_hours": self.api.data["filter_operating_time"],
-                "time_to_change_hours": self.api.data["filter_time_for_exchange"],
+        self._attr_unique_id = f"{description.key}"
+        self._attr_device_info = coordinator._attr_device_info
+
+        if self.entity_description.key == Entity.DIRTY_FILTER.value:
+            self._attr_extra_state_attributes = {
+                "operating_time_hours": data.filter_operating_time,
+                "time_to_change_hours": data.filter_time_for_exchange,
             }
-            
-    def is_filter_sensor(self) -> bool:
-        return self._condition == "dirty_filter"
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data update."""
+
+        self.sensor_data = _get_sensor_data(
+            self.coordinator.data, self.entity_description.key
+        )
+        self.async_write_ha_state()
 
     @property
-    def state(self):
-        """Return the state of the device."""
-        return self.api.data[self._condition]
+    def is_on(self) -> bool:
+        """Return true if the binary sensor is on."""
 
+        return cast(bool, self.sensor_data)
+
+
+def _get_sensor_data(sensors: FlexitSensorsResponse, sensor_name: str) -> str:
+    return sensors.__getattribute__(sensor_name)

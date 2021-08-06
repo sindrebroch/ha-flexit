@@ -1,187 +1,151 @@
 """The flexit component."""
-import asyncio
-import logging
 
-import voluptuous as vol
-
-from .flexit import Flexit
-from .exceptions import FlexitError
 from datetime import timedelta
+import logging
+from typing import Final, List
 
-from homeassistant.config_entries import SOURCE_IMPORT
-from homeassistant.const import (
-    CONF_NAME,
-    CONF_USERNAME,
-    CONF_PASSWORD,
-    CONF_API_KEY,
+from aiohttp.client_exceptions import ClientConnectorError
+from async_timeout import timeout
+from voluptuous.error import Error
+
+from homeassistant.components.flexit.const import (
+    CONF_INTERVAL,
+    CONF_PLANT,
+    DEFAULT_INTERVAL,
+    DOMAIN as FLEXIT_DOMAIN,
 )
-from homeassistant.core import callback
-from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers import config_validation as cv
+from homeassistant.components.flexit.flexit import Flexit
+from homeassistant.components.flexit.models import (
+    FlexitDeviceInfo,
+    FlexitSensorsResponse,
+)
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from homeassistant.const import CONF_API_KEY, CONF_NAME, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-    DataUpdateCoordinator,
-    UpdateFailed,
-)
+from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.typing import ConfigType
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import (
-    DATA_KEY_API,
-    DATA_KEY_COORDINATOR,
-    DOMAIN,
-    CONF_UPDATE_INTERVAL_MINUTES,
-    DEFAULT_UPDATE_INTERVAL_MINUTES,
-)
-
-from .flexit import Flexit, FlexitError
+PLATFORMS: Final[List[str]] = ["binary_sensor", "climate", "sensor"]
+ICON = "mdi:account"
 
 _LOGGER = logging.getLogger(__name__)
 
-FLEXIT_SCHEMA = vol.Schema(
-    vol.All(
-        {
-            vol.Required(CONF_NAME): cv.string,
-            vol.Required(CONF_USERNAME): cv.string,
-            vol.Required(CONF_PASSWORD): cv.string,
-            vol.Required(CONF_API_KEY): cv.string,
-        },
-    )
-)
 
-CONFIG_SCHEMA = vol.Schema(
-    { DOMAIN: vol.Schema(vol.All(cv.ensure_list, [FLEXIT_SCHEMA])) },
-    extra=vol.ALLOW_EXTRA,
-)
-
-async def async_setup(hass, config):
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Flexit integration."""
-    hass.data[DOMAIN] = {}
-    if DOMAIN in config:
-        for conf in config[DOMAIN]:
+
+    hass.data[FLEXIT_DOMAIN] = {}
+
+    if FLEXIT_DOMAIN in config:
+        for conf in config[FLEXIT_DOMAIN]:
             hass.async_create_task(
                 hass.config_entries.flow.async_init(
-                    DOMAIN, context={"source": SOURCE_IMPORT}, data=conf
+                    FLEXIT_DOMAIN, context={"source": SOURCE_IMPORT}, data=conf
                 )
             )
+
     return True
 
-async def async_setup_entry(hass, entry):
-    """Set up Flexit entry."""    
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up Flexit entry."""
 
     if not entry.options:
-        options = {
-            CONF_UPDATE_INTERVAL_MINUTES: entry.data.get(
-                CONF_UPDATE_INTERVAL_MINUTES, DEFAULT_UPDATE_INTERVAL_MINUTES
-            ),
-        }
-        hass.config_entries.async_update_entry(entry, options=options)
-
-    name = entry.data[CONF_NAME]
-    username = entry.data[CONF_USERNAME]
-    password = entry.data[CONF_PASSWORD]
-    api_key = entry.data.get(CONF_API_KEY)
-
-    _LOGGER.debug("Setting up %s integration", DOMAIN)
-
-    try:
-        session = async_get_clientsession(hass, False)
-        api = Flexit(
-            username=username, 
-            password=password, 
-            api_key=api_key, 
-            loop=hass.loop,
-            session=session,
+        hass.config_entries.async_update_entry(
+            entry,
+            options={
+                CONF_INTERVAL: entry.data.get(CONF_INTERVAL, DEFAULT_INTERVAL),
+            },
         )
-        await api.update_device_info()
-        await api.update_data()
-    except FlexitError as ex:
-        _LOGGER.warning("Failed to connect: %s", ex)
-        raise ConfigEntryNotReady from ex
 
-    async def async_update_data():
-        """Fetch data from API endpoint."""
-        _LOGGER.debug("Polling Flexit ( update interval = %s min )", entry.options[CONF_UPDATE_INTERVAL_MINUTES])
-        try:
-            await api.update_data()
-        except FlexitError as err:
-            _LOGGER.warning("Flexit error on update: %s", err)
-            raise UpdateFailed(f"Failed to communicating with API: {err}") from err
+    name: str = entry.data[CONF_NAME]
+    username: str = entry.data[CONF_USERNAME]
+    password: str = entry.data[CONF_PASSWORD]
+    api_key: str = entry.data[CONF_API_KEY]
+    plant: str = entry.data[CONF_PLANT]
+    update_interval: int = entry.options.get(CONF_INTERVAL, 30)
 
-    coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        name=name,
-        update_method=async_update_data,
-        update_interval=timedelta(minutes=entry.options[CONF_UPDATE_INTERVAL_MINUTES]),
+    websession = async_get_clientsession(hass)
+
+    flexit: Flexit = Flexit(websession, username, password, api_key, plant)
+    device_info: FlexitDeviceInfo = await flexit.device_info()
+    coordinator = FlexitDataUpdateCoordinator(
+        hass, name, flexit, device_info, update_interval
     )
-    hass.data[DOMAIN][entry.entry_id] = {
-        DATA_KEY_API: api,
-        DATA_KEY_COORDINATOR: coordinator,
-    }
 
-    await coordinator.async_refresh()
+    await coordinator.async_config_entry_first_refresh()
 
-    for platform in _async_platforms(entry):
-        hass.async_create_task( hass.config_entries.async_forward_entry_setup(entry, platform) )
+    entry.async_on_unload(entry.add_update_listener(update_listener))
+
+    hass.data.setdefault(FLEXIT_DOMAIN, {})[entry.entry_id] = coordinator
+
+    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
 
     return True
-    
+
+
 async def async_unload_entry(hass, entry):
     """Unload Flexit entry."""
-    unload_ok = all(
-        await asyncio.gather(
-            *[
-                hass.config_entries.async_forward_entry_unload(entry, platform)
-                for platform in _async_platforms(entry)
-            ]
-        )
-    )
+
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
     if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
+        hass.data[FLEXIT_DOMAIN].pop(entry.entry_id)
+
     return unload_ok
 
 
-@callback
-def _async_platforms(entry):
-    """Return platforms to be loaded / unloaded."""
-    return ["binary_sensor", "climate", "number", "select", "sensor"]
+async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Update listener."""
+
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
-class FlexitEntity(CoordinatorEntity):
-    """Representation of a Flexit entity."""
+class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
+    """Class to manage fetching from Flexit data API."""
 
-    def __init__(self, api, coordinator, name, server_unique_id):
-        """Initialize a Flexit entity."""
-        super().__init__(coordinator)
-        self.api = api
-        self._name = name
-        self._server_unique_id = server_unique_id
+    data: FlexitSensorsResponse
 
-    @property
-    def extra_state_attributes(self):
-        """Return the state attributes."""
-        return dict()
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        name: str,
+        flexit: Flexit,
+        device_info: FlexitDeviceInfo,
+        update_interval: int,
+    ) -> None:
+        """Initialize."""
 
-    @property
-    def icon(self):
-        """Icon to use in the frontend, if any."""
-        return "mdi:account"
+        self.name: str = name
+        self.flexit: Flexit = flexit
+        self.device_info: FlexitDeviceInfo = device_info
 
-    @property
-    def device_info(self):
-        """Return the device information of the entity."""
-        
-        device = self.api.device_info
-
-        return {
-            "identifiers": {
-                (DOMAIN, self._server_unique_id),
-                ("modelInfo", device.modelInfo or ""),
-                ("serialInfo", device.serialInfo or ""),
-                ("applicationSoftwareVersion", device.applicationSoftwareVersion or ""),
-            },
-            "name": self._name,
+        self._attr_device_info: DeviceInfo = {
+            "name": self.name,
             "manufacturer": "Flexit",
-            "model": device.modelName or "",
-            "sw_version": device.fw or "",
+            "model": self.device_info.modelName,
+            "sw_version": self.device_info.fw,
+            "identifiers": {(FLEXIT_DOMAIN, self.name)},
         }
+
+        super().__init__(
+            hass,
+            _LOGGER,
+            name=FLEXIT_DOMAIN,
+            update_interval=timedelta(minutes=update_interval),
+        )
+
+    async def _async_update_data(self) -> FlexitSensorsResponse:
+        """Update data via library."""
+
+        try:
+            async with timeout(10):
+                flexit = await self.flexit.sensor_data()
+
+        except (Error, ClientConnectorError) as error:
+            _LOGGER.error("Update error %s", error)
+            raise UpdateFailed(error) from error
+
+        return flexit

@@ -1,102 +1,158 @@
 """Config flow to configure the Flexit integration."""
-import logging
-import voluptuous as vol
 
-from .exceptions import FlexitError
-from .const import (
-    DEFAULT_NAME,
-    DOMAIN,
-    CONF_UPDATE_INTERVAL_MINUTES, 
-    DEFAULT_UPDATE_INTERVAL_MINUTES,
+import logging
+from typing import Any, Dict, List, Optional
+
+from aiohttp.client import ClientSession
+import voluptuous as vol
+from voluptuous.schema_builder import Schema
+
+from homeassistant.components.flexit.const import (
+    CONF_INTERVAL,
+    CONF_PLANT,
+    DEFAULT_INTERVAL,
+    DOMAIN as FLEXIT_DOMAIN,
 )
-from homeassistant.core import callback
+from homeassistant.components.flexit.flexit import Flexit
+from homeassistant.components.flexit.models import FlexitPlantItem
 from homeassistant.config_entries import ConfigFlow, OptionsFlow
-from homeassistant.const import (
-    CONF_NAME,
-    CONF_USERNAME,
-    CONF_PASSWORD,
-    CONF_API_KEY,
+from homeassistant.const import CONF_API_KEY, CONF_NAME, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.core import callback
+from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+
+CONFIG_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_NAME, default="Flexit"): str,
+        vol.Required(CONF_USERNAME): str,
+        vol.Required(CONF_PASSWORD): str,
+        vol.Required(CONF_API_KEY): str,
+    }
 )
 
 _LOGGER = logging.getLogger(__name__)
 
-class FlexitFlowHandler(ConfigFlow, domain=DOMAIN):
+
+class FlexitFlowHandler(ConfigFlow, domain=FLEXIT_DOMAIN):
     """Handle a Flexit config flow."""
+
+    VERSION = 1
+
+    def __init__(self) -> None:
+        """Initialize the config flow."""
+
+        self.user_input: Dict[str, Any] = {}
+
+        self.title: str = ""
+        self.plants: List[FlexitPlantItem] = []
+
+    def show_user_form(self, errors: Dict[str, Any] = {}) -> FlowResult:
+        """Show user form."""
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=CONFIG_SCHEMA,
+            errors=errors,
+            last_step=False,
+        )
+
+    def get_plant_schema(self, plants: List[FlexitPlantItem]) -> Schema:
+        """Get plant schema."""
+
+        plant_ids = (plant.id for plant in plants)
+        return vol.Schema({vol.Required(CONF_PLANT): vol.In(sorted(plant_ids))})
+
+    async def async_step_user(
+        self,
+        user_input: Optional[Dict[str, Any]] = None,
+    ) -> FlowResult:
+        """Handle a flow initiated by the user."""
+
+        if user_input is None:
+            return self.show_user_form()
+
+        self.user_input = user_input
+        name: str = user_input[CONF_NAME]
+        self.title = name.title()
+        username: str = user_input[CONF_USERNAME]
+        password: str = user_input[CONF_PASSWORD]
+        api_key: str = user_input[CONF_API_KEY]
+        session: ClientSession = async_get_clientsession(self.hass)
+        flexit: Flexit = Flexit(session, username, password, api_key)
+
+        try:
+            self.plants = await flexit.find_plants()
+
+        except Exception:
+            return self.show_user_form({"base": "cannot_connect"})
+
+        if self.plants is None or len(self.plants) == 0:
+            return self.async_abort(reason="no_devices_found")
+
+        elif self.plants is not None and len(self.plants) == 1:
+            return self.async_create_entry(
+                title=self.title,
+                data={**{CONF_PLANT: self.plants[0].id}, **self.user_input},
+            )
+
+        return await self.async_step_plant(user_input=user_input)
+
+    async def async_step_plant(
+        self,
+        user_input: Optional[Dict[str, Any]] = None,
+    ) -> FlowResult:
+        """Flow to handle choosing plant."""
+
+        if user_input is None or user_input.get(CONF_PLANT) is None:
+            return self.async_show_form(
+                step_id="plant",
+                data_schema=self.get_plant_schema(self.plants),
+                errors={},
+                last_step=True,
+            )
+
+        plant_id = user_input.get(CONF_PLANT)
+
+        await self.async_set_unique_id(plant_id)
+        self._abort_if_unique_id_configured()
+
+        return self.async_create_entry(
+            title=self.title,
+            data={**user_input, **self.user_input},
+        )
 
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
         """Get the options flow for this handler."""
+
         return FlexitOptionsFlowHandler(config_entry)
 
-    async def async_step_user(self, user_input=None):
-        """Handle a flow initiated by the user."""
-        return await self.async_step_init(user_input)
-
-    async def async_step_import(self, user_input=None):
-        """Handle a flow initiated by import."""
-        return await self.async_step_init(user_input, is_import=True)
-
-    async def async_step_init(self, user_input, is_import=False):
-        """Handle init step of a flow."""
-        errors = {}
-
-        if user_input is not None:
-            name = user_input[CONF_NAME]
-            username = user_input[CONF_USERNAME]
-            password = user_input[CONF_PASSWORD]
-            api_key = user_input.get(CONF_API_KEY)
-
-            try:
-                return self.async_create_entry(
-                    title=name,
-                    data={
-                        CONF_NAME: name,
-                        CONF_API_KEY: api_key,
-                        CONF_USERNAME: username,
-                        CONF_PASSWORD: password,
-                    },
-                )
-            except FlexitError as ex:
-                _LOGGER.debug("Connection failed: %s", ex)
-                if is_import:
-                    _LOGGER.error("Failed to import: %s", ex)
-                    return self.async_abort(reason="cannot_connect")
-                errors["base"] = "cannot_connect"
-
-        user_input = user_input or {}
-        return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_NAME,default=DEFAULT_NAME): str,
-                    vol.Required(CONF_USERNAME,default=""): str,
-                    vol.Required(CONF_PASSWORD,default=""): str,
-                    vol.Required(CONF_API_KEY,default=""): str,
-                }
-            ),
-            errors=errors,
-        )
 
 class FlexitOptionsFlowHandler(OptionsFlow):
     """Handle Flexit client options."""
 
-    def __init__(self, config_entry):
+    def __init__(self, config_entry) -> None:
         """Initialize options flow."""
+
         self.config_entry = config_entry
 
-    async def async_step_init(self, user_input = None):
+    def get_option_schema(self, default: int) -> Schema:
+        """Get option schema."""
+
+        return vol.Schema({vol.Required(CONF_INTERVAL, default=default): int})
+
+    async def async_step_init(
+        self, user_input: Optional[Dict[str, Any]] = None
+    ) -> FlowResult:
         """Manage Flexit options."""
+
         if user_input is not None:
-            return self.async_create_entry(title="Skriv inn options", data=user_input)
+            return self.async_create_entry(title="Options", data=user_input)
 
-        options = {
-            vol.Optional(
-                CONF_UPDATE_INTERVAL_MINUTES,
-                default=self.config_entry.options.get(
-                    CONF_UPDATE_INTERVAL_MINUTES, DEFAULT_UPDATE_INTERVAL_MINUTES
-                ),
-            ): int,
-        }
-
-        return self.async_show_form(step_id="init", data_schema=vol.Schema(options))
+        return self.async_show_form(
+            step_id="init",
+            data_schema=self.get_option_schema(
+                self.config_entry.options.get(CONF_INTERVAL, DEFAULT_INTERVAL)
+            ),
+        )

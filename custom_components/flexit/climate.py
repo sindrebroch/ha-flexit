@@ -1,194 +1,213 @@
-"""Platform for Flexit AC units with CI66 Modbus adapter."""
-import logging
-from typing import List, Optional
+"""Platform for Flexit AC units."""
 
-from homeassistant.core import HomeAssistant
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_NAME, TEMP_CELSIUS, ATTR_TEMPERATURE
-from homeassistant.components.climate import ClimateEntity
+import logging
+from typing import Any, Final, List, Optional, Tuple
+
+from homeassistant.components.climate import ClimateEntity, ClimateEntityDescription
 from homeassistant.components.climate.const import (
-    HVAC_MODE_HEAT,
-    HVAC_MODE_FAN_ONLY,
-    SUPPORT_TARGET_TEMPERATURE,
-    SUPPORT_PRESET_MODE,
-    PRESET_AWAY,
-    PRESET_HOME,
-    PRESET_BOOST,
-    CURRENT_HVAC_IDLE,
     CURRENT_HVAC_HEAT,
+    CURRENT_HVAC_IDLE,
+    SUPPORT_PRESET_MODE,
+    SUPPORT_TARGET_TEMPERATURE,
 )
-from . import FlexitEntity
-from .const import (
-    DATA_KEY_API,
-    DATA_KEY_COORDINATOR,
-    DOMAIN as FLEXIT_DOMAIN,
+from homeassistant.components.flexit import FlexitDataUpdateCoordinator
+from homeassistant.components.flexit.const import DOMAIN as FLEXIT_DOMAIN
+from homeassistant.components.flexit.flexit import Flexit
+from homeassistant.components.flexit.models import (
+    Entity,
+    FlexitSensorsResponse,
+    HvacMode,
+    Mode,
+    Preset,
+)
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+CLIMATES: Final[Tuple[ClimateEntityDescription, ...]] = (
+    ClimateEntityDescription(
+        name="Climate",
+        icon="mdi:hvac",
+        key=Entity.CLIMATE_FLEXIT.value,
+    ),
 )
 
 _LOGGER = logging.getLogger(__name__)
 
+
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the Flexit sensor."""
-    name = config_entry.data[CONF_NAME]
-    flexit_data = hass.data[FLEXIT_DOMAIN][config_entry.entry_id]
 
-    async_add_entities([
-        ClimateFlexit(
-            flexit_data[DATA_KEY_API],
-            flexit_data[DATA_KEY_COORDINATOR],
-            name,
-            config_entry.entry_id,
-        )], update_before_add=True)
+    coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
 
-class ClimateFlexit(FlexitEntity, ClimateEntity):
+    climates: List[FlexitClimate] = []
+
+    for description in CLIMATES:
+        climates.append(FlexitClimate(coordinator, description))
+
+    async_add_entities(climates)
+
+
+class FlexitClimate(CoordinatorEntity, ClimateEntity):
     """Representation of a Flexit ventilation unit."""
 
-    def __init__(self, api, coordinator, name, server_unique_id):
+    coordinator: FlexitDataUpdateCoordinator
+
+    def __init__(
+        self,
+        coordinator: FlexitDataUpdateCoordinator,
+        description: ClimateEntityDescription,
+    ) -> None:
         """Initialize a Flexit sensor."""
-        super().__init__(api, coordinator, name, server_unique_id)
 
-    @property
-    def assumed_state(self):
-        return True
+        super().__init__(coordinator)
 
-    @property
-    def supported_features(self):
-        """Return the list of supported features."""
-        return SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
+        self.entity_description = description
+        self.coordinator = coordinator
 
-    async def async_update(self):
-        """Update unit attributes."""
-        _LOGGER.debug("Async update climate")
-        await self.api.update_data()
+        self._attr_unique_id = f"{description.key}"
+        self._attr_assumed_state = True
+        self._attr_temperature_unit = TEMP_CELSIUS
+        self._attr_hvac_modes = [HvacMode.HEAT.value, HvacMode.FAN_ONLY.value]
+        self._attr_supported_features = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
+        self._attr_preset_modes = [
+            Preset.HOME.value,
+            Preset.AWAY.value,
+            Preset.BOOST.value,
+        ]
+        self._attr_device_info = coordinator._attr_device_info
 
-    @property
-    def extra_state_attributes(self):
-        """Return the state attributes."""
-        return {
-            "ventilation_mode": self.api.data["ventilation_mode"],
-        }
-
-    @property
-    def name(self):
-        """Return the name of the climate device."""
-        return self._name
-
-    @property
-    def icon(self):
-        """Icon to use in the frontend, if any."""
-        return "mdi:thermostat"
-
-    @property
-    def unique_id(self):
-        """Return the unique id of the sensor."""
-        return self._name
-
-    @property
-    def temperature_unit(self):
-        """Return the unit of measurement."""
-        return TEMP_CELSIUS
-
-    @property
-    def current_temperature(self):
-        """Return the current_hvac_mode temperature."""
-        return self.api.data["room_temperature"]
-
-    @property
-    def target_temperature(self):
-        """Return the temperature we try to reach."""
-        home_temp = self.api.data["home_air_temperature"]
-        away_temp = self.api.data["away_air_temperature"]
-        return away_temp if self.is_away() else home_temp
-
-    async def async_set_temperature(self, **kwargs):
-        """Set new target temperature."""
-        temperature = kwargs.get(ATTR_TEMPERATURE)        
-        current = self.target_temperature()
-        
-        assert temperature is not None
-        if temperature == current:
-            return
-        elif self.is_away():
-            await self.api.set_away_temp(str(temperature)) 
-        else:
-            await self.api.set_home_temp(str(temperature))
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data update."""
 
         self.async_write_ha_state()
 
     @property
-    def hvac_modes(self) -> List[str]:
-        """Return the list of available hvac operation modes. Need to be a subset of HVAC_MODES."""
-        return [HVAC_MODE_HEAT, HVAC_MODE_FAN_ONLY]
+    def current_temperature(self) -> float:
+        """Return the current_hvac_mode temperature."""
+
+        data: FlexitSensorsResponse = self.coordinator.data
+
+        return data.room_temperature
 
     @property
-    def hvac_mode(self):
+    def target_temperature(self) -> float:
+        """Return the temperature we try to reach."""
+
+        data: FlexitSensorsResponse = self.coordinator.data
+
+        return (
+            data.away_air_temperature
+            if data.ventilation_mode == Mode.AWAY.value
+            else data.home_air_temperature
+        )
+
+    async def async_set_temperature(self, **kwargs) -> None:
+        """Set new target temperature."""
+
+        coordinator: FlexitDataUpdateCoordinator = self.coordinator
+        data: FlexitSensorsResponse = coordinator.data
+
+        temperature: Optional[Any] = kwargs.get(ATTR_TEMPERATURE)
+        current = self.target_temperature
+
+        if temperature is None:
+            return
+
+        float_temp = float(temperature)
+        if float_temp == current:
+            return
+
+        elif (
+            data.ventilation_mode == Mode.AWAY.value
+            and await coordinator.flexit.set_away_temp(str(float_temp))
+        ):
+            data.away_air_temperature = float_temp
+
+        elif await coordinator.flexit.set_home_temp(str(float_temp)):
+            data.home_air_temperature = float_temp
+
+        self.async_write_ha_state()
+
+    @property
+    def hvac_mode(self) -> str:
         """Return current_hvac_mode operation ie. heat, fan_only."""
-        return HVAC_MODE_HEAT if self.is_heating() else HVAC_MODE_FAN_ONLY
+
+        data: FlexitSensorsResponse = self.coordinator.data
+        return HvacMode.HEAT.value if data.electric_heater else HvacMode.FAN_ONLY.value
 
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         """Set new target hvac mode."""
-        current_hvac_mode = HVAC_MODE_HEAT if self.is_heating() else HVAC_MODE_FAN_ONLY
-        if hvac_mode == current_hvac_mode:
-            return
-        elif hvac_mode == HVAC_MODE_HEAT:
-            await self.api.set_heater_state("on")
-        elif hvac_mode == HVAC_MODE_FAN_ONLY:
-            await self.api.set_heater_state("off")
-    
-        self.async_write_ha_state()
 
-    @property
-    def should_poll(self):
-        """Return the polling state."""
-        return False
+        coordinator: FlexitDataUpdateCoordinator = self.coordinator
+        data: FlexitSensorsResponse = coordinator.data
+        flexit: Flexit = coordinator.flexit
+
+        if hvac_mode == self.hvac_mode:
+            return
+
+        elif hvac_mode == HvacMode.HEAT.value and await flexit.set_heater_state(True):
+            data.electric_heater = True
+
+        elif hvac_mode == HvacMode.FAN_ONLY.value and await flexit.set_heater_state(
+            False
+        ):
+            data.electric_heater = False
+
+        self.async_write_ha_state()
 
     @property
     def hvac_action(self) -> str:
         """Return the current_hvac_mode running hvac operation if supported."""
-        return CURRENT_HVAC_HEAT if self.is_heating() else CURRENT_HVAC_IDLE
+
+        data: FlexitSensorsResponse = self.coordinator.data
+        return CURRENT_HVAC_HEAT if data.electric_heater else CURRENT_HVAC_IDLE
 
     @property
-    def preset_mode(self) -> Optional[str]:
+    def preset_mode(self) -> str:
         """Return the current_hvac_mode preset mode."""
-        if self.is_home():
-            return PRESET_HOME
-        elif self.is_away():
-            return PRESET_AWAY
-        elif self.is_high() or self.is_cooker_hood():
-            return PRESET_BOOST
+
+        coordinator: FlexitDataUpdateCoordinator = self.coordinator
+        data: FlexitSensorsResponse = coordinator.data
+        current_mode: str = data.ventilation_mode
+
+        if current_mode in (Mode.HOME.value):
+            return Preset.HOME.value
+
+        elif current_mode in (Mode.AWAY.value):
+            return Preset.AWAY.value
+
+        elif current_mode in (Mode.HIGH.value, Mode.COOKER_HOOD.value):
+            return Preset.BOOST.value
+
         else:
             _LOGGER.warning("Unknown preset mode %s", current_mode)
             return current_mode
 
-    @property
-    def preset_modes(self) -> Optional[List[str]]:
-        """Return a list of available preset modes."""
-        return [PRESET_HOME, PRESET_AWAY, PRESET_BOOST]
-
     async def async_set_preset_mode(self, preset_mode: str) -> None:
-        current_preset = self.api.data["ventilation_mode"]
-        if current_preset == preset_mode:
+        """Set preset mode async."""
+
+        coordinator: FlexitDataUpdateCoordinator = self.coordinator
+        data: FlexitSensorsResponse = coordinator.data
+        flexit: Flexit = coordinator.flexit
+
+        if data.ventilation_mode == preset_mode:
             return
-        elif preset_mode == PRESET_HOME:
-            await self.api.set_mode("Home")
-        elif preset_mode == PRESET_AWAY:
-            await self.api.set_mode("Away")
-        elif preset_mode == PRESET_BOOST:
-            await self.api.set_mode("High")
+
+        elif preset_mode == Preset.HOME.value and await flexit.set_mode(Mode.HOME):
+            data.ventilation_mode = Mode.HOME.value
+
+        elif preset_mode == Preset.AWAY.value and await flexit.set_mode(Mode.AWAY):
+            data.ventilation_mode = Mode.AWAY.value
+
+        elif preset_mode == Preset.BOOST.value and await flexit.set_mode(Mode.HIGH):
+            data.ventilation_mode = Mode.HIGH.value
 
         self.async_write_ha_state()
-
-    def is_heating(self) -> bool:
-        return self.api.data["electric_heater"] == "on"
-
-    def is_mode(self, mode) -> bool:
-        return self.api.data["ventilation_mode"] == mode
-    def is_home(self) -> bool:
-        return self.is_mode("Home")
-    def is_away(self) -> bool:
-        return self.is_mode("Away")
-    def is_high(self) -> bool:
-        return self.is_mode("High")
-    def is_cooker_hood(self) -> bool:
-        return self.is_mode("Cooker hood")

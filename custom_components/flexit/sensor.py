@@ -1,84 +1,127 @@
-"""Support for getting statistical data from a Flexit system."""
+"""Support for Flexit sensors."""
+
+from __future__ import annotations
 
 import logging
-from homeassistant.const import CONF_NAME
+from typing import Final, cast
 
-from . import FlexitEntity
-from .const import (
-    DATA_KEY_API,
-    DATA_KEY_COORDINATOR,
-    DOMAIN as FLEXIT_DOMAIN,
-    SENSOR_DICT,
-    SENSOR_LIST,
+from homeassistant.components.flexit import FlexitDataUpdateCoordinator
+from homeassistant.components.flexit.const import DOMAIN as FLEXIT_DOMAIN
+from homeassistant.components.flexit.models import Entity, FlexitSensorsResponse
+from homeassistant.components.sensor import (
+    STATE_CLASS_MEASUREMENT,
+    SensorEntity,
+    SensorEntityDescription,
+)
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import DEVICE_CLASS_TEMPERATURE, TEMP_CELSIUS
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import StateType
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+TEMPERATURE_ICON = "mdi:thermometer"
+
+SENSORS: Final[tuple[SensorEntityDescription, ...]] = (
+    SensorEntityDescription(
+        name="Room temperature",
+        key=Entity.ROOM_TEMPERATURE.value,
+        icon=TEMPERATURE_ICON,
+        unit_of_measurement=TEMP_CELSIUS,
+        device_class=DEVICE_CLASS_TEMPERATURE,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        name="Outside temperature",
+        key=Entity.OUTSIDE_TEMPERATURE.value,
+        icon=TEMPERATURE_ICON,
+        unit_of_measurement=TEMP_CELSIUS,
+        device_class=DEVICE_CLASS_TEMPERATURE,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        name="Supply temperature",
+        key=Entity.SUPPLY_TEMPERATURE.value,
+        icon=TEMPERATURE_ICON,
+        unit_of_measurement=TEMP_CELSIUS,
+        device_class=DEVICE_CLASS_TEMPERATURE,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        name="Exhaust temperature",
+        key=Entity.EXHAUST_TEMPERATURE.value,
+        icon=TEMPERATURE_ICON,
+        unit_of_measurement=TEMP_CELSIUS,
+        device_class=DEVICE_CLASS_TEMPERATURE,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        name="Extract temperature",
+        key=Entity.EXTRACT_TEMPERATURE.value,
+        icon=TEMPERATURE_ICON,
+        unit_of_measurement=TEMP_CELSIUS,
+        device_class=DEVICE_CLASS_TEMPERATURE,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ),
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up the Flexit sensor."""
-    name = entry.data[CONF_NAME]
-    flexit_data = hass.data[FLEXIT_DOMAIN][entry.entry_id]
-    sensors = [
-        FlexitSensor(
-            flexit_data[DATA_KEY_API],
-            flexit_data[DATA_KEY_COORDINATOR],
-            name,
-            sensor_name,
-            entry.entry_id,
-        )
-        for sensor_name in SENSOR_LIST
-    ]
-    async_add_entities(sensors, True)
 
-class FlexitSensor(FlexitEntity):
+    coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
+
+    sensors: list[FlexitSensor] = []
+
+    for description in SENSORS:
+        sensors.append(FlexitSensor(coordinator, description))
+
+    async_add_entities(sensors)
+
+
+class FlexitSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Flexit sensor."""
 
-    def __init__(self, api, coordinator, name, sensor_name, server_unique_id):
+    coordinator: FlexitDataUpdateCoordinator
+
+    def __init__(
+        self,
+        coordinator: FlexitDataUpdateCoordinator,
+        description: SensorEntityDescription,
+    ) -> None:
         """Initialize a Flexit sensor."""
-        super().__init__(api, coordinator, name, server_unique_id)
 
-        info = SENSOR_DICT[sensor_name]
+        super().__init__(coordinator)
 
-        self._condition = sensor_name
-        self._condition_name = info[0]
-        self._unit_of_measurement = info[1]
-        self._icon = info[2]
-        self._device_class = info[3]
-        self._state_class = info[4]
+        self.coordinator = coordinator
+        self.entity_description = description
+        self.sensor_data = _get_sensor_data(coordinator.data, description.key)
 
-    @property
-    def name(self):
-        """Return the name of the sensor."""
-        return f"{self._condition_name}"
+        self._attr_unique_id = f"{description.key}"
+
+        self._attr_device_info = coordinator._attr_device_info
 
     @property
-    def unique_id(self):
-        """Return the unique id of the sensor."""
-        return f"{self._server_unique_id}/{self._condition_name}"
+    def state(self) -> StateType:
+        """Return the state."""
 
-    @property
-    def icon(self):
-        """Icon to use in the frontend, if any."""
-        return self._icon
+        return cast(StateType, self.sensor_data)
 
-    @property
-    def unit_of_measurement(self):
-        """Return the unit the value is expressed in."""
-        return self._unit_of_measurement
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data update."""
 
-    @property
-    def device_class(self):
-        return self._device_class
+        self.sensor_data = _get_sensor_data(
+            self.coordinator.data, self.entity_description.key
+        )
+        self.async_write_ha_state()
 
-    @property
-    def state_class(self):
-        return self._state_class
 
-    @property
-    def state(self):
-        """Return the state of the device."""
-        try:
-            return round(self.api.data[self._condition], 2)
-        except TypeError:
-            return self.api.data[self._condition]
+def _get_sensor_data(sensors: FlexitSensorsResponse, sensor_name: str) -> str:
+    return sensors.__getattribute__(sensor_name)

@@ -29,7 +29,7 @@
         "step": {
             "init": {
                 "data": {
-                    "update_interval": "Update interval"
+                    "update_interval": "Update interval in minutes"
                 }
             }
         }
