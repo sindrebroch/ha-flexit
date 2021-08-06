@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import Final, cast
 
-from homeassistant.components.flexit import FlexitDataUpdateCoordinator
-from homeassistant.components.flexit.const import DOMAIN as FLEXIT_DOMAIN
-from homeassistant.components.flexit.models import Entity, FlexitSensorsResponse
+from . import FlexitDataUpdateCoordinator
+from .const import DOMAIN as FLEXIT_DOMAIN
+from .models import Entity, FlexitSensorsResponse
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
     SensorEntity,

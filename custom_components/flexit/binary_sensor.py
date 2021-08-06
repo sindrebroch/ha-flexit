@@ -7,9 +7,9 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
-from homeassistant.components.flexit import FlexitDataUpdateCoordinator
-from homeassistant.components.flexit.const import DOMAIN as FLEXIT_DOMAIN
-from homeassistant.components.flexit.models import Entity, FlexitSensorsResponse
+from . import FlexitDataUpdateCoordinator
+from .const import DOMAIN as FLEXIT_DOMAIN
+from .models import Entity, FlexitSensorsResponse
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback

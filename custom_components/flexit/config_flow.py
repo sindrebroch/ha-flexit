@@ -7,14 +7,14 @@ from aiohttp.client import ClientSession
 import voluptuous as vol
 from voluptuous.schema_builder import Schema
 
-from homeassistant.components.flexit.const import (
+from .const import (
     CONF_INTERVAL,
     CONF_PLANT,
     DEFAULT_INTERVAL,
     DOMAIN as FLEXIT_DOMAIN,
 )
-from homeassistant.components.flexit.flexit import Flexit
-from homeassistant.components.flexit.models import FlexitPlantItem
+from .flexit import Flexit
+from .models import FlexitPlantItem
 from homeassistant.config_entries import ConfigFlow, OptionsFlow
 from homeassistant.const import CONF_API_KEY, CONF_NAME, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import callback

@@ -8,14 +8,14 @@ from aiohttp.client_exceptions import ClientConnectorError
 from async_timeout import timeout
 from voluptuous.error import Error
 
-from homeassistant.components.flexit.const import (
+from .const import (
     CONF_INTERVAL,
     CONF_PLANT,
     DEFAULT_INTERVAL,
     DOMAIN as FLEXIT_DOMAIN,
 )
-from homeassistant.components.flexit.flexit import Flexit
-from homeassistant.components.flexit.models import (
+from .flexit import Flexit
+from .models import (
     FlexitDeviceInfo,
     FlexitSensorsResponse,
 )

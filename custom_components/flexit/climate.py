@@ -10,10 +10,10 @@ from homeassistant.components.climate.const import (
     SUPPORT_PRESET_MODE,
     SUPPORT_TARGET_TEMPERATURE,
 )
-from homeassistant.components.flexit import FlexitDataUpdateCoordinator
-from homeassistant.components.flexit.const import DOMAIN as FLEXIT_DOMAIN
-from homeassistant.components.flexit.flexit import Flexit
-from homeassistant.components.flexit.models import (
+from . import FlexitDataUpdateCoordinator
+from .const import DOMAIN as FLEXIT_DOMAIN
+from .flexit import Flexit
+from .models import (
     Entity,
     FlexitSensorsResponse,
     HvacMode,

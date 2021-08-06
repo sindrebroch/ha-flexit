@@ -8,8 +8,8 @@ import aiohttp
 from aiohttp.client import ClientSession
 from aiohttp.client_reqrep import ClientResponse
 
-from homeassistant.components.flexit.const import PLANTS_PATH, TOKEN_PATH
-from homeassistant.components.flexit.http import (
+from .const import PLANTS_PATH, TOKEN_PATH
+from .http import (
     get_escaped_datapoints_url,
     get_escaped_filter_url,
     get_headers,
@@ -18,7 +18,7 @@ from homeassistant.components.flexit.http import (
     is_success,
     put_body,
 )
-from homeassistant.components.flexit.models import (
+from .models import (
     FlexitDeviceInfo,
     FlexitPlantItem,
     FlexitPlants,
