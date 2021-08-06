@@ -32,8 +32,8 @@ HomeAssistant-integration for controlling your Flexit ventilation unit. Tested w
 ## API limitation
 API is restricted to 50 calls/min or 500 calls/week. Defaults to polling every 30 minutes, this can be configured but be aware of API restrictions. 
 
-## Known issues
-
+## Service status
+Service status can be found [here](https://status.climatixic.com/)
 
 ## Todo
 - [ ] Add tests
