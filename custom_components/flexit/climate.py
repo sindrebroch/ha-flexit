@@ -10,21 +10,16 @@ from homeassistant.components.climate.const import (
     SUPPORT_PRESET_MODE,
     SUPPORT_TARGET_TEMPERATURE,
 )
-from . import FlexitDataUpdateCoordinator
-from .const import DOMAIN as FLEXIT_DOMAIN
-from .flexit import Flexit
-from .models import (
-    Entity,
-    FlexitSensorsResponse,
-    HvacMode,
-    Mode,
-    Preset,
-)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+from . import FlexitDataUpdateCoordinator
+from .const import DOMAIN as FLEXIT_DOMAIN
+from .flexit import Flexit
+from .models import Entity, FlexitSensorsResponse, HvacMode, Mode, Preset
 
 CLIMATES: Final[Tuple[ClimateEntityDescription, ...]] = (
     ClimateEntityDescription(

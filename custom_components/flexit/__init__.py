@@ -8,17 +8,6 @@ from aiohttp.client_exceptions import ClientConnectorError
 from async_timeout import timeout
 from voluptuous.error import Error
 
-from .const import (
-    CONF_INTERVAL,
-    CONF_PLANT,
-    DEFAULT_INTERVAL,
-    DOMAIN as FLEXIT_DOMAIN,
-)
-from .flexit import Flexit
-from .models import (
-    FlexitDeviceInfo,
-    FlexitSensorsResponse,
-)
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import CONF_API_KEY, CONF_NAME, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -26,6 +15,10 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+
+from .const import CONF_INTERVAL, CONF_PLANT, DEFAULT_INTERVAL, DOMAIN as FLEXIT_DOMAIN
+from .flexit import Flexit
+from .models import FlexitDeviceInfo, FlexitSensorsResponse
 
 PLATFORMS: Final[List[str]] = ["binary_sensor", "climate", "sensor"]
 ICON = "mdi:account"

@@ -8,6 +8,8 @@ import aiohttp
 from aiohttp.client import ClientSession
 from aiohttp.client_reqrep import ClientResponse
 
+from homeassistant.const import HTTP_OK
+
 from .const import PLANTS_PATH, TOKEN_PATH
 from .http import (
     get_escaped_datapoints_url,
@@ -27,7 +29,6 @@ from .models import (
     Mode,
     Path,
 )
-from homeassistant.const import HTTP_OK
 
 SENSOR_DATA_PATH_LIST: Final[List[Path]] = [
     Path.VENTILATION_MODE_PATH,

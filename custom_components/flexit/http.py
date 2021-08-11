@@ -7,11 +7,7 @@ import urllib.parse
 from aiohttp.client import ClientSession
 from aiohttp.client_reqrep import ClientResponse
 
-from .const import (
-    DATAPOINTS_PATH,
-    FILTER_PATH,
-    TOKEN_PATH,
-)
+from .const import DATAPOINTS_PATH, FILTER_PATH, TOKEN_PATH
 from .models import FlexitSensorsResponseStatus
 
 RESULT_SUCCESS = "Success"

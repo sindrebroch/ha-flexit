@@ -5,9 +5,6 @@ from __future__ import annotations
 import logging
 from typing import Final, cast
 
-from . import FlexitDataUpdateCoordinator
-from .const import DOMAIN as FLEXIT_DOMAIN
-from .models import Entity, FlexitSensorsResponse
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
     SensorEntity,
@@ -19,6 +16,10 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+from . import FlexitDataUpdateCoordinator
+from .const import DOMAIN as FLEXIT_DOMAIN
+from .models import Entity, FlexitSensorsResponse
 
 TEMPERATURE_ICON = "mdi:thermometer"
 

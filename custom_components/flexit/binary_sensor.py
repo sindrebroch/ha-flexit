@@ -7,13 +7,14 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
-from . import FlexitDataUpdateCoordinator
-from .const import DOMAIN as FLEXIT_DOMAIN
-from .models import Entity, FlexitSensorsResponse
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+from . import FlexitDataUpdateCoordinator
+from .const import DOMAIN as FLEXIT_DOMAIN
+from .models import Entity, FlexitSensorsResponse
 
 BINARY_SENSORS: Final[Tuple[BinarySensorEntityDescription, ...]] = (
     BinarySensorEntityDescription(
