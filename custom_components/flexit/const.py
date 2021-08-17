@@ -8,6 +8,8 @@ CONF_INTERVAL = "update_interval"
 
 DEFAULT_INTERVAL = 30
 
+SUBSCRIPTION_KEY = "c3fc1f14ce8747588212eda5ae3b439e"
+
 SCHEME: str = "https"
 API_URL: str = f"{SCHEME}://api.climatixic.com"
 TOKEN_PATH: str = f"{API_URL}/Token"

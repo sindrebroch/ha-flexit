@@ -9,7 +9,7 @@ from async_timeout import timeout
 from voluptuous.error import Error
 
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
-from homeassistant.const import CONF_API_KEY, CONF_NAME, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import CONF_NAME, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity import DeviceInfo
@@ -56,13 +56,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     name: str = entry.data[CONF_NAME]
     username: str = entry.data[CONF_USERNAME]
     password: str = entry.data[CONF_PASSWORD]
-    api_key: str = entry.data[CONF_API_KEY]
     plant: str = entry.data[CONF_PLANT]
-    update_interval: int = entry.options.get(CONF_INTERVAL, 30)
+    update_interval: int = entry.options.get(CONF_INTERVAL, DEFAULT_INTERVAL)
 
     websession = async_get_clientsession(hass)
 
-    flexit: Flexit = Flexit(websession, username, password, api_key, plant)
+    flexit: Flexit = Flexit(websession, username, password, plant)
     device_info: FlexitDeviceInfo = await flexit.device_info()
     coordinator = FlexitDataUpdateCoordinator(
         hass, name, flexit, device_info, update_interval

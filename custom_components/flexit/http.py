@@ -7,7 +7,7 @@ import urllib.parse
 from aiohttp.client import ClientSession
 from aiohttp.client_reqrep import ClientResponse
 
-from .const import DATAPOINTS_PATH, FILTER_PATH, TOKEN_PATH
+from .const import DATAPOINTS_PATH, FILTER_PATH, SUBSCRIPTION_KEY, TOKEN_PATH
 from .models import FlexitSensorsResponseStatus
 
 RESULT_SUCCESS = "Success"
@@ -20,7 +20,7 @@ def get_token_body(username: str, password: str) -> str:
     return f"grant_type=password&username={username}&password={password}"
 
 
-def get_headers(api_key: str) -> Dict[str, str]:
+def get_headers() -> Dict[str, str]:
     """Get generic headers."""
 
     return {
@@ -29,15 +29,15 @@ def get_headers(api_key: str) -> Dict[str, str]:
         "Accept-Language": "en-us",
         "Content-Type": "application/json; charset=utf-8",
         "User-Agent": "Flexit%20GO/2.0.6 CFNetwork/1128.0.1 Darwin/19.6.0",
-        "Ocp-Apim-Subscription-Key": api_key,
+        "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY,
     }
 
 
-def get_headers_with_token(api_key: str, token: Optional[str]) -> Dict[str, str]:
+def get_headers_with_token(token: Optional[str]) -> Dict[str, str]:
     """Get headers with token added."""
 
     assert token is not None
-    headers = get_headers(api_key)
+    headers = get_headers()
     headers["Authorization"] = f"Bearer {token}"
     return headers
 
@@ -46,14 +46,13 @@ async def token_request(
     session: ClientSession,
     username: str,
     password: str,
-    api_key: str,
 ) -> ClientResponse:
     """Request token."""
 
     return await session.post(
         url=TOKEN_PATH,
         body=get_token_body(username, password),
-        headers=get_headers(api_key),
+        headers=get_headers(),
     )
 
 

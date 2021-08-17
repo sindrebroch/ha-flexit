@@ -8,7 +8,7 @@ import voluptuous as vol
 from voluptuous.schema_builder import Schema
 
 from homeassistant.config_entries import ConfigFlow, OptionsFlow
-from homeassistant.const import CONF_API_KEY, CONF_NAME, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import CONF_NAME, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -22,7 +22,6 @@ CONFIG_SCHEMA = vol.Schema(
         vol.Required(CONF_NAME, default="Flexit"): str,
         vol.Required(CONF_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
-        vol.Required(CONF_API_KEY): str,
     }
 )
 
@@ -72,9 +71,8 @@ class FlexitFlowHandler(ConfigFlow, domain=FLEXIT_DOMAIN):
         self.title = name.title()
         username: str = user_input[CONF_USERNAME]
         password: str = user_input[CONF_PASSWORD]
-        api_key: str = user_input[CONF_API_KEY]
         session: ClientSession = async_get_clientsession(self.hass)
-        flexit: Flexit = Flexit(session, username, password, api_key)
+        flexit: Flexit = Flexit(session, username, password)
 
         try:
             self.plants = await flexit.find_plants()

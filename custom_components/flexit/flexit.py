@@ -67,7 +67,6 @@ class Flexit:
         session: aiohttp.client.ClientSession,
         username: str,
         password: str,
-        api_key: str,
         plant_id: Optional[str] = None,
     ) -> None:
         """Initialize connection with the Flexit."""
@@ -75,7 +74,6 @@ class Flexit:
         self._session: ClientSession = session
         self.username: str = username
         self.password: str = password
-        self.api_key: str = api_key
         self.plant_id: Optional[str] = plant_id
 
         self.token: Optional[str] = None
@@ -118,7 +116,7 @@ class Flexit:
         return await self.handle_request(
             await self._session.get(
                 url=url,
-                headers=get_headers_with_token(self.api_key, self.token),
+                headers=get_headers_with_token(self.token),
             )
         )
 
@@ -131,11 +129,11 @@ class Flexit:
             await self._session.put(
                 url=get_escaped_datapoints_url(self.path(path)),
                 data=put_body(str(body)),
-                headers=get_headers_with_token(self.api_key, self.token),
+                headers=get_headers_with_token(self.token),
             )
         )
 
-    async def post(self, path: str) -> Any:
+    async def post(self, path: str, data: str) -> Any:
         """Post request."""
 
         _LOGGER.debug("post=%s", path)
@@ -143,8 +141,8 @@ class Flexit:
         return await self.handle_request(
             await self._session.post(
                 url=path,
-                headers=get_headers(self.api_key),
-                data=get_token_body(self.username, self.password),
+                headers=get_headers(),
+                data=data,
             )
         )
 
@@ -152,7 +150,12 @@ class Flexit:
         """Set token."""
 
         if self.token_refreshdate == date.today():
-            flexit_token = FlexitToken.from_dict(await self.post(TOKEN_PATH))
+            flexit_token = FlexitToken.from_dict(
+                await self.post(
+                    path=TOKEN_PATH,
+                    data=get_token_body(self.username, self.password),
+                )
+            )
             self.token = flexit_token.access_token
             self.token_refreshdate = date.today() + timedelta(days=1)
 

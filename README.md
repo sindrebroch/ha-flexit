@@ -26,8 +26,7 @@ HomeAssistant-integration for controlling your Flexit ventilation unit. Tested w
 ## Configuration
 1. Connect Flexit-unit to internet
 2. Register your unit in the Flexit Go-app
-3. Get your subscription-key from [the proper way](https://portal.api.climatixic.com/) (have not done this myself) or sniff it from the mobile app. (at your own risk)
-4. Add your Flexit-unit to HA with username, password and subscription-key
+3. Add your Flexit-unit to HA with username and password
 
 ## API limitation
 API is restricted to 50 calls/min or 500 calls/week. Defaults to polling every 30 minutes, this can be configured but be aware of API restrictions. 
