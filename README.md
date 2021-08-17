@@ -10,7 +10,7 @@ HomeAssistant-integration for controlling your Flexit ventilation unit. Tested w
 2. Add this repository as a custom repository
 3. Search for and install the "Flexit" integration.
 4. Restart Home Assistant.
-5. Configure the `Flexit` integration.
+5. Add the `Flexit` integration to HA from the integration-page
 
 ### MANUAL INSTALLATION
 
@@ -20,7 +20,7 @@ HomeAssistant-integration for controlling your Flexit ventilation unit. Tested w
    into the `custom_components` directory of your Home Assistant
    installation.
 3. Restart Home Assistant.
-4. Configure the `Flexit` integration.
+4. Add the `Flexit` integration to HA from the integration-page
 
 
 ## Configuration
@@ -38,7 +38,6 @@ Service status can be found [here](https://status.climatixic.com/)
 ## Todo
 - [ ] Add tests
 - [ ] Improve debug-logging
-- [ ] Add link to config-flow for finding subscription-key
 
 ## Features
 ### Climate
