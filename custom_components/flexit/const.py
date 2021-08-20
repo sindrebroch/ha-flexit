@@ -1,8 +1,8 @@
 """Constants for the flexit integration."""
 
-import logging
+import logging import Logger, getLogger
 
-LOGGER: Logger = logging.getLogger(__package__)
+LOGGER: Logger = getLogger(__package__)
 
 DOMAIN = "flexit"
 
@@ -13,8 +13,7 @@ DEFAULT_INTERVAL = 30
 
 SUBSCRIPTION_KEY = "c3fc1f14ce8747588212eda5ae3b439e"
 
-SCHEME: str = "https"
-API_URL: str = f"{SCHEME}://api.climatixic.com"
+API_URL: str = f"https://api.climatixic.com"
 TOKEN_PATH: str = f"{API_URL}/Token"
 PLANTS_PATH: str = f"{API_URL}/Plants"
 DATAPOINTS_PATH: str = f"{API_URL}/DataPoints"
