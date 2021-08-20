@@ -1,6 +1,6 @@
 """Constants for the flexit integration."""
 
-import logging import Logger, getLogger
+from logging import Logger, getLogger
 
 LOGGER: Logger = getLogger(__package__)
 
