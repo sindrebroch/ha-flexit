@@ -1,7 +1,6 @@
 """The flexit component."""
 
 from datetime import timedelta
-import logging
 from typing import Final, List
 
 from aiohttp.client_exceptions import ClientConnectorError
@@ -16,15 +15,12 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import CONF_INTERVAL, CONF_PLANT, DEFAULT_INTERVAL, DOMAIN as FLEXIT_DOMAIN
+from .const import CONF_INTERVAL, CONF_PLANT, DEFAULT_INTERVAL, DOMAIN as FLEXIT_DOMAIN, LOGGER
 from .flexit import Flexit
 from .models import FlexitDeviceInfo, FlexitSensorsResponse
 
 PLATFORMS: Final[List[str]] = ["binary_sensor", "climate", "sensor"]
 ICON = "mdi:account"
-
-_LOGGER = logging.getLogger(__name__)
-
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Flexit integration."""
@@ -124,7 +120,7 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
 
         super().__init__(
             hass,
-            _LOGGER,
+            LOGGER,
             name=FLEXIT_DOMAIN,
             update_interval=timedelta(minutes=update_interval),
         )
@@ -137,7 +133,7 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
                 flexit = await self.flexit.sensor_data()
 
         except (Error, ClientConnectorError) as error:
-            _LOGGER.error("Update error %s", error)
+            LOGGER.error("Update error %s", error)
             raise UpdateFailed(error) from error
 
         return flexit

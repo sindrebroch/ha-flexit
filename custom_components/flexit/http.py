@@ -1,6 +1,5 @@
 """Helper for http."""
 
-import logging
 from typing import Any, Dict, Optional
 import urllib.parse
 
@@ -11,8 +10,6 @@ from .const import DATAPOINTS_PATH, FILTER_PATH, SUBSCRIPTION_KEY, TOKEN_PATH
 from .models import FlexitSensorsResponseStatus
 
 RESULT_SUCCESS = "Success"
-_LOGGER = logging.getLogger(__name__)
-
 
 def get_token_body(username: str, password: str) -> str:
     """Get token body."""

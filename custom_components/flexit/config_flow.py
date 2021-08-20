@@ -1,6 +1,5 @@
 """Config flow to configure the Flexit integration."""
 
-import logging
 from typing import Any, Dict, List, Optional
 
 from aiohttp.client import ClientSession
@@ -24,8 +23,6 @@ CONFIG_SCHEMA = vol.Schema(
         vol.Required(CONF_PASSWORD): str,
     }
 )
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class FlexitFlowHandler(ConfigFlow, domain=FLEXIT_DOMAIN):

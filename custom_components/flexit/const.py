@@ -1,5 +1,8 @@
 """Constants for the flexit integration."""
 
+import logging
+
+LOGGER: Logger = logging.getLogger(__package__)
 
 DOMAIN = "flexit"
 

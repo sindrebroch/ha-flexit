@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Final, cast
 
 from homeassistant.components.sensor import (
@@ -65,8 +64,6 @@ SENSORS: Final[tuple[SensorEntityDescription, ...]] = (
         state_class=STATE_CLASS_MEASUREMENT,
     ),
 )
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(

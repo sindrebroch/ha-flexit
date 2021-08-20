@@ -1,6 +1,5 @@
 """Support for getting statistical data from a Flexit system."""
 
-import logging
 from typing import Final, List, Tuple, cast
 
 from homeassistant.components.binary_sensor import (
@@ -23,9 +22,6 @@ BINARY_SENSORS: Final[Tuple[BinarySensorEntityDescription, ...]] = (
         key=Entity.DIRTY_FILTER.value,
     ),
 )
-
-_LOGGER = logging.getLogger(__name__)
-
 
 async def async_setup_entry(
     hass: HomeAssistant,

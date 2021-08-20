@@ -1,7 +1,6 @@
 """Asynchronous Python client for Flexit."""
 
 from datetime import date, timedelta
-import logging
 from typing import Any, Final, List, Optional
 
 import aiohttp
@@ -10,7 +9,7 @@ from aiohttp.client_reqrep import ClientResponse
 
 from homeassistant.const import HTTP_OK
 
-from .const import PLANTS_PATH, TOKEN_PATH
+from .const import LOGGER, PLANTS_PATH, TOKEN_PATH
 from .http import (
     get_escaped_datapoints_url,
     get_escaped_filter_url,
@@ -56,8 +55,6 @@ DEVICE_INFO_PATH_LIST: Final[List[Path]] = [
     Path.LAST_RESTART_REASON_PATH,
 ]
 
-_LOGGER = logging.getLogger(__name__)
-
 
 class Flexit:
     """Main class for handling connections with a Flexit unit."""
@@ -83,14 +80,14 @@ class Flexit:
         """Return path with plant_id prefixed."""
 
         if self.plant_id is None:
-            _LOGGER.warning("plant_id=%s", self.plant_id)
+            LOGGER.warning("plant_id=%s", self.plant_id)
 
         return f"{self.plant_id}{path.value}"
 
     async def handle_request(self, response: ClientResponse) -> Any:
         """Get request."""
 
-        _LOGGER.debug("handle_request=%s", response)
+        LOGGER.debug("handle_request=%s", response)
 
         async with response as resp:
 
@@ -104,14 +101,14 @@ class Flexit:
     async def get(self, path: str) -> Any:
         """Get request."""
 
-        _LOGGER.debug("get=%s", path)
+        LOGGER.debug("get=%s", path)
 
         return await self.get_url(get_escaped_filter_url(path))
 
     async def get_url(self, url: str) -> Any:
         """Get request."""
 
-        _LOGGER.debug("get_url=%s", url)
+        LOGGER.debug("get_url=%s", url)
 
         return await self.handle_request(
             await self._session.get(
@@ -123,7 +120,7 @@ class Flexit:
     async def put(self, path: Path, body: Any) -> Any:
         """Put request."""
 
-        _LOGGER.debug("put=%s, body=%s", path, body)
+        LOGGER.debug("put=%s, body=%s", path, body)
 
         return await self.handle_request(
             await self._session.put(
@@ -136,7 +133,7 @@ class Flexit:
     async def post(self, path: str, data: str) -> Any:
         """Post request."""
 
-        _LOGGER.debug("post=%s", path)
+        LOGGER.debug("post=%s", path)
 
         return await self.handle_request(
             await self._session.post(

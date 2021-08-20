@@ -1,7 +1,6 @@
 """Asynchronous Python client for Flexit."""
 
 from enum import Enum
-import logging
 from typing import Any, Dict, List
 
 import attr
@@ -14,10 +13,10 @@ from homeassistant.components.climate.const import (
     PRESET_HOME,
 )
 
+from .const import LOGGER
+
 VALUE = "value"
 VALUES = "values"
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class Entity(Enum):
@@ -176,7 +175,7 @@ class FlexitToken:
     def from_dict(data: Dict[str, Any]) -> "FlexitToken":
         """Transform response to FlexitToken."""
 
-        _LOGGER.debug("FlexitToken=%s", data)
+        LOGGER.debug("FlexitToken=%s", data)
 
         return FlexitToken(
             access_token=data["access_token"],
@@ -212,7 +211,7 @@ class FlexitSensorsResponse:
     def from_dict(plant: str, data: Dict[str, Any]) -> "FlexitSensorsResponse":
         """Transform response to FlexitSensorsResponse."""
 
-        _LOGGER.debug("FlexitSensorsResponse. plant=%s. data=%s", plant, data)
+        LOGGER.debug("FlexitSensorsResponse. plant=%s. data=%s", plant, data)
 
         util = UtilClass(data=data, plant=plant)
 
@@ -257,7 +256,7 @@ class FlexitDeviceInfo:
     def from_dict(plant: str, data: Dict[str, Any]) -> "FlexitDeviceInfo":
         """Transform response to FlexitDeviceInfo."""
 
-        _LOGGER.debug("FlexitDeviceInfo. plant=%s. data=%s", plant, data)
+        LOGGER.debug("FlexitDeviceInfo. plant=%s. data=%s", plant, data)
 
         util = UtilClass(data=data, plant=plant)
 
@@ -286,7 +285,7 @@ class FlexitPlantItem:
     def from_dict(data: Dict[str, Any]) -> "FlexitPlantItem":
         """Transform response to FlexitPlantItem."""
 
-        _LOGGER.debug("FlexitPlantItem=%s", data)
+        LOGGER.debug("FlexitPlantItem=%s", data)
 
         return FlexitPlantItem(id=data["id"])
 
@@ -302,7 +301,7 @@ class FlexitPlants:
     def from_dict(data: Dict[str, Any]) -> "FlexitPlants":
         """Transform response to FlexitPlants."""
 
-        _LOGGER.debug("FlexitPlants=%s", data)
+        LOGGER.debug("FlexitPlants=%s", data)
 
         flexit_plant_items: List[FlexitPlantItem] = []
         for plant_item in data["items"]:
@@ -324,6 +323,6 @@ class FlexitSensorsResponseStatus:
     def from_dict(data: Dict[str, Any]) -> "FlexitSensorsResponseStatus":
         """Transform response to FlexitSensorsResponseStatus."""
 
-        _LOGGER.debug("FlexitSensorsResponseStatus=%s", data)
+        LOGGER.debug("FlexitSensorsResponseStatus=%s", data)
 
         return FlexitSensorsResponseStatus(stateTexts=data["stateTexts"])

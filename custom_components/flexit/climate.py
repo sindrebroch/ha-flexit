@@ -1,6 +1,5 @@
 """Platform for Flexit AC units."""
 
-import logging
 from typing import Any, Final, List, Optional, Tuple
 
 from homeassistant.components.climate import ClimateEntity, ClimateEntityDescription
@@ -17,7 +16,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import FlexitDataUpdateCoordinator
-from .const import DOMAIN as FLEXIT_DOMAIN
+from .const import DOMAIN as FLEXIT_DOMAIN, LOGGER
 from .flexit import Flexit
 from .models import Entity, FlexitSensorsResponse, HvacMode, Mode, Preset
 
@@ -28,9 +27,6 @@ CLIMATES: Final[Tuple[ClimateEntityDescription, ...]] = (
         key=Entity.CLIMATE_FLEXIT.value,
     ),
 )
-
-_LOGGER = logging.getLogger(__name__)
-
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -183,7 +179,7 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
             return Preset.BOOST.value
 
         else:
-            _LOGGER.warning("Unknown preset mode %s", current_mode)
+            LOGGER.warning("Unknown preset mode %s", current_mode)
             return current_mode
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
