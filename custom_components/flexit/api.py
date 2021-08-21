@@ -3,12 +3,12 @@
 from datetime import date, timedelta
 from typing import Any, Dict, List
 
+import socket
 import asyncio
 import urllib.parse
 import aiohttp
 import async_timeout
 from aiohttp.client import ClientSession
-from homeassistant.helpers.config_validation import socket_timeout
 
 from .const import (
     API_HEADERS,
@@ -108,7 +108,7 @@ class FlexitApiClient:
             raise ApiClientException(
                 f"Error parsing information from {url} - {exception}"
             ) from exception
-        except (aiohttp.ClientError, socket_timeout.gaierror) as exception:
+        except (aiohttp.ClientError, socket.gaierror) as exception:
             raise ApiClientException(
                 f"Error fetching information from {url} - {exception}"
             ) from exception
