@@ -130,7 +130,7 @@ class FlexitApiClient:
         return await self.handle_request(
             await self._session.put(
                 url=self.get_escaped_datapoints_url(self.path(path)),
-                data='{"Value": "' + str(body) + '"}'
+                data='{"Value": "' + str(body) + '"}',
                 headers=self.get_headers_with_token(self.token),
             )
         )
@@ -155,7 +155,7 @@ class FlexitApiClient:
             self.token = FlexitToken.from_dict(
                 await self.post(
                     path=TOKEN_PATH,
-                    data=f"grant_type=password&username={self.username}&password={self.password}"
+                    data=f"grant_type=password&username={self.username}&password={self.password}",
                 )
             ).access_token
             self.token_refreshdate = date.today() + timedelta(days=1)
@@ -242,7 +242,7 @@ class FlexitApiClient:
             self.path(Path.ELECTRIC_HEATER_PATH),
         )
 
-    def get_headers() -> Dict[str, str]:
+    def get_headers(self) -> Dict[str, str]:
         """Get generic headers."""
 
         return {
@@ -254,7 +254,7 @@ class FlexitApiClient:
             "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY,
         }
 
-    def get_headers_with_token(token: Optional[str]) -> Dict[str, str]:
+    def get_headers_with_token(self, token: Optional[str]) -> Dict[str, str]:
         """Get headers with token added."""
 
         assert token is not None
@@ -262,19 +262,19 @@ class FlexitApiClient:
         headers["Authorization"] = f"Bearer {token}"
         return headers
 
-    def is_success(response: Dict[str, Any], path_with_plant: str) -> bool:
+    def is_success(self, response: Dict[str, Any], path_with_plant: str) -> bool:
         """Check if response is successful."""
 
         stateTexts = FlexitSensorsResponseStatus.from_dict(response).stateTexts
 
         return stateTexts[path_with_plant] == RESULT_SUCCESS
 
-    def get_escaped_datapoints_url(id: str) -> str:
+    def get_escaped_datapoints_url(self, id: str) -> str:
         """Util for adding DATAPOINTS_PATH."""
 
         return f"{DATAPOINTS_PATH}/{urllib.parse.quote(id)}"
 
-    def get_escaped_filter_url(path: str) -> str:
+    def get_escaped_filter_url(self, path: str) -> str:
         """Util for adding FILTER_PATH."""
 
         return f"{FILTER_PATH}{urllib.parse.quote(path)}"
