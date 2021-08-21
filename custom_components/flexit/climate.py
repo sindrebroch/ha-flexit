@@ -8,6 +8,9 @@ from homeassistant.components.climate.const import (
     CURRENT_HVAC_IDLE,
     HVAC_MODE_FAN_ONLY,
     HVAC_MODE_HEAT,
+    PRESET_AWAY,
+    PRESET_BOOST,
+    PRESET_HOME,
     SUPPORT_PRESET_MODE,
     SUPPORT_TARGET_TEMPERATURE,
 )
@@ -27,7 +30,7 @@ from .const import (
     MODE_HOME,
 )
 from .flexit import Flexit
-from .models import Entity, FlexitSensorsResponse, Mode, Preset
+from .models import Entity, FlexitSensorsResponse
 
 CLIMATES: Final[Tuple[ClimateEntityDescription, ...]] = (
     ClimateEntityDescription(
@@ -73,11 +76,7 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         self._attr_temperature_unit = TEMP_CELSIUS
         self._attr_hvac_modes = [HVAC_MODE_HEAT, HVAC_MODE_FAN_ONLY]
         self._attr_supported_features = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
-        self._attr_preset_modes = [
-            Preset.HOME.value,
-            Preset.AWAY.value,
-            Preset.BOOST.value,
-        ]
+        self._attr_preset_modes = [PRESET_HOME, PRESET_AWAY, PRESET_BOOST]
         self._attr_device_info = coordinator._attr_device_info
 
     @property
@@ -102,26 +101,23 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         """Set new target temperature."""
 
         coordinator: FlexitDataUpdateCoordinator = self.coordinator
-        data: FlexitSensorsResponse = coordinator.data
 
         temperature: Optional[Any] = kwargs.get(ATTR_TEMPERATURE)
-        current = self.target_temperature
-
         if temperature is None:
             return
 
         float_temp = float(temperature)
-        if float_temp == current:
+        if float_temp == self.target_temperature:
             return
 
         elif (
-            data.ventilation_mode == MODE_AWAY
+            coordinator.data.ventilation_mode == MODE_AWAY
             and await coordinator.flexit.set_away_temp(str(float_temp))
         ):
-            data.away_air_temperature = float_temp
+            coordinator.data.away_air_temperature = float_temp
 
         elif await coordinator.flexit.set_home_temp(str(float_temp)):
-            data.home_air_temperature = float_temp
+            coordinator.data.home_air_temperature = float_temp
 
         self.async_write_ha_state()
 
@@ -166,11 +162,11 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         current_mode: str = data.ventilation_mode
 
         if current_mode == MODE_HOME:
-            return Preset.HOME.value
+            return PRESET_HOME
         elif current_mode == MODE_AWAY:
-            return Preset.AWAY.value
+            return PRESET_AWAY
         elif current_mode in (MODE_HIGH, MODE_COOKER_HOOD):
-            return Preset.BOOST.value
+            return PRESET_BOOST
         else:
             LOGGER.warning("Unknown preset mode %s", current_mode)
             return current_mode
@@ -182,15 +178,15 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
 
         if coordinator.data.ventilation_mode == preset_mode:
             return
-        elif preset_mode == Preset.HOME.value and await coordinator.flexit.set_mode(
+        elif preset_mode == PRESET_HOME and await coordinator.flexit.set_mode(
             MODE_HOME
         ):
             coordinator.data.ventilation_mode = MODE_HOME
-        elif preset_mode == Preset.AWAY.value and await coordinator.flexit.set_mode(
+        elif preset_mode == PRESET_AWAY and await coordinator.flexit.set_mode(
             MODE_AWAY
         ):
             coordinator.data.ventilation_mode = MODE_AWAY
-        elif preset_mode == Preset.BOOST.value and await coordinator.flexit.set_mode(
+        elif preset_mode == PRESET_BOOST and await coordinator.flexit.set_mode(
             MODE_HIGH
         ):
             coordinator.data.ventilation_mode = MODE_HIGH

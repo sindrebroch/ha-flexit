@@ -25,7 +25,6 @@ from .models import (
     FlexitPlants,
     FlexitSensorsResponse,
     FlexitToken,
-    Mode,
     Path,
 )
 

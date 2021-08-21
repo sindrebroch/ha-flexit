@@ -35,23 +35,6 @@ class Entity(Enum):
     VENTILATION_MODE = "ventilation_mode"
 
 
-class Preset(Enum):
-    """Enum representing Presets."""
-
-    HOME = PRESET_HOME
-    AWAY = PRESET_AWAY
-    BOOST = PRESET_BOOST
-
-
-class Mode(Enum):
-    """Enum representing Modes."""
-
-    HOME = "Home"
-    AWAY = "Away"
-    HIGH = "High"
-    COOKER_HOOD = "Cooker hood"
-
-
 class Path(Enum):
     """Enum representing Paths."""
 
