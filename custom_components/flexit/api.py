@@ -1,29 +1,33 @@
 """Asynchronous Python client for Flexit."""
 
 from datetime import date, timedelta
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
+import urllib.parse
 import aiohttp
 from aiohttp.client import ClientSession
 from aiohttp.client_reqrep import ClientResponse
 
 from homeassistant.const import HTTP_OK
 
-from .const import LOGGER, MODE_AWAY, MODE_HIGH, MODE_HOME, PLANTS_PATH, TOKEN_PATH
-from .http import (
-    get_escaped_datapoints_url,
-    get_escaped_filter_url,
-    get_headers,
-    get_headers_with_token,
-    get_token_body,
-    is_success,
-    put_body,
+from .const import (
+    DATAPOINTS_PATH,
+    FILTER_PATH,
+    LOGGER,
+    MODE_AWAY,
+    MODE_HIGH,
+    MODE_HOME,
+    PLANTS_PATH,
+    SUBSCRIPTION_KEY,
+    TOKEN_PATH,
 )
+
 from .models import (
     FlexitDeviceInfo,
     FlexitPlantItem,
     FlexitPlants,
     FlexitSensorsResponse,
+    FlexitSensorsResponseStatus,
     FlexitToken,
     Path,
 )
@@ -53,6 +57,8 @@ DEVICE_INFO_PATH_LIST: List[Path] = [
     Path.SYSTEM_STATUS_PATH,
     Path.LAST_RESTART_REASON_PATH,
 ]
+
+RESULT_SUCCESS = "Success"
 
 
 class FlexitApiClient:
@@ -102,7 +108,7 @@ class FlexitApiClient:
 
         LOGGER.debug("get=%s", path)
 
-        return await self.get_url(get_escaped_filter_url(path))
+        return await self.get_url(self.get_escaped_filter_url(path))
 
     async def get_url(self, url: str) -> Any:
         """Get request."""
@@ -112,7 +118,7 @@ class FlexitApiClient:
         return await self.handle_request(
             await self._session.get(
                 url=url,
-                headers=get_headers_with_token(self.token),
+                headers=self.get_headers_with_token(self.token),
             )
         )
 
@@ -123,9 +129,9 @@ class FlexitApiClient:
 
         return await self.handle_request(
             await self._session.put(
-                url=get_escaped_datapoints_url(self.path(path)),
-                data=put_body(str(body)),
-                headers=get_headers_with_token(self.token),
+                url=self.get_escaped_datapoints_url(self.path(path)),
+                data='{"Value": "' + str(body) + '"}'
+                headers=self.get_headers_with_token(self.token),
             )
         )
 
@@ -137,7 +143,7 @@ class FlexitApiClient:
         return await self.handle_request(
             await self._session.post(
                 url=path,
-                headers=get_headers(),
+                headers=self.get_headers(),
                 data=data,
             )
         )
@@ -149,7 +155,7 @@ class FlexitApiClient:
             self.token = FlexitToken.from_dict(
                 await self.post(
                     path=TOKEN_PATH,
-                    data=get_token_body(self.username, self.password),
+                    data=f"grant_type=password&username={self.username}&password={self.password}"
                 )
             ).access_token
             self.token_refreshdate = date.today() + timedelta(days=1)
@@ -198,7 +204,7 @@ class FlexitApiClient:
     async def set_home_temp(self, temp) -> bool:
         """Set home temp."""
 
-        return is_success(
+        return self.is_success(
             await self.put(Path.HOME_AIR_TEMPERATURE_PATH, temp),
             self.path(Path.HOME_AIR_TEMPERATURE_PATH),
         )
@@ -206,7 +212,7 @@ class FlexitApiClient:
     async def set_away_temp(self, temp) -> bool:
         """Set away temp."""
 
-        return is_success(
+        return self.is_success(
             await self.put(Path.AWAY_AIR_TEMPERATURE_PATH, temp),
             self.path(Path.AWAY_AIR_TEMPERATURE_PATH),
         )
@@ -223,7 +229,7 @@ class FlexitApiClient:
         if mode_int == -1:
             return False
 
-        return is_success(
+        return self.is_success(
             await self.put(Path.VENTILATION_MODE_PUT_PATH, mode_int),
             self.path(Path.VENTILATION_MODE_PUT_PATH),
         )
@@ -231,7 +237,44 @@ class FlexitApiClient:
     async def set_heater_state(self, heater_bool: bool) -> bool:
         """Set heater state."""
 
-        return is_success(
+        return self.is_success(
             await self.put(Path.ELECTRIC_HEATER_PATH, 1 if heater_bool else 0),
             self.path(Path.ELECTRIC_HEATER_PATH),
         )
+
+    def get_headers() -> Dict[str, str]:
+        """Get generic headers."""
+
+        return {
+            "Accept": "application/json",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "en-us",
+            "Content-Type": "application/json; charset=utf-8",
+            "User-Agent": "Flexit%20GO/2.0.6 CFNetwork/1128.0.1 Darwin/19.6.0",
+            "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY,
+        }
+
+    def get_headers_with_token(token: Optional[str]) -> Dict[str, str]:
+        """Get headers with token added."""
+
+        assert token is not None
+        headers = self.get_headers()
+        headers["Authorization"] = f"Bearer {token}"
+        return headers
+
+    def is_success(response: Dict[str, Any], path_with_plant: str) -> bool:
+        """Check if response is successful."""
+
+        stateTexts = FlexitSensorsResponseStatus.from_dict(response).stateTexts
+
+        return stateTexts[path_with_plant] == RESULT_SUCCESS
+
+    def get_escaped_datapoints_url(id: str) -> str:
+        """Util for adding DATAPOINTS_PATH."""
+
+        return f"{DATAPOINTS_PATH}/{urllib.parse.quote(id)}"
+
+    def get_escaped_filter_url(path: str) -> str:
+        """Util for adding FILTER_PATH."""
+
+        return f"{FILTER_PATH}{urllib.parse.quote(path)}"
