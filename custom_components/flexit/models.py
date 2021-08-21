@@ -5,7 +5,32 @@ from typing import Any, Dict, List
 
 import attr
 
-from .const import LOGGER, MODE_AWAY, MODE_HIGH, MODE_HOME
+from .const import (
+    APPLICATION_SOFTWARE_VERSION_PATH,
+    AWAY_AIR_TEMPERATURE_PATH,
+    DEVICE_DESCRIPTION_PATH,
+    ELECTRIC_HEATER_PATH,
+    EXHAUST_AIR_TEMPERATURE_PATH,
+    EXTRACT_AIR_TEMPERATURE_PATH,
+    FILTER_OPERATING_TIME_PATH,
+    FILTER_TIME_FOR_EXCHANGE_PATH,
+    FIRMWARE_REVISION_PATH,
+    HOME_AIR_TEMPERATURE_PATH,
+    LAST_RESTART_REASON_PATH,
+    LOGGER,
+    MODEL_INFORMATION_PATH,
+    MODEL_NAME_PATH,
+    MODE_AWAY,
+    MODE_HIGH,
+    MODE_HOME,
+    OFFLINE_ONLINE_PATH,
+    OUTSIDE_AIR_TEMPERATURE_PATH,
+    ROOM_TEMPERATURE_PATH,
+    SERIAL_NUMBER_PATH,
+    SUPPLY_AIR_TEMPERATURE_PATH,
+    SYSTEM_STATUS_PATH,
+    VENTILATION_MODE_PATH,
+)
 
 VALUE = "value"
 VALUES = "values"
@@ -27,35 +52,6 @@ class Entity(Enum):
     VENTILATION_MODE = "ventilation_mode"
 
 
-class Path(Enum):
-    """Enum representing Paths."""
-
-    HOME_AIR_TEMPERATURE_PATH = ";1!0020007CA000055"
-    AWAY_AIR_TEMPERATURE_PATH = ";1!0020007C1000055"
-    ROOM_TEMPERATURE_PATH = ";1!00000004B000055"
-    VENTILATION_MODE_PATH = ";1!013000169000055"
-    VENTILATION_MODE_PUT_PATH = ";1!01300002A000055"
-    OUTSIDE_AIR_TEMPERATURE_PATH = ";1!000000001000055"
-    SUPPLY_AIR_TEMPERATURE_PATH = ";1!000000004000055"
-    EXTRACT_AIR_TEMPERATURE_PATH = ";1!00000003B000055"
-    EXHAUST_AIR_TEMPERATURE_PATH = ";1!00000000B000055"
-    ELECTRIC_HEATER_PATH = ";1!0050001BD000055"
-    FILTER_OPERATING_TIME_PATH = ";1!00200011D000055"
-    FILTER_TIME_FOR_EXCHANGE_PATH = ";1!00200011E000055"
-
-    APPLICATION_SOFTWARE_VERSION_PATH = ";0!0083FFFFF00000C"
-    DEVICE_DESCRIPTION_PATH = ";0!0083FFFFF00001C"
-    MODEL_NAME_PATH = ";0!0083FFFFF000046"
-    MODEL_INFORMATION_PATH = ";0!0083FFFFF0012DB"
-    SERIAL_NUMBER_PATH = ";0!0083FFFFF0013EC"
-    FIRMWARE_REVISION_PATH = ";0!0083FFFFF00002C"
-    LAST_RESTART_REASON_PATH = ";0!0083FFFFF0000C4"
-    OFFLINE_ONLINE_PATH = ";0!Online"
-    SYSTEM_STATUS_PATH = ";0!0083FFFFF000070"
-    BACNET_MAC_PATH = ";0!108000000001313"
-    DEVICE_FEATURES_PATH = ";0!0083FFFFF0013F4"
-
-
 class UtilClass:
     """UtilClass."""
 
@@ -69,27 +65,27 @@ class UtilClass:
         self.data: Dict[str, Any] = data
         self.plant: str = plant
 
-    def _int(self, path: Path) -> int:
+    def _int(self, path: str) -> int:
         """Get float from path."""
 
         return int(self._get(path))
 
-    def _int2(self, path: Path) -> int:
+    def _int2(self, path: str) -> int:
         """Get float from path."""
 
         return int(self._get2(path))
 
-    def _float(self, path: Path) -> float:
+    def _float(self, path: str) -> float:
         """Get float from path."""
 
         return float(self._get2(path))
 
-    def _get(self, path: Path) -> str:
+    def _get(self, path: str) -> str:
         """Get value from path."""
 
         return self.data[VALUES][f"{self.plant}{path.value}"][VALUE]
 
-    def _get2(self, path: Path) -> str:
+    def _get2(self, path: str) -> str:
         """Get value from path."""
 
         return self.data[VALUES][f"{self.plant}{path.value}"][VALUE][VALUE]
@@ -175,23 +171,19 @@ class FlexitSensorsResponse:
 
         util = UtilClass(data=data, plant=plant)
 
-        operating_time = util._get2(Path.FILTER_OPERATING_TIME_PATH)
-        exchange_time = util._get2(Path.FILTER_TIME_FOR_EXCHANGE_PATH)
+        operating_time = util._get2(FILTER_OPERATING_TIME_PATH)
+        exchange_time = util._get2(FILTER_TIME_FOR_EXCHANGE_PATH)
 
         return FlexitSensorsResponse(
-            home_air_temperature=util._float(Path.HOME_AIR_TEMPERATURE_PATH),
-            away_air_temperature=util._float(Path.AWAY_AIR_TEMPERATURE_PATH),
-            outside_air_temperature=util._float(Path.OUTSIDE_AIR_TEMPERATURE_PATH),
-            supply_air_temperature=util._float(Path.SUPPLY_AIR_TEMPERATURE_PATH),
-            exhaust_air_temperature=util._float(Path.EXHAUST_AIR_TEMPERATURE_PATH),
-            extract_air_temperature=util._float(Path.EXTRACT_AIR_TEMPERATURE_PATH),
-            room_temperature=util._float(Path.ROOM_TEMPERATURE_PATH),
-            electric_heater=util._electric_heater(
-                util._int2(Path.ELECTRIC_HEATER_PATH)
-            ),
-            ventilation_mode=util._ventilation_mode(
-                util._int2(Path.VENTILATION_MODE_PATH)
-            ),
+            home_air_temperature=util._float(HOME_AIR_TEMPERATURE_PATH),
+            away_air_temperature=util._float(AWAY_AIR_TEMPERATURE_PATH),
+            outside_air_temperature=util._float(OUTSIDE_AIR_TEMPERATURE_PATH),
+            supply_air_temperature=util._float(SUPPLY_AIR_TEMPERATURE_PATH),
+            exhaust_air_temperature=util._float(EXHAUST_AIR_TEMPERATURE_PATH),
+            extract_air_temperature=util._float(EXTRACT_AIR_TEMPERATURE_PATH),
+            room_temperature=util._float(ROOM_TEMPERATURE_PATH),
+            electric_heater=util._electric_heater(util._int2(ELECTRIC_HEATER_PATH)),
+            ventilation_mode=util._ventilation_mode(util._int2(VENTILATION_MODE_PATH)),
             filter_operating_time=operating_time,
             filter_time_for_exchange=exchange_time,
             dirty_filter=util._is_filter_dirty(operating_time, exchange_time),
@@ -221,17 +213,15 @@ class FlexitDeviceInfo:
         util = UtilClass(data=data, plant=plant)
 
         return FlexitDeviceInfo(
-            fw=util._get(Path.FIRMWARE_REVISION_PATH),
-            modelName=util._get(Path.MODEL_NAME_PATH),
-            modelInfo=util._get(Path.MODEL_INFORMATION_PATH),
-            serialInfo=util._get(Path.SERIAL_NUMBER_PATH),
-            systemStatus=util._get(Path.SYSTEM_STATUS_PATH),
-            status=util._get(Path.OFFLINE_ONLINE_PATH),
-            deviceDescription=util._get(Path.DEVICE_DESCRIPTION_PATH),
-            applicationSoftwareVersion=util._get(
-                Path.APPLICATION_SOFTWARE_VERSION_PATH
-            ),
-            lastRestartReason=util._int(Path.LAST_RESTART_REASON_PATH),
+            fw=util._get(FIRMWARE_REVISION_PATH),
+            modelName=util._get(MODEL_NAME_PATH),
+            modelInfo=util._get(MODEL_INFORMATION_PATH),
+            serialInfo=util._get(SERIAL_NUMBER_PATH),
+            systemStatus=util._get(SYSTEM_STATUS_PATH),
+            status=util._get(OFFLINE_ONLINE_PATH),
+            deviceDescription=util._get(DEVICE_DESCRIPTION_PATH),
+            applicationSoftwareVersion=util._get(APPLICATION_SOFTWARE_VERSION_PATH),
+            lastRestartReason=util._int(LAST_RESTART_REASON_PATH),
         )
 
 

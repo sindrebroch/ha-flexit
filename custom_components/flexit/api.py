@@ -4,22 +4,27 @@ from datetime import date, timedelta
 from typing import Any, Dict, List, Optional
 
 import urllib.parse
-import aiohttp
 from aiohttp.client import ClientSession
 from aiohttp.client_reqrep import ClientResponse
 
 from homeassistant.const import HTTP_OK
 
 from .const import (
+    AWAY_AIR_TEMPERATURE_PATH,
     DATAPOINTS_PATH,
+    DEVICE_INFO_PATH_LIST,
+    ELECTRIC_HEATER_PATH,
     FILTER_PATH,
+    HOME_AIR_TEMPERATURE_PATH,
     LOGGER,
     MODE_AWAY,
     MODE_HIGH,
     MODE_HOME,
     PLANTS_PATH,
+    SENSOR_DATA_PATH_LIST,
     SUBSCRIPTION_KEY,
     TOKEN_PATH,
+    VENTILATION_MODE_PUT_PATH,
 )
 
 from .models import (
@@ -29,34 +34,8 @@ from .models import (
     FlexitSensorsResponse,
     FlexitSensorsResponseStatus,
     FlexitToken,
-    Path,
 )
 
-SENSOR_DATA_PATH_LIST: List[Path] = [
-    Path.VENTILATION_MODE_PATH,
-    Path.OUTSIDE_AIR_TEMPERATURE_PATH,
-    Path.SUPPLY_AIR_TEMPERATURE_PATH,
-    Path.EXTRACT_AIR_TEMPERATURE_PATH,
-    Path.EXHAUST_AIR_TEMPERATURE_PATH,
-    Path.HOME_AIR_TEMPERATURE_PATH,
-    Path.AWAY_AIR_TEMPERATURE_PATH,
-    Path.ROOM_TEMPERATURE_PATH,
-    Path.FILTER_OPERATING_TIME_PATH,
-    Path.FILTER_TIME_FOR_EXCHANGE_PATH,
-    Path.ELECTRIC_HEATER_PATH,
-]
-
-DEVICE_INFO_PATH_LIST: List[Path] = [
-    Path.APPLICATION_SOFTWARE_VERSION_PATH,
-    Path.DEVICE_DESCRIPTION_PATH,
-    Path.MODEL_NAME_PATH,
-    Path.MODEL_INFORMATION_PATH,
-    Path.SERIAL_NUMBER_PATH,
-    Path.FIRMWARE_REVISION_PATH,
-    Path.OFFLINE_ONLINE_PATH,
-    Path.SYSTEM_STATUS_PATH,
-    Path.LAST_RESTART_REASON_PATH,
-]
 
 RESULT_SUCCESS = "Success"
 
@@ -66,28 +45,27 @@ class FlexitApiClient:
 
     def __init__(
         self,
-        session: aiohttp.client.ClientSession,
+        session: ClientSession,
         username: str,
         password: str,
-        plant_id: Optional[str] = None,
+        plant_id: str or None = None,
     ) -> None:
         """Initialize connection with the Flexit."""
+        self._session = session
+        self._username = username
+        self._password = password
+        self._plant_id = plant_id
 
-        self._session: ClientSession = session
-        self.username: str = username
-        self.password: str = password
-        self.plant_id: Optional[str] = plant_id
-
-        self.token: Optional[str] = None
+        self.token: str or None = None
         self.token_refreshdate: date = date.today()
 
-    def path(self, path: Path) -> str:
+    def path(self, path: str) -> str:
         """Return path with plant_id prefixed."""
 
-        if self.plant_id is None:
-            LOGGER.warning("plant_id=%s", self.plant_id)
+        if self._plant_id is None:
+            LOGGER.warning("plant_id=%s", self._plant_id)
 
-        return f"{self.plant_id}{path.value}"
+        return f"{self._plant_id}{path}"
 
     async def handle_request(self, response: ClientResponse) -> Any:
         """Get request."""
@@ -122,7 +100,7 @@ class FlexitApiClient:
             )
         )
 
-    async def put(self, path: Path, body: Any) -> Any:
+    async def put(self, path: str, body: Any) -> Any:
         """Put request."""
 
         LOGGER.debug("put=%s, body=%s", path, body)
@@ -155,7 +133,7 @@ class FlexitApiClient:
             self.token = FlexitToken.from_dict(
                 await self.post(
                     path=TOKEN_PATH,
-                    data=f"grant_type=password&username={self.username}&password={self.password}",
+                    data=f"grant_type=password&username={self._username}&password={self._password}",
                 )
             ).access_token
             self.token_refreshdate = date.today() + timedelta(days=1)
@@ -168,7 +146,7 @@ class FlexitApiClient:
         await self.auth()
         return FlexitPlants.from_dict(await self.get_url(PLANTS_PATH)).items
 
-    def create_list_from_paths(self, paths: List[Path]) -> str:
+    def create_list_from_paths(self, paths: List[str]) -> str:
         """Create path from PATH_LIST."""
 
         path_str: str = "["
@@ -183,10 +161,10 @@ class FlexitApiClient:
         """Fetch data."""
 
         await self.auth()
-        assert self.plant_id is not None
+        assert self._plant_id is not None
 
         return FlexitSensorsResponse.from_dict(
-            self.plant_id,
+            self._plant_id,
             await self.get(self.create_list_from_paths(SENSOR_DATA_PATH_LIST)),
         )
 
@@ -194,10 +172,10 @@ class FlexitApiClient:
         """Fetch device info."""
 
         await self.auth()
-        assert self.plant_id is not None
+        assert self._plant_id is not None
 
         return FlexitDeviceInfo.from_dict(
-            self.plant_id,
+            self._plant_id,
             await self.get(self.create_list_from_paths(DEVICE_INFO_PATH_LIST)),
         )
 
@@ -205,16 +183,16 @@ class FlexitApiClient:
         """Set home temp."""
 
         return self.is_success(
-            await self.put(Path.HOME_AIR_TEMPERATURE_PATH, temp),
-            self.path(Path.HOME_AIR_TEMPERATURE_PATH),
+            await self.put(HOME_AIR_TEMPERATURE_PATH, temp),
+            self.path(HOME_AIR_TEMPERATURE_PATH),
         )
 
     async def set_away_temp(self, temp) -> bool:
         """Set away temp."""
 
         return self.is_success(
-            await self.put(Path.AWAY_AIR_TEMPERATURE_PATH, temp),
-            self.path(Path.AWAY_AIR_TEMPERATURE_PATH),
+            await self.put(AWAY_AIR_TEMPERATURE_PATH, temp),
+            self.path(AWAY_AIR_TEMPERATURE_PATH),
         )
 
     async def set_mode(self, mode: str) -> bool:
@@ -230,16 +208,16 @@ class FlexitApiClient:
             return False
 
         return self.is_success(
-            await self.put(Path.VENTILATION_MODE_PUT_PATH, mode_int),
-            self.path(Path.VENTILATION_MODE_PUT_PATH),
+            await self.put(VENTILATION_MODE_PUT_PATH, mode_int),
+            self.path(VENTILATION_MODE_PUT_PATH),
         )
 
     async def set_heater_state(self, heater_bool: bool) -> bool:
         """Set heater state."""
 
         return self.is_success(
-            await self.put(Path.ELECTRIC_HEATER_PATH, 1 if heater_bool else 0),
-            self.path(Path.ELECTRIC_HEATER_PATH),
+            await self.put(ELECTRIC_HEATER_PATH, 1 if heater_bool else 0),
+            self.path(ELECTRIC_HEATER_PATH),
         )
 
     def get_headers(self) -> Dict[str, str]:
