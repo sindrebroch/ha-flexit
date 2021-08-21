@@ -95,10 +95,9 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
 
         self.coordinator = coordinator
         self.entity_description = description
-        self.sensor_data = _get_sensor_data(coordinator.data, description.key)
+        self.sensor_data = coordinator.data.__getattribute__(description.key)
 
         self._attr_unique_id = f"{description.key}"
-
         self._attr_device_info = coordinator._attr_device_info
 
     @property
@@ -111,11 +110,5 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
 
-        self.sensor_data = _get_sensor_data(
-            self.coordinator.data, self.entity_description.key
-        )
+        self.sensor_data = self.coordinator.data.__getattribute__(self.entity_description.key)
         self.async_write_ha_state()
-
-
-def _get_sensor_data(sensors: FlexitSensorsResponse, sensor_name: str) -> str:
-    return sensors.__getattribute__(sensor_name)

@@ -6,14 +6,12 @@ from typing import Any, Dict, List
 import attr
 
 from homeassistant.components.climate.const import (
-    HVAC_MODE_FAN_ONLY,
-    HVAC_MODE_HEAT,
     PRESET_AWAY,
     PRESET_BOOST,
     PRESET_HOME,
 )
 
-from .const import LOGGER
+from .const import LOGGER, MODE_AWAY, MODE_HIGH, MODE_HOME
 
 VALUE = "value"
 VALUES = "values"
@@ -35,13 +33,6 @@ class Entity(Enum):
     CLIMATE_FLEXIT = "climate_flexit"
     ELECTRIC_HEATER = "electric_heater"
     VENTILATION_MODE = "ventilation_mode"
-
-
-class HvacMode(Enum):
-    """Enum representing HvacModes."""
-
-    HEAT = HVAC_MODE_HEAT
-    FAN_ONLY = HVAC_MODE_FAN_ONLY
 
 
 class Preset(Enum):
@@ -149,14 +140,11 @@ class UtilClass:
         # 5 => Cooker hood
         # 7 => Timed boost ?
         if ventilation_int in (0, 3, 5, 7):
-            return Mode.HOME.value
-
+            return MODE_HOME
         if ventilation_int == 2:
-            return Mode.AWAY.value
-
+            return MODE_AWAY
         elif ventilation_int == 4:
-            return Mode.HIGH.value
-
+            return MODE_HIGH
         return f"Unknown mode: {str(ventilation_int)}"
 
 

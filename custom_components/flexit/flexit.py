@@ -1,7 +1,7 @@
 """Asynchronous Python client for Flexit."""
 
 from datetime import date, timedelta
-from typing import Any, Final, List, Optional
+from typing import Any, List, Optional
 
 import aiohttp
 from aiohttp.client import ClientSession
@@ -9,7 +9,7 @@ from aiohttp.client_reqrep import ClientResponse
 
 from homeassistant.const import HTTP_OK
 
-from .const import LOGGER, PLANTS_PATH, TOKEN_PATH
+from .const import LOGGER, MODE_AWAY, MODE_HIGH, MODE_HOME, PLANTS_PATH, TOKEN_PATH
 from .http import (
     get_escaped_datapoints_url,
     get_escaped_filter_url,
@@ -29,7 +29,7 @@ from .models import (
     Path,
 )
 
-SENSOR_DATA_PATH_LIST: Final[List[Path]] = [
+SENSOR_DATA_PATH_LIST: List[Path] = [
     Path.VENTILATION_MODE_PATH,
     Path.OUTSIDE_AIR_TEMPERATURE_PATH,
     Path.SUPPLY_AIR_TEMPERATURE_PATH,
@@ -43,7 +43,7 @@ SENSOR_DATA_PATH_LIST: Final[List[Path]] = [
     Path.ELECTRIC_HEATER_PATH,
 ]
 
-DEVICE_INFO_PATH_LIST: Final[List[Path]] = [
+DEVICE_INFO_PATH_LIST: List[Path] = [
     Path.APPLICATION_SOFTWARE_VERSION_PATH,
     Path.DEVICE_DESCRIPTION_PATH,
     Path.MODEL_NAME_PATH,
@@ -147,13 +147,12 @@ class Flexit:
         """Set token."""
 
         if self.token_refreshdate == date.today():
-            flexit_token = FlexitToken.from_dict(
+            self.token = FlexitToken.from_dict(
                 await self.post(
                     path=TOKEN_PATH,
                     data=get_token_body(self.username, self.password),
                 )
-            )
-            self.token = flexit_token.access_token
+            ).access_token
             self.token_refreshdate = date.today() + timedelta(days=1)
 
         return True
@@ -162,7 +161,6 @@ class Flexit:
         """Find plants."""
 
         await self.auth()
-
         return FlexitPlants.from_dict(await self.get_url(PLANTS_PATH)).items
 
     def create_list_from_paths(self, paths: List[Path]) -> str:
@@ -201,32 +199,40 @@ class Flexit:
     async def set_home_temp(self, temp) -> bool:
         """Set home temp."""
 
-        path = Path.HOME_AIR_TEMPERATURE_PATH
-        return is_success(await self.put(path, temp), self.path(path))
+        return is_success(
+            await self.put(Path.HOME_AIR_TEMPERATURE_PATH, temp),
+            self.path(Path.HOME_AIR_TEMPERATURE_PATH),
+        )
 
     async def set_away_temp(self, temp) -> bool:
         """Set away temp."""
 
-        path = Path.AWAY_AIR_TEMPERATURE_PATH
-        return is_success(await self.put(path, temp), self.path(path))
+        return is_success(
+            await self.put(Path.AWAY_AIR_TEMPERATURE_PATH, temp),
+            self.path(Path.AWAY_AIR_TEMPERATURE_PATH),
+        )
 
-    async def set_mode(self, mode: Mode) -> bool:
+    async def set_mode(self, mode: str) -> bool:
         """Set ventilation mode."""
 
-        switcher = {Mode.HOME: 0, Mode.AWAY: 2, Mode.HIGH: 4}
-
-        mode_int = switcher.get(mode, -1)
+        mode_int = {
+            MODE_HOME: 0,
+            MODE_AWAY: 2,
+            MODE_HIGH: 4,
+        }.get(mode, -1)
 
         if mode_int == -1:
             return False
 
-        path = Path.VENTILATION_MODE_PUT_PATH
-        return is_success(await self.put(path, mode_int), self.path(path))
+        return is_success(
+            await self.put(Path.VENTILATION_MODE_PUT_PATH, mode_int),
+            self.path(Path.VENTILATION_MODE_PUT_PATH),
+        )
 
     async def set_heater_state(self, heater_bool: bool) -> bool:
         """Set heater state."""
 
-        path = Path.ELECTRIC_HEATER_PATH
         return is_success(
-            await self.put(path, 1 if heater_bool else 0), self.path(path)
+            await self.put(Path.ELECTRIC_HEATER_PATH, 1 if heater_bool else 0),
+            self.path(Path.ELECTRIC_HEATER_PATH),
         )

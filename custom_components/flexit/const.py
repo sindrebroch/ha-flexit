@@ -18,3 +18,11 @@ TOKEN_PATH: str = f"{API_URL}/Token"
 PLANTS_PATH: str = f"{API_URL}/Plants"
 DATAPOINTS_PATH: str = f"{API_URL}/DataPoints"
 FILTER_PATH: str = f"{DATAPOINTS_PATH}/Values?filterId="
+
+ATTR_OPERATING_TIME = "operating_time_hours"
+ATTR_TIME_TO_CHANGE = "time_to_change_hours"
+
+MODE_HOME = "Home"
+MODE_AWAY = "Away"
+MODE_HIGH = "High"
+MODE_COOKER_HOOD = "Cooker hood"

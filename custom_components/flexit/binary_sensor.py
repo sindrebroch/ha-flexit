@@ -1,6 +1,6 @@
 """Support for getting statistical data from a Flexit system."""
 
-from typing import Final, List, Tuple, cast
+from typing import Final, Tuple, cast
 
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
@@ -12,7 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import FlexitDataUpdateCoordinator
-from .const import DOMAIN as FLEXIT_DOMAIN
+from .const import DOMAIN as FLEXIT_DOMAIN, ATTR_OPERATING_TIME, ATTR_TIME_TO_CHANGE
 from .models import Entity, FlexitSensorsResponse
 
 BINARY_SENSORS: Final[Tuple[BinarySensorEntityDescription, ...]] = (
@@ -54,24 +54,23 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self.coordinator = coordinator
 
         data: FlexitSensorsResponse = coordinator.data
-        self.sensor_data = _get_sensor_data(data, description.key)
+        self.sensor_data = data.__getattribute__(description.key)
 
         self._attr_unique_id = f"{description.key}"
         self._attr_device_info = coordinator._attr_device_info
 
         if self.entity_description.key == Entity.DIRTY_FILTER.value:
             self._attr_extra_state_attributes = {
-                "operating_time_hours": data.filter_operating_time,
-                "time_to_change_hours": data.filter_time_for_exchange,
+                ATTR_OPERATING_TIME: data.filter_operating_time,
+                ATTR_TIME_TO_CHANGE: data.filter_time_for_exchange,
             }
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
 
-        self.sensor_data = _get_sensor_data(
-            self.coordinator.data, self.entity_description.key
-        )
+        self.sensor_data = self.coordinator.data.__getattribute__(self.entity_description.key)
+        
         self.async_write_ha_state()
 
     @property
@@ -79,7 +78,3 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
         """Return true if the binary sensor is on."""
 
         return cast(bool, self.sensor_data)
-
-
-def _get_sensor_data(sensors: FlexitSensorsResponse, sensor_name: str) -> str:
-    return sensors.__getattribute__(sensor_name)
