@@ -75,12 +75,8 @@ async def async_setup_entry(
 
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
 
-    sensors: list[FlexitSensor] = []
-
     for description in SENSORS:
-        sensors.append(FlexitSensor(coordinator, description))
-
-    async_add_entities(sensors)
+        async_add_entities([FlexitSensor(coordinator, description)])
 
 
 class FlexitSensor(CoordinatorEntity, SensorEntity):

@@ -37,13 +37,8 @@ async def async_setup_entry(
 
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
 
-    climates: List[FlexitClimate] = []
-
     for description in CLIMATES:
-        climates.append(FlexitClimate(coordinator, description))
-
-    async_add_entities(climates)
-
+        async_add_entities([FlexitClimate(coordinator, description)])
 
 class FlexitClimate(CoordinatorEntity, ClimateEntity):
     """Representation of a Flexit ventilation unit."""

@@ -32,12 +32,8 @@ async def async_setup_entry(
 
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
 
-    binary_sensors: List[FlexitBinarySensor] = []
-
     for description in BINARY_SENSORS:
-        binary_sensors.append(FlexitBinarySensor(coordinator, description))
-
-    async_add_entities(binary_sensors)
+        async_add_entities([FlexitBinarySensor(coordinator, description)])
 
 
 class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
