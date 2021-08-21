@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import Flexit
+from .api import FlexitApiClient
 from .const import DOMAIN as FLEXIT_DOMAIN, LOGGER
 from .models import FlexitDeviceInfo, FlexitSensorsResponse
 
@@ -25,15 +25,15 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
         self,
         hass: HomeAssistant,
         name: str,
-        api: Flexit,
+        api: FlexitApiClient,
         device_info: FlexitDeviceInfo,
         update_interval: int,
     ) -> None:
         """Initialize."""
 
-        self.name: str = name
-        self.api: Flexit = api
-        self.device_info: FlexitDeviceInfo = device_info
+        self.name = name
+        self.api = api
+        self.device_info = device_info
 
         self._attr_device_info: DeviceInfo = {
             "name": self.name,

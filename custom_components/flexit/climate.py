@@ -1,6 +1,6 @@
 """Platform for Flexit AC units."""
 
-from typing import Any, Final, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 from homeassistant.components.climate import ClimateEntity, ClimateEntityDescription
 from homeassistant.components.climate.const import (
@@ -20,7 +20,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from . import FlexitDataUpdateCoordinator
+from .api import FlexitApiClient
 from .const import (
     DOMAIN as FLEXIT_DOMAIN,
     LOGGER,
@@ -29,10 +29,10 @@ from .const import (
     MODE_HIGH,
     MODE_HOME,
 )
-from .api import Flexit
+from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity, FlexitSensorsResponse
 
-CLIMATES: Final[Tuple[ClimateEntityDescription, ...]] = (
+CLIMATES: Tuple[ClimateEntityDescription, ...] = (
     ClimateEntityDescription(
         name="Climate",
         icon="mdi:hvac",
@@ -125,24 +125,27 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
     def hvac_mode(self) -> str:
         """Return current_hvac_mode operation ie. heat, fan_only."""
 
-        data: FlexitSensorsResponse = self.coordinator.data
-        return HVAC_MODE_HEAT if data.electric_heater else HVAC_MODE_FAN_ONLY
+        return (
+            HVAC_MODE_HEAT
+            if self.coordinator.data.electric_heater
+            else HVAC_MODE_FAN_ONLY
+        )
 
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         """Set new target hvac mode."""
 
         coordinator: FlexitDataUpdateCoordinator = self.coordinator
-        data: FlexitSensorsResponse = coordinator.data
-        api: Flexit = coordinator.api
 
         if hvac_mode == self.hvac_mode:
             return
-
-        elif hvac_mode == HVAC_MODE_HEAT and await api.set_heater_state(True):
-            data.electric_heater = True
-
-        elif hvac_mode == HVAC_MODE_FAN_ONLY and await api.set_heater_state(False):
-            data.electric_heater = False
+        elif hvac_mode == HVAC_MODE_HEAT and await coordinator.api.set_heater_state(
+            True
+        ):
+            coordinator.data.electric_heater = True
+        elif hvac_mode == HVAC_MODE_FAN_ONLY and await coordinator.api.set_heater_state(
+            False
+        ):
+            coordinator.data.electric_heater = False
 
         self.async_write_ha_state()
 
@@ -150,16 +153,17 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
     def hvac_action(self) -> str:
         """Return the current_hvac_mode running hvac operation if supported."""
 
-        data: FlexitSensorsResponse = self.coordinator.data
-        return CURRENT_HVAC_HEAT if data.electric_heater else CURRENT_HVAC_IDLE
+        return (
+            CURRENT_HVAC_HEAT
+            if self.coordinator.data.electric_heater
+            else CURRENT_HVAC_IDLE
+        )
 
     @property
     def preset_mode(self) -> str:
         """Return the current_hvac_mode preset mode."""
 
-        coordinator: FlexitDataUpdateCoordinator = self.coordinator
-        data: FlexitSensorsResponse = coordinator.data
-        current_mode: str = data.ventilation_mode
+        current_mode = self.coordinator.data.ventilation_mode
 
         if current_mode == MODE_HOME:
             return PRESET_HOME

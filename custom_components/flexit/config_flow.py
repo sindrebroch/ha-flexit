@@ -12,7 +12,7 @@ from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import Flexit
+from .api import FlexitApiClient
 from .const import CONF_INTERVAL, CONF_PLANT, DEFAULT_INTERVAL, DOMAIN as FLEXIT_DOMAIN
 from .models import FlexitPlantItem
 
@@ -69,7 +69,7 @@ class FlexitFlowHandler(ConfigFlow, domain=FLEXIT_DOMAIN):
         username: str = user_input[CONF_USERNAME]
         password: str = user_input[CONF_PASSWORD]
         session: ClientSession = async_get_clientsession(self.hass)
-        api: Flexit = Flexit(session, username, password)
+        api = FlexitApiClient(session, username, password)
 
         try:
             self.plants = await api.find_plants()

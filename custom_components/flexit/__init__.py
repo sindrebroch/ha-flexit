@@ -1,17 +1,17 @@
 """The flexit component."""
 
-from typing import Final, List
+from typing import List
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import Flexit
+from .api import FlexitApiClient
 from .const import CONF_INTERVAL, CONF_PLANT, DEFAULT_INTERVAL, DOMAIN as FLEXIT_DOMAIN
 from .coordinator import FlexitDataUpdateCoordinator
 
-PLATFORMS: Final[List[str]] = ["binary_sensor", "climate", "sensor"]
+PLATFORMS: List[str] = ["binary_sensor", "climate", "sensor"]
 ICON = "mdi:account"
 
 
@@ -28,7 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             },
         )
 
-    api: Flexit = Flexit(
+    api = FlexitApiClient(
         session=async_get_clientsession(hass),
         username=entry.data[CONF_USERNAME],
         password=entry.data[CONF_PASSWORD],

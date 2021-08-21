@@ -1,6 +1,6 @@
 """Support for getting statistical data from a Flexit system."""
 
-from typing import Final, Tuple, cast
+from typing import Tuple, cast
 
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
@@ -11,17 +11,18 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from . import FlexitDataUpdateCoordinator
 from .const import DOMAIN as FLEXIT_DOMAIN, ATTR_OPERATING_TIME, ATTR_TIME_TO_CHANGE
+from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity, FlexitSensorsResponse
 
-BINARY_SENSORS: Final[Tuple[BinarySensorEntityDescription, ...]] = (
+BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         name="Dirty filter",
         icon="mdi:hvac",
         key=Entity.DIRTY_FILTER.value,
     ),
 )
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -69,8 +70,10 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
 
-        self.sensor_data = self.coordinator.data.__getattribute__(self.entity_description.key)
-        
+        self.sensor_data = self.coordinator.data.__getattribute__(
+            self.entity_description.key
+        )
+
         self.async_write_ha_state()
 
     @property

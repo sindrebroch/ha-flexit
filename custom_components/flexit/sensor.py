@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Final, cast
+from typing import cast
 
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
@@ -16,13 +16,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from . import FlexitDataUpdateCoordinator
 from .const import DOMAIN as FLEXIT_DOMAIN
+from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity
 
 TEMPERATURE_ICON = "mdi:thermometer"
 
-SENSORS: Final[tuple[SensorEntityDescription, ...]] = (
+SENSORS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
         name="Room temperature",
         key=Entity.ROOM_TEMPERATURE.value,

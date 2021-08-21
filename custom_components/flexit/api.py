@@ -55,7 +55,7 @@ DEVICE_INFO_PATH_LIST: List[Path] = [
 ]
 
 
-class Flexit:
+class FlexitApiClient:
     """Main class for handling connections with a Flexit unit."""
 
     def __init__(
