@@ -11,9 +11,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
+from .api import Flexit
 from .const import DOMAIN as FLEXIT_DOMAIN, LOGGER
-from .flexit import Flexit
 from .models import FlexitDeviceInfo, FlexitSensorsResponse
+
 
 class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching from Flexit data API."""
@@ -24,14 +25,14 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
         self,
         hass: HomeAssistant,
         name: str,
-        flexit: Flexit,
+        api: Flexit,
         device_info: FlexitDeviceInfo,
         update_interval: int,
     ) -> None:
         """Initialize."""
 
         self.name: str = name
-        self.flexit: Flexit = flexit
+        self.api: Flexit = api
         self.device_info: FlexitDeviceInfo = device_info
 
         self._attr_device_info: DeviceInfo = {
@@ -54,10 +55,10 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
 
         try:
             async with timeout(10):
-                flexit = await self.flexit.sensor_data()
+                data = await self.api.sensor_data()
 
         except (Error, ClientConnectorError) as error:
             LOGGER.error("Update error %s", error)
             raise UpdateFailed(error) from error
 
-        return flexit
+        return data

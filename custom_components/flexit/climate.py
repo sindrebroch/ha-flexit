@@ -29,7 +29,7 @@ from .const import (
     MODE_HIGH,
     MODE_HOME,
 )
-from .flexit import Flexit
+from .api import Flexit
 from .models import Entity, FlexitSensorsResponse
 
 CLIMATES: Final[Tuple[ClimateEntityDescription, ...]] = (
@@ -112,11 +112,11 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
 
         elif (
             coordinator.data.ventilation_mode == MODE_AWAY
-            and await coordinator.flexit.set_away_temp(str(float_temp))
+            and await coordinator.api.set_away_temp(str(float_temp))
         ):
             coordinator.data.away_air_temperature = float_temp
 
-        elif await coordinator.flexit.set_home_temp(str(float_temp)):
+        elif await coordinator.api.set_home_temp(str(float_temp)):
             coordinator.data.home_air_temperature = float_temp
 
         self.async_write_ha_state()
@@ -133,15 +133,15 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
 
         coordinator: FlexitDataUpdateCoordinator = self.coordinator
         data: FlexitSensorsResponse = coordinator.data
-        flexit: Flexit = coordinator.flexit
+        api: Flexit = coordinator.api
 
         if hvac_mode == self.hvac_mode:
             return
 
-        elif hvac_mode == HVAC_MODE_HEAT and await flexit.set_heater_state(True):
+        elif hvac_mode == HVAC_MODE_HEAT and await api.set_heater_state(True):
             data.electric_heater = True
 
-        elif hvac_mode == HVAC_MODE_FAN_ONLY and await flexit.set_heater_state(False):
+        elif hvac_mode == HVAC_MODE_FAN_ONLY and await api.set_heater_state(False):
             data.electric_heater = False
 
         self.async_write_ha_state()
@@ -178,16 +178,10 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
 
         if coordinator.data.ventilation_mode == preset_mode:
             return
-        elif preset_mode == PRESET_HOME and await coordinator.flexit.set_mode(
-            MODE_HOME
-        ):
+        elif preset_mode == PRESET_HOME and await coordinator.api.set_mode(MODE_HOME):
             coordinator.data.ventilation_mode = MODE_HOME
-        elif preset_mode == PRESET_AWAY and await coordinator.flexit.set_mode(
-            MODE_AWAY
-        ):
+        elif preset_mode == PRESET_AWAY and await coordinator.api.set_mode(MODE_AWAY):
             coordinator.data.ventilation_mode = MODE_AWAY
-        elif preset_mode == PRESET_BOOST and await coordinator.flexit.set_mode(
-            MODE_HIGH
-        ):
+        elif preset_mode == PRESET_BOOST and await coordinator.api.set_mode(MODE_HIGH):
             coordinator.data.ventilation_mode = MODE_HIGH
         self.async_write_ha_state()

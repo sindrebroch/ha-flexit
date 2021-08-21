@@ -18,7 +18,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import FlexitDataUpdateCoordinator
 from .const import DOMAIN as FLEXIT_DOMAIN
-from .models import Entity, FlexitSensorsResponse
+from .models import Entity
 
 TEMPERATURE_ICON = "mdi:thermometer"
 
@@ -110,5 +110,7 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
 
-        self.sensor_data = self.coordinator.data.__getattribute__(self.entity_description.key)
+        self.sensor_data = self.coordinator.data.__getattribute__(
+            self.entity_description.key
+        )
         self.async_write_ha_state()
