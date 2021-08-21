@@ -13,7 +13,7 @@ from .const import (
     AWAY_AIR_TEMPERATURE_PATH,
     DATAPOINTS_PATH,
     DEVICE_INFO_PATH_LIST,
-    ELECTRIC_HEATER_PATH,
+    HEATER_PATH,
     FILTER_PATH,
     HOME_AIR_TEMPERATURE_PATH,
     LOGGER,
@@ -23,7 +23,7 @@ from .const import (
     PLANTS_PATH,
     SENSOR_DATA_PATH_LIST,
     TOKEN_PATH,
-    VENTILATION_MODE_PUT_PATH,
+    MODE_PUT_PATH,
 )
 from .models import (
     FlexitDeviceInfo,
@@ -164,15 +164,11 @@ class FlexitApiClient:
             MODE_HIGH: 4,
         }.get(mode, -1)
 
-        return (
-            False
-            if mode_int == -1
-            else await self.update(VENTILATION_MODE_PUT_PATH, mode_int)
-        )
+        return False if mode_int == -1 else await self.update(MODE_PUT_PATH, mode_int)
 
     async def set_heater_state(self, heater_bool: bool) -> bool:
         """Set heater state."""
-        return await self.update(ELECTRIC_HEATER_PATH, 1 if heater_bool else 0)
+        return await self.update(HEATER_PATH, 1 if heater_bool else 0)
 
     def path(self, path: str) -> str:
         """Return path with plant_id prefixed."""

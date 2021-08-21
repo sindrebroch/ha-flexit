@@ -9,7 +9,7 @@ from .const import (
     APPLICATION_SOFTWARE_VERSION_PATH,
     AWAY_AIR_TEMPERATURE_PATH,
     DEVICE_DESCRIPTION_PATH,
-    ELECTRIC_HEATER_PATH,
+    HEATER_PATH,
     EXHAUST_AIR_TEMPERATURE_PATH,
     EXTRACT_AIR_TEMPERATURE_PATH,
     FILTER_OPERATING_TIME_PATH,
@@ -29,7 +29,7 @@ from .const import (
     SERIAL_NUMBER_PATH,
     SUPPLY_AIR_TEMPERATURE_PATH,
     SYSTEM_STATUS_PATH,
-    VENTILATION_MODE_PATH,
+    MODE_PATH,
 )
 
 VALUE = "value"
@@ -61,43 +61,35 @@ class UtilClass:
         plant: str,
     ) -> None:
         """Initialize."""
-
         self.data: Dict[str, Any] = data
         self.plant: str = plant
 
-    def _int(self, path: str) -> int:
-        """Get float from path."""
-
-        return int(self._get(path))
-
-    def _int2(self, path: str) -> int:
-        """Get float from path."""
-
-        return int(self._get2(path))
-
-    def _float(self, path: str) -> float:
-        """Get float from path."""
-
-        return float(self._get2(path))
-
-    def _get(self, path: str) -> str:
+    def _str_device(self, path: str) -> str:
         """Get value from path."""
+        return self.data[VALUES][f"{self.plant}{path}"][VALUE]
 
-        return self.data[VALUES][f"{self.plant}{path.value}"][VALUE]
+    def _int_device(self, path: str) -> int:
+        """Get float from path."""
+        return int(self._str_device(path))
 
-    def _get2(self, path: str) -> str:
+    def _str_sensor(self, path: str) -> str:
         """Get value from path."""
+        return self.data[VALUES][f"{self.plant}{path}"][VALUE][VALUE]
 
-        return self.data[VALUES][f"{self.plant}{path.value}"][VALUE][VALUE]
+    def _int_sensor(self, path: str) -> int:
+        """Get float from path."""
+        return int(self._str_sensor(path))
 
-    def _is_filter_dirty(self, operating_time: str, exchange_time: str) -> bool:
+    def _float_sensor(self, path: str) -> float:
+        """Get float from path."""
+        return float(self._str_sensor(path))
+
+    def _dirty_filter(self, operating_time: str, exchange_time: str) -> bool:
         """Get filter status based on hours operated."""
-
         return True if operating_time >= exchange_time else False
 
-    def _electric_heater(self, heater_int: int) -> bool:
+    def _is_heating(self, heater_int: int) -> bool:
         """Get electric heater status from integer."""
-
         return True if heater_int == 1 else False
 
     def _ventilation_mode(self, ventilation_int: int) -> str:
@@ -154,12 +146,9 @@ class FlexitSensorsResponse:
     away_air_temperature: float
     home_air_temperature: float
     room_temperature: float
-
     ventilation_mode: str
-
     electric_heater: bool
     dirty_filter: bool
-
     filter_operating_time: str
     filter_time_for_exchange: str
 
@@ -171,22 +160,22 @@ class FlexitSensorsResponse:
 
         util = UtilClass(data=data, plant=plant)
 
-        operating_time = util._get2(FILTER_OPERATING_TIME_PATH)
-        exchange_time = util._get2(FILTER_TIME_FOR_EXCHANGE_PATH)
-
         return FlexitSensorsResponse(
-            home_air_temperature=util._float(HOME_AIR_TEMPERATURE_PATH),
-            away_air_temperature=util._float(AWAY_AIR_TEMPERATURE_PATH),
-            outside_air_temperature=util._float(OUTSIDE_AIR_TEMPERATURE_PATH),
-            supply_air_temperature=util._float(SUPPLY_AIR_TEMPERATURE_PATH),
-            exhaust_air_temperature=util._float(EXHAUST_AIR_TEMPERATURE_PATH),
-            extract_air_temperature=util._float(EXTRACT_AIR_TEMPERATURE_PATH),
-            room_temperature=util._float(ROOM_TEMPERATURE_PATH),
-            electric_heater=util._electric_heater(util._int2(ELECTRIC_HEATER_PATH)),
-            ventilation_mode=util._ventilation_mode(util._int2(VENTILATION_MODE_PATH)),
-            filter_operating_time=operating_time,
-            filter_time_for_exchange=exchange_time,
-            dirty_filter=util._is_filter_dirty(operating_time, exchange_time),
+            home_air_temperature=util._float_sensor(HOME_AIR_TEMPERATURE_PATH),
+            away_air_temperature=util._float_sensor(AWAY_AIR_TEMPERATURE_PATH),
+            outside_air_temperature=util._float_sensor(OUTSIDE_AIR_TEMPERATURE_PATH),
+            supply_air_temperature=util._float_sensor(SUPPLY_AIR_TEMPERATURE_PATH),
+            exhaust_air_temperature=util._float_sensor(EXHAUST_AIR_TEMPERATURE_PATH),
+            extract_air_temperature=util._float_sensor(EXTRACT_AIR_TEMPERATURE_PATH),
+            room_temperature=util._float_sensor(ROOM_TEMPERATURE_PATH),
+            electric_heater=util._is_heating(util._int_sensor(HEATER_PATH)),
+            ventilation_mode=util._ventilation_mode(util._int_sensor(MODE_PATH)),
+            filter_operating_time=util._str_sensor(FILTER_OPERATING_TIME_PATH),
+            filter_time_for_exchange=util._str_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
+            dirty_filter=util._dirty_filter(
+                util._str_sensor(FILTER_OPERATING_TIME_PATH),
+                util._str_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
+            ),
         )
 
 
@@ -213,15 +202,17 @@ class FlexitDeviceInfo:
         util = UtilClass(data=data, plant=plant)
 
         return FlexitDeviceInfo(
-            fw=util._get(FIRMWARE_REVISION_PATH),
-            modelName=util._get(MODEL_NAME_PATH),
-            modelInfo=util._get(MODEL_INFORMATION_PATH),
-            serialInfo=util._get(SERIAL_NUMBER_PATH),
-            systemStatus=util._get(SYSTEM_STATUS_PATH),
-            status=util._get(OFFLINE_ONLINE_PATH),
-            deviceDescription=util._get(DEVICE_DESCRIPTION_PATH),
-            applicationSoftwareVersion=util._get(APPLICATION_SOFTWARE_VERSION_PATH),
-            lastRestartReason=util._int(LAST_RESTART_REASON_PATH),
+            fw=util._str_device(FIRMWARE_REVISION_PATH),
+            modelName=util._str_device(MODEL_NAME_PATH),
+            modelInfo=util._str_device(MODEL_INFORMATION_PATH),
+            serialInfo=util._str_device(SERIAL_NUMBER_PATH),
+            systemStatus=util._str_device(SYSTEM_STATUS_PATH),
+            status=util._str_device(OFFLINE_ONLINE_PATH),
+            deviceDescription=util._str_device(DEVICE_DESCRIPTION_PATH),
+            applicationSoftwareVersion=util._str_device(
+                APPLICATION_SOFTWARE_VERSION_PATH
+            ),
+            lastRestartReason=util._int_device(LAST_RESTART_REASON_PATH),
         )
 
 
