@@ -32,7 +32,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         session=async_get_clientsession(hass),
         username=entry.data[CONF_USERNAME],
         password=entry.data[CONF_PASSWORD],
-        plant=entry.data[CONF_PLANT],
+        plant_id=entry.data[CONF_PLANT],
     )
     coordinator = FlexitDataUpdateCoordinator(
         hass,

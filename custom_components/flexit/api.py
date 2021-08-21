@@ -5,8 +5,10 @@ from typing import Any, Dict, List
 
 import asyncio
 import urllib.parse
+import aiohttp
 import async_timeout
 from aiohttp.client import ClientSession
+from homeassistant.helpers.config_validation import socket_timeout
 
 from .const import (
     API_HEADERS,
@@ -33,6 +35,10 @@ from .models import (
     FlexitSensorsResponseStatus,
     FlexitToken,
 )
+
+
+class ApiClientException(Exception):
+    """Api Client Exception."""
 
 
 class FlexitApiClient:
@@ -88,14 +94,26 @@ class FlexitApiClient:
             headers,
         )
 
-        async with async_timeout.timeout(10, loop=asyncio.get_event_loop()):
-            response = await self._session.request(
-                method=method,
-                url=url,
-                headers=headers,
-                json=data,
-            )
-            return await response.json()
+        try:
+            async with async_timeout.timeout(10, loop=asyncio.get_event_loop()):
+                response = await self._session.request(
+                    method=method, url=url, headers=headers, json=data
+                )
+                return await response.json()
+        except asyncio.TimeoutError as exception:
+            raise ApiClientException(
+                f"Timeout error fetching information from {url}"
+            ) from exception
+        except (KeyError, TypeError) as exception:
+            raise ApiClientException(
+                f"Error parsing information from {url} - {exception}"
+            ) from exception
+        except (aiohttp.ClientError, socket_timeout.gaierror) as exception:
+            raise ApiClientException(
+                f"Error fetching information from {url} - {exception}"
+            ) from exception
+        except Exception as exception:  # pylint: disable=broad-except
+            raise ApiClientException(exception) from exception
 
     async def auth(self) -> bool:
         """Set token."""
