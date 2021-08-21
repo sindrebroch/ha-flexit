@@ -27,6 +27,12 @@ API_HEADERS = {
     "Ocp-Apim-Subscription-Key": "c3fc1f14ce8747588212eda5ae3b439e",
 }
 
+BINARY_SENSOR = "binary_sensor"
+CLIMATE = "climate"
+SENSOR = "sensor"
+PLATFORMS: List[str] = [BINARY_SENSOR, CLIMATE, SENSOR]
+
+
 # Attributes
 ATTR_OPERATING_TIME = "operating_time_hours"
 ATTR_TIME_TO_CHANGE = "time_to_change_hours"
