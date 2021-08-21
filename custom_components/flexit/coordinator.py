@@ -3,7 +3,6 @@
 from datetime import timedelta
 
 from aiohttp.client_exceptions import ClientConnectorError
-from async_timeout import timeout
 from voluptuous.error import Error
 
 from homeassistant.core import HomeAssistant
@@ -31,8 +30,8 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
     ) -> None:
         """Initialize."""
 
-        self.name = name
         self.api = api
+        self.name = name
         self.device_info = device_info
 
         self._attr_device_info: DeviceInfo = {
@@ -54,11 +53,7 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
         """Update data via library."""
 
         try:
-            async with timeout(10):
-                data = await self.api.sensor_data()
-
+            return await self.api.sensor_data()
         except (Error, ClientConnectorError) as error:
             LOGGER.error("Update error %s", error)
             raise UpdateFailed(error) from error
-
-        return data

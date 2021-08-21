@@ -1,8 +1,7 @@
 """Config flow to configure the Flexit integration."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-from aiohttp.client import ClientSession
 import voluptuous as vol
 from voluptuous.schema_builder import Schema
 
@@ -56,7 +55,7 @@ class FlexitFlowHandler(ConfigFlow, domain=FLEXIT_DOMAIN):
 
     async def async_step_user(
         self,
-        user_input: Optional[Dict[str, Any]] = None,
+        user_input: Dict[str, Any] or None = None,
     ) -> FlowResult:
         """Handle a flow initiated by the user."""
 
@@ -66,20 +65,20 @@ class FlexitFlowHandler(ConfigFlow, domain=FLEXIT_DOMAIN):
         self.user_input = user_input
         name: str = user_input[CONF_NAME]
         self.title = name.title()
-        username: str = user_input[CONF_USERNAME]
-        password: str = user_input[CONF_PASSWORD]
-        session: ClientSession = async_get_clientsession(self.hass)
-        api = FlexitApiClient(session, username, password)
+
+        api = FlexitApiClient(
+            async_get_clientsession(self.hass),
+            user_input[CONF_USERNAME],
+            user_input[CONF_PASSWORD],
+        )
 
         try:
             self.plants = await api.find_plants()
-
         except Exception:
             return self.show_user_form({"base": "cannot_connect"})
 
         if self.plants is None or len(self.plants) == 0:
             return self.async_abort(reason="no_devices_found")
-
         elif self.plants is not None and len(self.plants) == 1:
             return self.async_create_entry(
                 title=self.title,
@@ -90,7 +89,7 @@ class FlexitFlowHandler(ConfigFlow, domain=FLEXIT_DOMAIN):
 
     async def async_step_plant(
         self,
-        user_input: Optional[Dict[str, Any]] = None,
+        user_input: Dict[str, Any] or None = None,
     ) -> FlowResult:
         """Flow to handle choosing plant."""
 
@@ -116,7 +115,6 @@ class FlexitFlowHandler(ConfigFlow, domain=FLEXIT_DOMAIN):
     @callback
     def async_get_options_flow(config_entry):
         """Get the options flow for this handler."""
-
         return FlexitOptionsFlowHandler(config_entry)
 
 
@@ -125,16 +123,10 @@ class FlexitOptionsFlowHandler(OptionsFlow):
 
     def __init__(self, config_entry) -> None:
         """Initialize options flow."""
-
         self.config_entry = config_entry
 
-    def get_option_schema(self, default: int) -> Schema:
-        """Get option schema."""
-
-        return vol.Schema({vol.Required(CONF_INTERVAL, default=default): int})
-
     async def async_step_init(
-        self, user_input: Optional[Dict[str, Any]] = None
+        self, user_input: Dict[str, Any] or None = None
     ) -> FlowResult:
         """Manage Flexit options."""
 
@@ -143,7 +135,7 @@ class FlexitOptionsFlowHandler(OptionsFlow):
 
         return self.async_show_form(
             step_id="init",
-            data_schema=self.get_option_schema(
-                self.config_entry.options.get(CONF_INTERVAL, DEFAULT_INTERVAL)
+            data_schema=vol.Schema(
+                {vol.Required(CONF_INTERVAL, default=DEFAULT_INTERVAL): int}
             ),
         )

@@ -20,7 +20,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .api import FlexitApiClient
 from .const import (
     DOMAIN as FLEXIT_DOMAIN,
     LOGGER,
