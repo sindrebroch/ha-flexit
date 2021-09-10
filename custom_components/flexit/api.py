@@ -166,7 +166,7 @@ class FlexitApiClient:
 
     async def update(self, path: str, value: Any) -> bool:
         """Update path with value."""
-        return await self.is_success(await self.put(path, str(value)), path)
+        return await self.is_success(await self.put(path, str(value)), self.path(path))
 
     async def set_home_temp(self, temp) -> bool:
         """Set home temp."""
@@ -191,6 +191,12 @@ class FlexitApiClient:
         """Set heater state."""
         return await self.update(HEATER_PATH, 1 if heater_bool else 0)
 
+    async def is_success(self, response: Dict[str, Any], path_with_plant: str) -> bool:
+        """Check if response is successful."""
+
+        stateTexts = FlexitSensorsResponseStatus.from_dict(response).stateTexts
+        return stateTexts[path_with_plant] == "Success"
+    
     def path(self, path: str) -> str:
         """Return path with plant_id prefixed."""
         assert self._plant_id is not None
@@ -215,9 +221,3 @@ class FlexitApiClient:
         """Get headers with token added."""
         assert self.token is not None
         return {**API_HEADERS, **{"Authorization": f"Bearer {self.token}"}}
-
-    def is_success(self, response: Dict[str, Any], path_with_plant: str) -> bool:
-        """Check if response is successful."""
-
-        stateTexts = FlexitSensorsResponseStatus.from_dict(response).stateTexts
-        return stateTexts[path_with_plant] == "Success"
