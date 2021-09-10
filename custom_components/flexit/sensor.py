@@ -69,7 +69,6 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         key=Entity.SUPPLY_FAN_SPEED.value,
         icon=FAN_ICON,
         unit_of_measurement="rev/min",
-
     ),
     SensorEntityDescription(
         name="Supply Fan Control Signal",

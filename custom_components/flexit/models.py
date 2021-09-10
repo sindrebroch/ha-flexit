@@ -95,9 +95,9 @@ class UtilClass:
         """Get float from path."""
         return float(self._str_sensor(path))
 
-    def _dirty_filter(self, operating_time: str, exchange_time: str) -> bool:
+    def _dirty_filter(self, operating_time: int, change_interval: int) -> bool:
         """Get filter status based on hours operated."""
-        return True if operating_time >= exchange_time else False
+        return True if operating_time > change_interval else False
 
     def _is_heating(self, heater_int: int) -> bool:
         """Get electric heater status from integer."""
@@ -187,17 +187,19 @@ class FlexitSensorsResponse:
             room_temperature=util._float_sensor(ROOM_TEMPERATURE_PATH),
             electric_heater=util._is_heating(util._int_sensor(HEATER_PATH)),
             ventilation_mode=util._ventilation_mode(util._int_sensor(MODE_PATH)),
-            filter_operating_time=util._str_sensor(FILTER_OPERATING_TIME_PATH),
-            filter_time_for_exchange=util._str_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
+            filter_operating_time=util._int_sensor(FILTER_OPERATING_TIME_PATH),
+            filter_time_for_exchange=util._int_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
             dirty_filter=util._dirty_filter(
-                util._str_sensor(FILTER_OPERATING_TIME_PATH),
-                util._str_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
+                util._int_sensor(FILTER_OPERATING_TIME_PATH),
+                util._int_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
             ),
             heat_exchanger_speed=util._int_sensor(HEAT_EXCHANGER_SPEED_PATH),
             supply_fan_speed=util._float_sensor(SUPPLY_FAN_SPEED_PATH),
             supply_fan_control_signal=util._int_sensor(SUPPLY_FAN_CONTROL_SIGNAL_PATH),
             extract_fan_speed=util._float_sensor(EXTRACT_FAN_SPEED_PATH),
-            extract_fan_control_signal=util._int_sensor(EXTRACT_FAN_CONTROL_SIGNAL_PATH),
+            extract_fan_control_signal=util._int_sensor(
+                EXTRACT_FAN_CONTROL_SIGNAL_PATH
+            ),
         )
 
 

@@ -34,8 +34,9 @@ PLATFORMS: List[str] = [BINARY_SENSOR, CLIMATE, SENSOR]
 
 
 # Attributes
-ATTR_OPERATING_TIME = "operating_time_hours"
-ATTR_TIME_TO_CHANGE = "time_to_change_hours"
+ATTR_UNTIL_DIRTY = "hours_until_dirty"
+ATTR_OPERATING_TIME = "hours_since_change"
+ATTR_TIME_TO_CHANGE = "filter_change_interval_hours"
 
 # Modes
 MODE_HOME = "Home"

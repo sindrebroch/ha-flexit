@@ -11,7 +11,12 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN as FLEXIT_DOMAIN, ATTR_OPERATING_TIME, ATTR_TIME_TO_CHANGE
+from .const import (
+    ATTR_UNTIL_DIRTY,
+    DOMAIN as FLEXIT_DOMAIN,
+    ATTR_OPERATING_TIME,
+    ATTR_TIME_TO_CHANGE,
+)
 from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity, FlexitSensorsResponse
 
@@ -64,6 +69,9 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
             self._attr_extra_state_attributes = {
                 ATTR_OPERATING_TIME: data.filter_operating_time,
                 ATTR_TIME_TO_CHANGE: data.filter_time_for_exchange,
+                ATTR_UNTIL_DIRTY: (
+                    data.filter_time_for_exchange - data.filter_operating_time
+                ),
             }
 
     @callback
