@@ -1,6 +1,6 @@
 # Flexit for HomeAssistant
 
-HomeAssistant-integration for controlling your Flexit ventilation unit. Tested with Flexit Nordic S3.
+HomeAssistant-integration for controlling your Flexit ventilation unit. Tested with Flexit Nordic S3 and Nordic S4.
 
 ## Features
 ### Climate-entity
