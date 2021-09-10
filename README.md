@@ -1,6 +1,10 @@
 # Flexit for HomeAssistant
 
-HomeAssistant-integration for controlling your Flexit ventilation unit. Tested with Flexit Nordic S3 and Nordic S4.
+HomeAssistant-integration for controlling your Flexit ventilation unit. 
+
+This integration uses an unofficial API, use at your own risk.
+
+Tested with Flexit Nordic S3 and Nordic S4.
 
 ## Features
 ### Climate-entity
@@ -19,10 +23,17 @@ HomeAssistant-integration for controlling your Flexit ventilation unit. Tested w
 - Supply temperature
 - Room temperature
 
+- Extract Fan Control Signal
+- Extract Fan Speed
+- Heat Exchanger Speed
+- Supply Fan Control Signal
+- Supply Fan Speed
+
 ### Binary sensor-entity
 - Dirty filter
-   - Operating time hours 
-   - Time to change hours
+   - Hours since change
+   - Hours until dirty 
+   - Filter change interval hours
 
 ## Requirements
 - Your Flexit-unit needs to be connected to the Internet
