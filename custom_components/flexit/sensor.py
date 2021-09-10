@@ -10,7 +10,7 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import DEVICE_CLASS_TEMPERATURE, TEMP_CELSIUS
+from homeassistant.const import DEVICE_CLASS_TEMPERATURE, PERCENTAGE, TEMP_CELSIUS
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
@@ -21,6 +21,7 @@ from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity
 
 TEMPERATURE_ICON = "mdi:thermometer"
+FAN_ICON = "mdi:fan"
 
 SENSORS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
@@ -62,6 +63,37 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         unit_of_measurement=TEMP_CELSIUS,
         device_class=DEVICE_CLASS_TEMPERATURE,
         state_class=STATE_CLASS_MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        name="Supply Fan Speed",
+        key=Entity.SUPPLY_FAN_SPEED.value,
+        icon=FAN_ICON,
+        unit_of_measurement="rev/min",
+
+    ),
+    SensorEntityDescription(
+        name="Supply Fan Control Signal",
+        key=Entity.SUPPLY_FAN_CONTROL_SIGNAL.value,
+        icon=FAN_ICON,
+        unit_of_measurement=PERCENTAGE,
+    ),
+    SensorEntityDescription(
+        name="Extract Fan Speed",
+        key=Entity.EXTRACT_FAN_SPEED.value,
+        icon=FAN_ICON,
+        unit_of_measurement="rev/min",
+    ),
+    SensorEntityDescription(
+        name="Extract Fan Control Signal",
+        key=Entity.EXTRACT_FAN_CONTROL_SIGNAL.value,
+        icon=FAN_ICON,
+        unit_of_measurement=PERCENTAGE,
+    ),
+    SensorEntityDescription(
+        name="Heat Exchanger Speed",
+        key=Entity.HEAT_EXCHANGER_SPEED.value,
+        icon=FAN_ICON,
+        unit_of_measurement=PERCENTAGE,
     ),
 )
 

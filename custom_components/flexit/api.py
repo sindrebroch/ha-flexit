@@ -97,7 +97,10 @@ class FlexitApiClient:
         try:
             async with async_timeout.timeout(10, loop=asyncio.get_event_loop()):
                 response = await self._session.request(
-                    method=method, url=url, headers=headers, json=data
+                    method=method,
+                    url=url,
+                    headers=headers,
+                    data=data,
                 )
                 return await response.json()
         except asyncio.TimeoutError as exception:

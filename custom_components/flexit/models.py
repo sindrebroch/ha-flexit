@@ -30,6 +30,11 @@ from .const import (
     SUPPLY_AIR_TEMPERATURE_PATH,
     SYSTEM_STATUS_PATH,
     MODE_PATH,
+    HEAT_EXCHANGER_SPEED_PATH,
+    SUPPLY_FAN_SPEED_PATH,
+    SUPPLY_FAN_CONTROL_SIGNAL_PATH,
+    EXTRACT_FAN_SPEED_PATH,
+    EXTRACT_FAN_CONTROL_SIGNAL_PATH,
 )
 
 VALUE = "value"
@@ -50,6 +55,12 @@ class Entity(Enum):
     CLIMATE_FLEXIT = "climate_flexit"
     ELECTRIC_HEATER = "electric_heater"
     VENTILATION_MODE = "ventilation_mode"
+
+    HEAT_EXCHANGER_SPEED = "heat_exchanger_speed"
+    SUPPLY_FAN_SPEED = "supply_fan_speed"
+    SUPPLY_FAN_CONTROL_SIGNAL = "supply_fan_control_signal"
+    EXTRACT_FAN_SPEED = "extract_fan_speed"
+    EXTRACT_FAN_CONTROL_SIGNAL = "extract_fan_control_signal"
 
 
 class UtilClass:
@@ -152,6 +163,12 @@ class FlexitSensorsResponse:
     filter_operating_time: str
     filter_time_for_exchange: str
 
+    heat_exchanger_speed: int
+    supply_fan_speed: float
+    supply_fan_control_signal: int
+    extract_fan_speed: float
+    extract_fan_control_signal: int
+
     @staticmethod
     def from_dict(plant: str, data: Dict[str, Any]) -> "FlexitSensorsResponse":
         """Transform response to FlexitSensorsResponse."""
@@ -176,6 +193,11 @@ class FlexitSensorsResponse:
                 util._str_sensor(FILTER_OPERATING_TIME_PATH),
                 util._str_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
             ),
+            heat_exchanger_speed=util._int_sensor(HEAT_EXCHANGER_SPEED_PATH),
+            supply_fan_speed=util._float_sensor(SUPPLY_FAN_SPEED_PATH),
+            supply_fan_control_signal=util._int_sensor(SUPPLY_FAN_CONTROL_SIGNAL_PATH),
+            extract_fan_speed=util._float_sensor(EXTRACT_FAN_SPEED_PATH),
+            extract_fan_control_signal=util._int_sensor(EXTRACT_FAN_CONTROL_SIGNAL_PATH),
         )
 
 
