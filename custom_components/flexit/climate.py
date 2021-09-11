@@ -33,7 +33,7 @@ from .models import Entity, FlexitSensorsResponse
 
 CLIMATES: Tuple[ClimateEntityDescription, ...] = (
     ClimateEntityDescription(
-        name="Climate",
+        name="Flexit",
         icon="mdi:hvac",
         key=Entity.CLIMATE_FLEXIT.value,
     ),
