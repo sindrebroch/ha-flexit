@@ -28,7 +28,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Room temperature",
         key=Entity.ROOM_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
-        unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=TEMP_CELSIUS,
         device_class=DEVICE_CLASS_TEMPERATURE,
         state_class=STATE_CLASS_MEASUREMENT,
     ),
@@ -36,7 +36,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Outside temperature",
         key=Entity.OUTSIDE_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
-        unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=TEMP_CELSIUS,
         device_class=DEVICE_CLASS_TEMPERATURE,
         state_class=STATE_CLASS_MEASUREMENT,
     ),
@@ -44,7 +44,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Supply temperature",
         key=Entity.SUPPLY_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
-        unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=TEMP_CELSIUS,
         device_class=DEVICE_CLASS_TEMPERATURE,
         state_class=STATE_CLASS_MEASUREMENT,
     ),
@@ -52,7 +52,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Exhaust temperature",
         key=Entity.EXHAUST_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
-        unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=TEMP_CELSIUS,
         device_class=DEVICE_CLASS_TEMPERATURE,
         state_class=STATE_CLASS_MEASUREMENT,
     ),
@@ -60,7 +60,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Extract temperature",
         key=Entity.EXTRACT_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
-        unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=TEMP_CELSIUS,
         device_class=DEVICE_CLASS_TEMPERATURE,
         state_class=STATE_CLASS_MEASUREMENT,
     ),
@@ -68,31 +68,31 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Supply Fan Speed",
         key=Entity.SUPPLY_FAN_SPEED.value,
         icon=FAN_ICON,
-        unit_of_measurement="rev/min",
+        native_unit_of_measurement="rev/min",
     ),
     SensorEntityDescription(
         name="Supply Fan Control Signal",
         key=Entity.SUPPLY_FAN_CONTROL_SIGNAL.value,
         icon=FAN_ICON,
-        unit_of_measurement=PERCENTAGE,
+        native_unit_of_measurement=PERCENTAGE,
     ),
     SensorEntityDescription(
         name="Extract Fan Speed",
         key=Entity.EXTRACT_FAN_SPEED.value,
         icon=FAN_ICON,
-        unit_of_measurement="rev/min",
+        native_unit_of_measurement="rev/min",
     ),
     SensorEntityDescription(
         name="Extract Fan Control Signal",
         key=Entity.EXTRACT_FAN_CONTROL_SIGNAL.value,
         icon=FAN_ICON,
-        unit_of_measurement=PERCENTAGE,
+        native_unit_of_measurement=PERCENTAGE,
     ),
     SensorEntityDescription(
         name="Heat Exchanger Speed",
         key=Entity.HEAT_EXCHANGER_SPEED.value,
         icon=FAN_ICON,
-        unit_of_measurement=PERCENTAGE,
+        native_unit_of_measurement=PERCENTAGE,
     ),
 )
 
@@ -132,7 +132,7 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
         self._attr_device_info = coordinator._attr_device_info
 
     @property
-    def state(self) -> StateType:
+    def native_value(self) -> StateType:
         """Return the state."""
 
         return cast(StateType, self.sensor_data)
