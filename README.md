@@ -68,3 +68,13 @@ Service status can be found [here](https://status.climatixic.com/)
 
 ### API limitation
 API is restricted to 50 calls/min or 500 calls/week. Defaults to polling every 30 minutes, this can be configured but be aware of API restrictions. 
+
+## Debugging
+If something is not working properly, logs might help with debugging. To turn on debug-logging add this to your `configuration.yaml`
+```
+logger:
+  default: info
+  logs:
+    custom_components.flexit: debug
+```
+PS: This will log various details, including all HTTP-requests for the Flexit-integration to your home-assistant.log. This includes your username and password in cleartext in your Token-requests.
