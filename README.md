@@ -4,7 +4,10 @@ HomeAssistant-integration for controlling your Flexit ventilation unit.
 
 This integration uses an unofficial API, use at your own risk.
 
-Tested with Flexit Nordic S3 and Nordic S4.
+Tested with: 
+- Nordic S2
+- Nordic S3 
+- Nordic S4
 
 ## Features
 ### Climate-entity
