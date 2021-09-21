@@ -22,7 +22,7 @@ from .models import Entity
 
 TEMPERATURE_ICON = "mdi:thermometer"
 FAN_ICON = "mdi:fan"
-BATTERY_ICON = "mdi:battery"
+HEATING_ICON = "mdi:radiator"
 
 SENSORS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
@@ -96,9 +96,9 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         native_unit_of_measurement=PERCENTAGE,
     ),
     SensorEntityDescription(
-        name="Heating Electric Battery",
+        name="Additional Heater",
         key=Entity.HEATING_BATTERY_ELECTRICAL.value,
-        icon=BATTERY_ICON,
+        icon=HEATING_ICON,
         native_unit_of_measurement=PERCENTAGE,
     )
 )
