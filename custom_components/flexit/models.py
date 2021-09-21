@@ -35,7 +35,7 @@ from .const import (
     SUPPLY_FAN_CONTROL_SIGNAL_PATH,
     EXTRACT_FAN_SPEED_PATH,
     EXTRACT_FAN_CONTROL_SIGNAL_PATH,
-    HEATING_BATTERY_ELECTRICAL_PATH,
+    ADDITIONAL_HEATER_PATH,
 )
 
 VALUE = "value"
@@ -62,7 +62,7 @@ class Entity(Enum):
     SUPPLY_FAN_CONTROL_SIGNAL = "supply_fan_control_signal"
     EXTRACT_FAN_SPEED = "extract_fan_speed"
     EXTRACT_FAN_CONTROL_SIGNAL = "extract_fan_control_signal"
-    HEATING_BATTERY_ELECTRICAL = "heating_battery_electrical"
+    ADDITIONAL_HEATER = "additional_heater"
 
 class UtilClass:
     """UtilClass."""
@@ -169,7 +169,7 @@ class FlexitSensorsResponse:
     supply_fan_control_signal: int
     extract_fan_speed: float
     extract_fan_control_signal: int
-    heating_battery_electrical: float
+    additional_heater: float
 
     @staticmethod
     def from_dict(plant: str, data: Dict[str, Any]) -> "FlexitSensorsResponse":
@@ -202,7 +202,7 @@ class FlexitSensorsResponse:
             extract_fan_control_signal=util._int_sensor(
                 EXTRACT_FAN_CONTROL_SIGNAL_PATH
             ),
-            heating_battery_electrical=util._float_sensor(HEATING_BATTERY_ELECTRICAL_PATH)
+            additional_heater=util._float_sensor(ADDITIONAL_HEATER_PATH)
         )
 
 

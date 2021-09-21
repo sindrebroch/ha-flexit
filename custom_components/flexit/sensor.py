@@ -97,7 +97,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         name="Additional Heater",
-        key=Entity.HEATING_BATTERY_ELECTRICAL.value,
+        key=Entity.ADDITIONAL_HEATER.value,
         icon=HEATING_ICON,
         native_unit_of_measurement=PERCENTAGE,
     )
