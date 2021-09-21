@@ -31,6 +31,7 @@ Tested with:
 - Heat Exchanger Speed
 - Supply Fan Control Signal
 - Supply Fan Speed
+- Additional Heater
 
 ### Binary sensor-entity
 - Dirty filter
