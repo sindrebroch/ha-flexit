@@ -8,6 +8,7 @@ Tested with:
 - Nordic S2
 - Nordic S3 
 - Nordic S4
+- Nordic CL4
 
 ## Features
 ### Climate-entity
