@@ -2,7 +2,7 @@
 
 HomeAssistant-integration for controlling your Flexit ventilation unit. 
 
-This integration uses an unofficial API, use at your own risk.
+This integration uses an undocumented API, use at your own risk. This integration uses the same domain name as the official Flexit-integration, so in its current state you can't use both at the same time.
 
 Tested with: 
 - Nordic S2
