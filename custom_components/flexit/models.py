@@ -6,6 +6,8 @@ from typing import Any, Dict, List
 import attr
 
 from .const import (
+    ALARM_CODE_A_PATH,
+    ALARM_CODE_B_PATH,
     APPLICATION_SOFTWARE_VERSION_PATH,
     AWAY_AIR_TEMPERATURE_PATH,
     DEVICE_DESCRIPTION_PATH,
@@ -61,6 +63,8 @@ class Entity(Enum):
     CLIMATE_FLEXIT = "climate_flexit"
     ELECTRIC_HEATER = "electric_heater"
     VENTILATION_MODE = "ventilation_mode"
+    ALARM_CODE_A = "alarm_code_a"
+    ALARM_CODE_B = "alarm_code_b"
 
     HEAT_EXCHANGER_SPEED = "heat_exchanger_speed"
     SUPPLY_FAN_SPEED = "supply_fan_speed"
@@ -175,11 +179,13 @@ class FlexitSensorsResponse:
     dirty_filter: bool
     filter_operating_time: str
     filter_time_for_exchange: str
+    alarm_code_a: int
+    alarm_code_b: int
 
     heat_exchanger_speed: int
-    supply_fan_speed: float
+    supply_fan_speed: int
     supply_fan_control_signal: int
-    extract_fan_speed: float
+    extract_fan_speed: int
     extract_fan_control_signal: int
     additional_heater: float
 
@@ -214,7 +220,9 @@ class FlexitSensorsResponse:
             extract_fan_control_signal=util._int_sensor(
                 EXTRACT_FAN_CONTROL_SIGNAL_PATH
             ),
-            additional_heater=util._float_sensor(ADDITIONAL_HEATER_PATH)
+            additional_heater=util._float_sensor(ADDITIONAL_HEATER_PATH),
+            alarm_code_a=util._int_sensor(ALARM_CODE_A_PATH),
+            alarm_code_b=util._int_sensor(ALARM_CODE_B_PATH)
         )
 
 

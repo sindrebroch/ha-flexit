@@ -12,10 +12,11 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
+    ATTR_ALARM_CODE,
     ATTR_UNTIL_DIRTY,
-    DOMAIN as FLEXIT_DOMAIN,
     ATTR_OPERATING_TIME,
     ATTR_TIME_TO_CHANGE,
+    DOMAIN as FLEXIT_DOMAIN,
 )
 from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity, FlexitSensorsResponse
@@ -25,6 +26,16 @@ BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
         name="Dirty filter",
         icon="mdi:hvac",
         key=Entity.DIRTY_FILTER.value,
+    ),
+    BinarySensorEntityDescription(
+        name="Alarm Code A",
+        icon="mdi:alarm-light",
+        key=Entity.ALARM_CODE_A.value,
+    ),
+    BinarySensorEntityDescription(
+        name="Alarm Code B",
+        icon="mdi:alarm-light",
+        key=Entity.ALARM_CODE_B.value,
     ),
 )
 
@@ -73,6 +84,14 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
                     data.filter_time_for_exchange - data.filter_operating_time
                 ),
             }
+        elif self.entity_description.key == Entity.ALARM_CODE_A.value:
+            self._attr_extra_state_attributes = {
+                ATTR_ALARM_CODE: data.alarm_code_a
+            }
+        elif self.entity_description.key == Entity.ALARM_CODE_B.value:
+            self._attr_extra_state_attributes = {
+                ATTR_ALARM_CODE: data.alarm_code_b
+            }
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -88,4 +107,6 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
     def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
 
+        if self.entity_description.key in (Entity.ALARM_CODE_A.value, Entity.ALARM_CODE_B.value):
+            return self.sensor_data > 0
         return cast(bool, self.sensor_data)

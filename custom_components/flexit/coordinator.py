@@ -34,13 +34,13 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
         self.name = name
         self.device_info = device_info
 
-        self._attr_device_info: DeviceInfo = {
-            "name": self.name,
-            "manufacturer": "Flexit",
-            "model": self.device_info.modelName,
-            "sw_version": self.device_info.fw,
-            "identifiers": {(FLEXIT_DOMAIN, self.name)},
-        }
+        self._attr_device_info = DeviceInfo(
+            name=self.name,
+            manufacturer="Flexit",
+            model=self.device_info.modelName,
+            sw_version=self.device_info.fw,
+            identifiers={(FLEXIT_DOMAIN, self.name)},
+        )
 
         super().__init__(
             hass,
