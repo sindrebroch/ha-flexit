@@ -107,6 +107,8 @@ class UtilClass:
     def _ventilation_mode(self, ventilation_int: int) -> str:
         """Get ventilation mode from integer."""
 
+        # Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
+        
         # 0 =>
         # 3 =>
         # 5 => Cooker hood
