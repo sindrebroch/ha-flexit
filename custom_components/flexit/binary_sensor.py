@@ -24,17 +24,14 @@ from .models import Entity, FlexitSensorsResponse
 BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         name="Dirty filter",
-        icon="mdi:hvac",
         key=Entity.DIRTY_FILTER.value,
     ),
     BinarySensorEntityDescription(
         name="Alarm Code A",
-        icon="mdi:alarm-light",
         key=Entity.ALARM_CODE_A.value,
     ),
     BinarySensorEntityDescription(
         name="Alarm Code B",
-        icon="mdi:alarm-light",
         key=Entity.ALARM_CODE_B.value,
     ),
 )
@@ -102,9 +99,9 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
         )
 
         if self.entity_description.key == Entity.DIRTY_FILTER.value:
-            self._attr_icon = "mdi:hvac" if self.sensor_data else "mdi:hvac-off"
+            self._attr_icon = "mdi:hvac" if self.is_on else "mdi:hvac-off"
         elif self.entity_description.key in (Entity.ALARM_CODE_A.value, Entity.ALARM_CODE_B.value):
-            self._attr_icon = "mdi:alarm-light" if self.sensor_data else "mdi:alarm-light-off"
+            self._attr_icon = "mdi:alarm-light" if self.is_on else "mdi:alarm-light-off"
 
         self.async_write_ha_state()
 
