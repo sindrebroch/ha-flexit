@@ -179,12 +179,12 @@ class FlexitApiClient:
     async def set_mode(self, mode: str) -> bool:
         """Set ventilation mode."""
 
+        # Null*Stop*Away*Home*High
         mode_int = {
-            MODE_HOME: 0,
             MODE_AWAY: 2,
+            MODE_HOME: 3,
             MODE_HIGH: 4,
         }.get(mode, -1)
-        # Modes => Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
 
         return False if mode_int == -1 else await self.update(MODE_PUT_PATH, mode_int)
 

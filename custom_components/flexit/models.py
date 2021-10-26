@@ -86,20 +86,20 @@ class UtilClass:
         return self.data[VALUES][f"{self.plant}{path}"][VALUE]
 
     def _int_device(self, path: str) -> int:
-        """Get float from path."""
+        """Get int from path."""
         return int(self._str_device(path))
 
     def _str_sensor(self, path: str) -> str:
-        """Get value from path."""
+        """Get string from path."""
         return self.data[VALUES][f"{self.plant}{path}"][VALUE][VALUE]
 
     def _int_sensor(self, path: str) -> int:
-        """Get float from path."""
+        """Get int from path."""
         return int(self._str_sensor(path))
 
     def _float_sensor(self, path: str) -> float:
         """Get float from path."""
-        return float(self._str_sensor(path))
+        return round(float(self._str_sensor(path)), 2)
 
     def _dirty_filter(self, operating_time: int, change_interval: int) -> bool:
         """Get filter status based on hours operated."""
@@ -111,7 +111,8 @@ class UtilClass:
 
     def _ventilation_mode(self, ventilation_int: int) -> str:
         """Get ventilation mode from integer."""
-        
+
+        # Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
         if ventilation_int == 0:
             return MODE_NULL
         elif ventilation_int == 1:
@@ -207,9 +208,9 @@ class FlexitSensorsResponse:
                 util._int_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
             ),
             heat_exchanger_speed=util._int_sensor(HEAT_EXCHANGER_SPEED_PATH),
-            supply_fan_speed=util._float_sensor(SUPPLY_FAN_SPEED_PATH),
+            supply_fan_speed=util._int_sensor(SUPPLY_FAN_SPEED_PATH),
             supply_fan_control_signal=util._int_sensor(SUPPLY_FAN_CONTROL_SIGNAL_PATH),
-            extract_fan_speed=util._float_sensor(EXTRACT_FAN_SPEED_PATH),
+            extract_fan_speed=util._int_sensor(EXTRACT_FAN_SPEED_PATH),
             extract_fan_control_signal=util._int_sensor(
                 EXTRACT_FAN_CONTROL_SIGNAL_PATH
             ),
