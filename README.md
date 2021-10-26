@@ -44,6 +44,11 @@ Tested with:
 - Your Flexit-unit needs to be connected to the Internet
 - Unit needs to be registered in the Flexit Go-app
 
+## TODO - If possible
+- [ ] Be able to set all modes (Fireplace, Calendar missing)
+- [ ] Service to set modes with modifications (delay, duration, override etc)
+- [ ] Binary sensor for Alarm type A/B
+
 ## Installation
 
 ### HACS (Recommended - Easier to update)
