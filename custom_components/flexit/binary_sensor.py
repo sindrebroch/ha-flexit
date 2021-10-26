@@ -67,8 +67,8 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self.entity_description = description
         self.coordinator = coordinator
 
-        data: FlexitSensorsResponse = coordinator.data
-        self.sensor_data = data.__getattribute__(description.key)
+        self.data: FlexitSensorsResponse = coordinator.data
+        self.sensor_data = self.data.__getattribute__(description.key)
 
         self._attr_unique_id = f"{description.key}"
         self._attr_device_info = coordinator._attr_device_info
