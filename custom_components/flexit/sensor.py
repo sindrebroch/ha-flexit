@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import cast
+from typing import Any, cast
 
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
@@ -121,6 +121,7 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Flexit sensor."""
 
     coordinator: FlexitDataUpdateCoordinator
+    sensor_data: Any
 
     def __init__(
         self,
@@ -130,13 +131,11 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
         """Initialize a Flexit sensor."""
 
         super().__init__(coordinator)
-
         self.coordinator = coordinator
         self.entity_description = description
-        self.sensor_data = coordinator.data.__getattribute__(description.key)
-
         self._attr_unique_id = f"{description.key}"
         self._attr_device_info = coordinator._attr_device_info
+        self.update_from_data()
 
     @property
     def native_value(self) -> StateType:
@@ -144,11 +143,14 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
 
         return cast(StateType, self.sensor_data)
 
+    def update_from_data(self) -> None:
+        """Update attributes based on new data."""
+        self.sensor_data = self.coordinator.data.__getattribute__(self.entity_description.key)
+
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
+        
+        self.update_from_data()
+        super()._handle_coordinator_update()
 
-        self.sensor_data = self.coordinator.data.__getattribute__(
-            self.entity_description.key
-        )
-        self.async_write_ha_state()

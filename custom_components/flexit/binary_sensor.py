@@ -1,6 +1,6 @@
 """Support for getting statistical data from a Flexit system."""
 
-from typing import Tuple, cast
+from typing import Any, Tuple, cast
 
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
@@ -54,6 +54,7 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
     """Representation of a Flexit binary sensor."""
 
     coordinator: FlexitDataUpdateCoordinator
+    sensor_data: Any
 
     def __init__(
         self,
@@ -66,22 +67,21 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
 
         self.entity_description = description
         self.coordinator = coordinator
-
         self.data: FlexitSensorsResponse = coordinator.data
-        self.sensor_data = self.data.__getattribute__(description.key)
-
         self._attr_unique_id = f"{description.key}"
         self._attr_device_info = coordinator._attr_device_info
+        self.update_from_data()
+
+    def update_from_data(self) -> None:
+        """Update attributes from data."""
+        self.sensor_data = self.data.__getattribute__(self.entity_description.key)
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
 
-        self.sensor_data = self.coordinator.data.__getattribute__(
-            self.entity_description.key
-        )
-
-        self.async_write_ha_state()
+        self.update_from_data()
+        super()._handle_coordinator_update()
 
     @property
     def is_on(self) -> bool:
@@ -109,14 +109,11 @@ class FlexitFilterBinarySensor(FlexitBinarySensor):
         }
 
 class FlexitAlarmBinarySensor(FlexitBinarySensor):
-    
-    sensor_data_a: int = 0
-    sensor_data_b: int = 0
 
     @property
     def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
-        return self.sensor_data_a > 0 and self.sensor_data_b > 0
+        return self.sensor_data.alarm_code_a > 0 and self.sensor_data.alarm_code_b > 0
 
     @property
     def icon(self):
@@ -128,18 +125,14 @@ class FlexitAlarmBinarySensor(FlexitBinarySensor):
         """Return the state attributes."""
 
         return {
-            ATTR_ALARM_CODE_A: self.sensor_data_a,
-            ATTR_ALARM_CODE_B: self.sensor_data_b
-        } if self.is_on else {
-            ATTR_ALARM_CODE_A: "No alarm",
-            ATTR_ALARM_CODE_B: "No alarm"
+            ATTR_ALARM_CODE_A: self.sensor_data.alarm_code_a if self.sensor_data.alarm_code_a > 0 else "No alarm",
+            ATTR_ALARM_CODE_B: self.sensor_data.alarm_code_b if self.sensor_data.alarm_code_b > 0 else "No alarm"
         }
 
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle data update."""
-
-        self.sensor_data_a = self.coordinator.data.__getattribute__(Entity.ALARM_CODE_A)
-        self.sensor_data_b = self.coordinator.data.__getattribute__(Entity.ALARM_CODE_B)
-
-        self.async_write_ha_state()
+    def update_from_data(self) -> None:
+        """Update attributes based on new data."""
+        
+        self.sensor_data = {
+            "alarm_code_a": self.data.__getattribute__(Entity.ALARM_CODE_A.value),
+            "alarm_code_b": self.data.__getattribute__(Entity.ALARM_CODE_B.value),
+        }
