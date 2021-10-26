@@ -187,7 +187,7 @@ class FlexitSensorsResponse:
     supply_fan_control_signal: int
     extract_fan_speed: int
     extract_fan_control_signal: int
-    additional_heater: float
+    additional_heater: int
 
     @staticmethod
     def from_dict(plant: str, data: Dict[str, Any]) -> "FlexitSensorsResponse":
@@ -220,7 +220,7 @@ class FlexitSensorsResponse:
             extract_fan_control_signal=util._int_sensor(
                 EXTRACT_FAN_CONTROL_SIGNAL_PATH
             ),
-            additional_heater=util._float_sensor(ADDITIONAL_HEATER_PATH),
+            additional_heater=util._int_sensor(ADDITIONAL_HEATER_PATH),
             alarm_code_a=util._int_sensor(ALARM_CODE_A_PATH),
             alarm_code_b=util._int_sensor(ALARM_CODE_B_PATH)
         )
