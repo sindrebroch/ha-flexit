@@ -101,6 +101,11 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
             self.entity_description.key
         )
 
+        if self.entity_description.key == Entity.DIRTY_FILTER.value:
+            self._attr_icon = "mdi:hvac" if self.sensor_data else "mdi:hvac-off"
+        elif self.entity_description.key in (Entity.ALARM_CODE_A.value, Entity.ALARM_CODE_B.value):
+            self._attr_icon = "mdi:alarm-light" if self.sensor_data else "mdi:alarm-light-off"
+
         self.async_write_ha_state()
 
     @property
