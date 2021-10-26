@@ -63,6 +63,7 @@ class Entity(Enum):
     CLIMATE_FLEXIT = "climate_flexit"
     ELECTRIC_HEATER = "electric_heater"
     VENTILATION_MODE = "ventilation_mode"
+    ALARM = "alarm"
     ALARM_CODE_A = "alarm_code_a"
     ALARM_CODE_B = "alarm_code_b"
 

@@ -12,7 +12,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
-    ATTR_ALARM_CODE,
+    ATTR_ALARM_CODE_A,
+    ATTR_ALARM_CODE_B,
     ATTR_UNTIL_DIRTY,
     ATTR_OPERATING_TIME,
     ATTR_TIME_TO_CHANGE,
@@ -21,21 +22,18 @@ from .const import (
 from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity, FlexitSensorsResponse
 
-BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
+ALARM_BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
+    BinarySensorEntityDescription(
+        name="Alarm",
+        key=Entity.ALARM.value,
+    ),
+)
+FILTER_BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         name="Dirty filter",
         key=Entity.DIRTY_FILTER.value,
     ),
-    BinarySensorEntityDescription(
-        name="Alarm Code A",
-        key=Entity.ALARM_CODE_A.value,
-    ),
-    BinarySensorEntityDescription(
-        name="Alarm Code B",
-        key=Entity.ALARM_CODE_B.value,
-    ),
 )
-
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -46,8 +44,10 @@ async def async_setup_entry(
 
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
 
-    for description in BINARY_SENSORS:
-        async_add_entities([FlexitBinarySensor(coordinator, description)])
+    for description in FILTER_BINARY_SENSORS:
+        async_add_entities([FlexitFilterBinarySensor(coordinator, description)])
+    for description in ALARM_BINARY_SENSORS:
+        async_add_entities([FlexitAlarmBinarySensor(coordinator, description)])
 
 
 class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
@@ -73,23 +73,6 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self._attr_unique_id = f"{description.key}"
         self._attr_device_info = coordinator._attr_device_info
 
-        if self.entity_description.key == Entity.DIRTY_FILTER.value:
-            self._attr_extra_state_attributes = {
-                ATTR_OPERATING_TIME: data.filter_operating_time,
-                ATTR_TIME_TO_CHANGE: data.filter_time_for_exchange,
-                ATTR_UNTIL_DIRTY: (
-                    data.filter_time_for_exchange - data.filter_operating_time
-                ),
-            }
-        elif self.entity_description.key == Entity.ALARM_CODE_A.value:
-            self._attr_extra_state_attributes = {
-                ATTR_ALARM_CODE: data.alarm_code_a
-            }
-        elif self.entity_description.key == Entity.ALARM_CODE_B.value:
-            self._attr_extra_state_attributes = {
-                ATTR_ALARM_CODE: data.alarm_code_b
-            }
-
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
@@ -98,17 +81,65 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
             self.entity_description.key
         )
 
-        if self.entity_description.key == Entity.DIRTY_FILTER.value:
-            self._attr_icon = "mdi:hvac" if self.is_on else "mdi:hvac-off"
-        elif self.entity_description.key in (Entity.ALARM_CODE_A.value, Entity.ALARM_CODE_B.value):
-            self._attr_icon = "mdi:alarm-light" if self.is_on else "mdi:alarm-light-off"
-
         self.async_write_ha_state()
 
     @property
     def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
-
-        if self.entity_description.key in (Entity.ALARM_CODE_A.value, Entity.ALARM_CODE_B.value):
-            return self.sensor_data > 0
         return cast(bool, self.sensor_data)
+
+class FlexitFilterBinarySensor(FlexitBinarySensor):
+
+    @property
+    def icon(self):
+        """Return the icon to use in the frontend."""
+        return "mdi:hvac" if self.is_on else "mdi:hvac-off"
+
+    @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        
+        operating_time = self.data.filter_operating_time
+        exchange_time = self.data.filter_time_for_exchange
+
+        return {
+            ATTR_OPERATING_TIME: operating_time,
+            ATTR_TIME_TO_CHANGE: exchange_time,
+            ATTR_UNTIL_DIRTY: exchange_time - operating_time,
+        }
+
+class FlexitAlarmBinarySensor(FlexitBinarySensor):
+    
+    sensor_data_a: int = 0
+    sensor_data_b: int = 0
+
+    @property
+    def is_on(self) -> bool:
+        """Return true if the binary sensor is on."""
+        return self.sensor_data_a > 0 and self.sensor_data_b > 0
+
+    @property
+    def icon(self):
+        """Return the icon to use in the frontend."""
+        return "mdi:alarm-light" if self.is_on else "mdi:alarm-light-off"
+
+    @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+
+        return {
+            ATTR_ALARM_CODE_A: self.sensor_data_a,
+            ATTR_ALARM_CODE_B: self.sensor_data_b
+        } if self.is_on else {
+            ATTR_ALARM_CODE_A: "No alarm",
+            ATTR_ALARM_CODE_B: "No alarm"
+        }
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data update."""
+
+        self.sensor_data_a = self.coordinator.data.__getattribute__(Entity.ALARM_CODE_A)
+        self.sensor_data_b = self.coordinator.data.__getattribute__(Entity.ALARM_CODE_B)
+
+        self.async_write_ha_state()

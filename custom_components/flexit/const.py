@@ -37,7 +37,8 @@ PLATFORMS: List[str] = [BINARY_SENSOR, CLIMATE, SENSOR]
 ATTR_UNTIL_DIRTY = "hours_until_dirty"
 ATTR_OPERATING_TIME = "hours_since_change"
 ATTR_TIME_TO_CHANGE = "filter_change_interval_hours"
-ATTR_ALARM_CODE = "alarm_code"
+ATTR_ALARM_CODE_A = "alarm_code_a"
+ATTR_ALARM_CODE_B = "alarm_code_b"
 
 # Modes
 MODE_NULL = "Null"
