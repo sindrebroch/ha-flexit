@@ -20,9 +20,14 @@ from .const import (
     LOGGER,
     MODEL_INFORMATION_PATH,
     MODEL_NAME_PATH,
+    MODE_NULL,
+    MODE_OFF,
     MODE_AWAY,
     MODE_HIGH,
     MODE_HOME,
+    MODE_COOKER_HOOD,
+    MODE_FIREPLACE,
+    MODE_FORCED_VENTILATION,
     OFFLINE_ONLINE_PATH,
     OUTSIDE_AIR_TEMPERATURE_PATH,
     ROOM_TEMPERATURE_PATH,
@@ -106,19 +111,23 @@ class UtilClass:
 
     def _ventilation_mode(self, ventilation_int: int) -> str:
         """Get ventilation mode from integer."""
-
-        # Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
         
-        # 0 =>
-        # 3 =>
-        # 5 => Cooker hood
-        # 7 => Timed boost ?
-        if ventilation_int in (0, 3, 5, 7):
-            return MODE_HOME
-        if ventilation_int == 2:
+        if ventilation_int == 0:
+            return MODE_NULL
+        elif ventilation_int == 1:
+            return MODE_OFF
+        elif ventilation_int == 2:
             return MODE_AWAY
+        elif ventilation_int == 3:
+            return MODE_HOME
         elif ventilation_int == 4:
             return MODE_HIGH
+        elif ventilation_int == 5:
+            return MODE_COOKER_HOOD
+        elif ventilation_int == 6:
+            return MODE_FIREPLACE
+        elif ventilation_int == 7:
+            return MODE_FORCED_VENTILATION
         return f"Unknown mode: {str(ventilation_int)}"
 
 

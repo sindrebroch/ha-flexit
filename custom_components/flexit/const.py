@@ -39,10 +39,14 @@ ATTR_OPERATING_TIME = "hours_since_change"
 ATTR_TIME_TO_CHANGE = "filter_change_interval_hours"
 
 # Modes
-MODE_HOME = "Home"
+MODE_NULL = "Null"
+MODE_OFF = "Off"
 MODE_AWAY = "Away"
+MODE_HOME = "Home"
 MODE_HIGH = "High"
 MODE_COOKER_HOOD = "Cooker hood"
+MODE_FIREPLACE = "Fireplace"
+MODE_FORCED_VENTILATION = "Forced Ventilation"
 
 # Paths
 HOME_AIR_TEMPERATURE_PATH = ";1!0020007CA000055"
