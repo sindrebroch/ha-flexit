@@ -39,6 +39,7 @@ Tested with:
    - Hours since change
    - Hours until dirty 
    - Filter change interval hours
+- [Soon] Alarm (Alarm Code A/B potentially in attribute)
 
 ## Requirements
 - Your Flexit-unit needs to be connected to the Internet
