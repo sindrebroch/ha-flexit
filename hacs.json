@@ -2,6 +2,6 @@
     "name": "Flexit",
     "hacs": "1.6.0",
     "domains": ["binary_sensor", "climate", "sensor"],
-    "homeassistant": "2021.6.0",
+    "homeassistant": "2021.11.0",
     "render_readme": true
 }
