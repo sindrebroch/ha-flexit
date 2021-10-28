@@ -48,7 +48,6 @@ Tested with:
 ## TODO - If possible
 - [ ] Be able to set all modes (Fireplace, Calendar missing)
 - [ ] Service to set modes with modifications (delay, duration, override etc)
-- [ ] Binary sensor for Alarm type A/B
 
 ## Installation
 
