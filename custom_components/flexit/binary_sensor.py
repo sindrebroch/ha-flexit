@@ -7,6 +7,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import ENTITY_CATEGORY_DIAGNOSTIC
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -26,12 +27,14 @@ ALARM_BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         name="Alarm",
         key=Entity.ALARM.value,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
 )
 FILTER_BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         name="Dirty filter",
         key=Entity.DIRTY_FILTER.value,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
 )
 
@@ -109,6 +112,15 @@ class FlexitFilterBinarySensor(FlexitBinarySensor):
         }
 
 class FlexitAlarmBinarySensor(FlexitBinarySensor):
+
+    def __init__(
+        self,
+        coordinator: FlexitDataUpdateCoordinator,
+        description: BinarySensorEntityDescription,
+    ) -> None:
+        """Initialize a Flexit binary sensor."""
+
+        super().__init__(coordinator, description)
 
     @property
     def is_on(self) -> bool:
