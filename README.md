@@ -19,6 +19,15 @@ Tested with:
 - Operation modes:  
   - Fan only
   - Heat
+- Viewable modes:
+  - Null
+  - Off
+  - Away
+  - Home
+  - High
+  - Cooker hood
+  - Fireplace
+  - Forced ventilation
 
 ### Sensor-entities
 - Extract temperature
