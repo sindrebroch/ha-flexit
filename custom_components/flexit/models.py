@@ -108,7 +108,7 @@ class UtilClass:
 
     def _dirty_filter(self, operating_time: int, change_interval: int) -> bool:
         """Get filter status based on hours operated."""
-        return True if operating_time > change_interval else False
+        return True if operating_time >= change_interval else False
 
     def _is_heating(self, heater_int: int) -> bool:
         """Get electric heater status from integer."""
