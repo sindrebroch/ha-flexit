@@ -43,6 +43,7 @@ from .const import (
     EXTRACT_FAN_SPEED_PATH,
     EXTRACT_FAN_CONTROL_SIGNAL_PATH,
     ADDITIONAL_HEATER_PATH,
+    CALENDAR_TEMPORARY_OVERRIDE_PATH,
 )
 
 VALUE = "value"
@@ -66,6 +67,12 @@ class Entity(Enum):
     ALARM = "alarm"
     ALARM_CODE_A = "alarm_code_a"
     ALARM_CODE_B = "alarm_code_b"
+
+    CALENDAR_TEMPORARY_OVERRIDE = "calendar_temporary_override"
+    BOOST_TEMPORARY = "boost_temporary"
+    BOOST_DURATION = "boost_duration"
+    FIREPLACE_DURATION = "fireplace_duration"
+    AWAY_DELAY = "away_delay"
 
     HEAT_EXCHANGER_SPEED = "heat_exchanger_speed"
     SUPPLY_FAN_SPEED = "supply_fan_speed"
@@ -102,6 +109,10 @@ class UtilClass:
         """Get int from path."""
         return int(self._str_sensor(path))
 
+    def _bool_sensor(self, path: str) -> bool:
+        """Get int from path."""
+        return True if self._int_sensor(path) == 1 else False
+
     def _float_sensor(self, path: str) -> float:
         """Get float from path."""
         return round(float(self._str_sensor(path)), 2)
@@ -109,10 +120,6 @@ class UtilClass:
     def _dirty_filter(self, operating_time: int, change_interval: int) -> bool:
         """Get filter status based on hours operated."""
         return True if operating_time >= change_interval else False
-
-    def _is_heating(self, heater_int: int) -> bool:
-        """Get electric heater status from integer."""
-        return True if heater_int == 1 else False
 
     def _ventilation_mode(self, ventilation_int: int) -> str:
         """Get ventilation mode from integer."""
@@ -182,6 +189,7 @@ class FlexitSensorsResponse:
     filter_time_for_exchange: str
     alarm_code_a: int
     alarm_code_b: int
+    calendar_temporary_override: bool
 
     heat_exchanger_speed: int
     supply_fan_speed: int
@@ -206,7 +214,7 @@ class FlexitSensorsResponse:
             exhaust_air_temperature=util._float_sensor(EXHAUST_AIR_TEMPERATURE_PATH),
             extract_air_temperature=util._float_sensor(EXTRACT_AIR_TEMPERATURE_PATH),
             room_temperature=util._float_sensor(ROOM_TEMPERATURE_PATH),
-            electric_heater=util._is_heating(util._int_sensor(HEATER_PATH)),
+            electric_heater=util._bool_sensor(HEATER_PATH),
             ventilation_mode=util._ventilation_mode(util._int_sensor(MODE_PATH)),
             filter_operating_time=util._int_sensor(FILTER_OPERATING_TIME_PATH),
             filter_time_for_exchange=util._int_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
@@ -223,7 +231,8 @@ class FlexitSensorsResponse:
             ),
             additional_heater=util._int_sensor(ADDITIONAL_HEATER_PATH),
             alarm_code_a=util._int_sensor(ALARM_CODE_A_PATH),
-            alarm_code_b=util._int_sensor(ALARM_CODE_B_PATH)
+            alarm_code_b=util._int_sensor(ALARM_CODE_B_PATH),
+            calendar_temporary_override=util._bool_sensor(CALENDAR_TEMPORARY_OVERRIDE_PATH),
         )
 
 

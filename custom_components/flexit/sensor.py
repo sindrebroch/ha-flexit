@@ -1,8 +1,8 @@
-"""Support for Flexit sensors."""
+"""Sensor platform for Flexit."""
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any, Tuple, cast
 
 from homeassistant.components.sensor import (
     SensorEntity,
@@ -25,7 +25,7 @@ TEMPERATURE_ICON = "mdi:thermometer"
 FAN_ICON = "mdi:fan"
 HEATING_ICON = "mdi:radiator"
 
-SENSORS: tuple[SensorEntityDescription, ...] = (
+SENSORS: Tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
         name="Room temperature",
         key=Entity.ROOM_TEMPERATURE.value,
@@ -117,8 +117,8 @@ async def async_setup_entry(
 class FlexitSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Flexit sensor."""
 
-    coordinator: FlexitDataUpdateCoordinator
     sensor_data: Any
+    coordinator: FlexitDataUpdateCoordinator
 
     def __init__(
         self,

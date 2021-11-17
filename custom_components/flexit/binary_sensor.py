@@ -1,11 +1,9 @@
-"""Support for getting statistical data from a Flexit system."""
+"""Binary_sensor platform Flexit system."""
 
 from typing import Any, Tuple, cast
+from dataclasses import dataclass
 
-from homeassistant.components.binary_sensor import (
-    BinarySensorEntity,
-    BinarySensorEntityDescription,
-)
+from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ENTITY_CATEGORY_DIAGNOSTIC
 from homeassistant.core import HomeAssistant, callback
@@ -23,18 +21,27 @@ from .const import (
 from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity, FlexitSensorsResponse
 
-ALARM_BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
-    BinarySensorEntityDescription(
+BINARY_SENSORS: Tuple[FlexitBinarySensorEntityDescription, ...] = (
+    FlexitBinarySensorEntityDescription(
+        name="Calendar Temporary Override",
+        key=Entity.CALENDAR_TEMPORARY_OVERRIDE.value,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+    ),
+    FlexitBinarySensorEntityDescription(
         name="Alarm",
         key=Entity.ALARM.value,
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity=FlexitAlarmBinarySensor,
+        icon_on="mdi:alarm-light",
+        icon_off="mdi:alarm-light-off",
     ),
-)
-FILTER_BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
-    BinarySensorEntityDescription(
+    FlexitBinarySensorEntityDescription(
         name="Dirty filter",
         key=Entity.DIRTY_FILTER.value,
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity=FlexitFilterBinarySensor,
+        icon_on="mdi:hvac",
+        icon_off="mdi:hvac-off",
     ),
 )
 
@@ -44,20 +51,37 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ):
     """Set up the Flexit sensor."""
+
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
-    async_add_entities(FlexitFilterBinarySensor(coordinator, description) for description in FILTER_BINARY_SENSORS)
-    async_add_entities(FlexitAlarmBinarySensor(coordinator, description) for description in ALARM_BINARY_SENSORS)
+
+    for description in BINARY_SENSORS:
+        if description.entity == FlexitAlarmBinarySensor:
+            async_add_entities([FlexitAlarmBinarySensor(coordinator, description)])
+        elif description.entity == FlexitFilterBinarySensor:
+            async_add_entities([FlexitFilterBinarySensor(coordinator, description)])
+        else:
+            async_add_entities([FlexitBinarySensor(coordinator, description)])
+
+
+@dataclass
+class FlexitBinarySensorEntityDescription(BinarySensorEntityDescription):
+    """A class that describes number entities."""
+
+    icon_on: str = "mdi:toggle-switch-outline"
+    icon_off: str = "mdi:toggle-switch-off-outline"
+    entity: FlexitBinarySensor = FlexitBinarySensor
 
 class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
     """Representation of a Flexit binary sensor."""
 
-    coordinator: FlexitDataUpdateCoordinator
     sensor_data: Any
+    coordinator: FlexitDataUpdateCoordinator
+    entity_description: FlexitBinarySensorEntityDescription
 
     def __init__(
         self,
         coordinator: FlexitDataUpdateCoordinator,
-        description: BinarySensorEntityDescription,
+        description: FlexitBinarySensorEntityDescription,
     ) -> None:
         """Initialize a Flexit binary sensor."""
 
@@ -70,6 +94,16 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self._attr_device_info = coordinator._attr_device_info
         self.update_from_data()
 
+    @property
+    def is_on(self) -> bool:
+        """Return true if the binary sensor is on."""
+        return cast(bool, self.sensor_data)
+
+    @property
+    def icon(self):
+        """Return the icon to use in the frontend."""
+        return self.entity_description.icon_on if self.is_on else self.entity_description.icon_off
+
     def update_from_data(self) -> None:
         """Update attributes from data."""
         self.sensor_data = self.data.__getattribute__(self.entity_description.key)
@@ -81,17 +115,8 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self.update_from_data()
         super()._handle_coordinator_update()
 
-    @property
-    def is_on(self) -> bool:
-        """Return true if the binary sensor is on."""
-        return cast(bool, self.sensor_data)
 
 class FlexitFilterBinarySensor(FlexitBinarySensor):
-
-    @property
-    def icon(self):
-        """Return the icon to use in the frontend."""
-        return "mdi:hvac" if self.is_on else "mdi:hvac-off"
 
     @property
     def extra_state_attributes(self):
@@ -108,24 +133,10 @@ class FlexitFilterBinarySensor(FlexitBinarySensor):
 
 class FlexitAlarmBinarySensor(FlexitBinarySensor):
 
-    def __init__(
-        self,
-        coordinator: FlexitDataUpdateCoordinator,
-        description: BinarySensorEntityDescription,
-    ) -> None:
-        """Initialize a Flexit binary sensor."""
-
-        super().__init__(coordinator, description)
-
     @property
     def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
         return self.sensor_data.get("alarm_code_a", 0) > 0 or self.sensor_data.get("alarm_code_b", 0) > 0
-
-    @property
-    def icon(self):
-        """Return the icon to use in the frontend."""
-        return "mdi:alarm-light" if self.is_on else "mdi:alarm-light-off"
 
     @property
     def extra_state_attributes(self):
