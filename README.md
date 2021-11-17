@@ -56,7 +56,7 @@ Tested with:
 - Your Flexit-unit needs to be connected to the Internet
 - Unit needs to be registered in the Flexit Go-app
 
-## TODO - If possible
+## Roadmap
 - [ ] Be able to set all modes (Fireplace, Calendar missing)
 - [ ] Service to set modes with modifications (delay, duration, override etc)
 
