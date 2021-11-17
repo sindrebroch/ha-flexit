@@ -125,7 +125,7 @@ class FlexitAlarmBinarySensor(FlexitBinarySensor):
     @property
     def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
-        return self.sensor_data.get("alarm_code_a", 0) > 0 and self.sensor_data.get("alarm_code_b", 0) > 0
+        return self.sensor_data.get("alarm_code_a", 0) > 0 or self.sensor_data.get("alarm_code_b", 0) > 0
 
     @property
     def icon(self):
