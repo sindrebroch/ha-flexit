@@ -136,9 +136,12 @@ class FlexitAlarmBinarySensor(FlexitBinarySensor):
     def extra_state_attributes(self):
         """Return the state attributes."""
 
+        alarm_code_a = self.sensor_data.get("alarm_code_a", 0)
+        alarm_code_b = self.sensor_data.get("alarm_code_b", 0)
+        
         return {
-            ATTR_ALARM_CODE_A: self.sensor_data.alarm_code_a if self.sensor_data.get("alarm_code_a", 0) > 0 else "No alarm",
-            ATTR_ALARM_CODE_B: self.sensor_data.alarm_code_b if self.sensor_data.get("alarm_code_b", 0) > 0 else "No alarm"
+            ATTR_ALARM_CODE_A: alarm_code_a if alarm_code_a > 0 else "No alarm",
+            ATTR_ALARM_CODE_B: alarm_code_b if alarm_code_b > 0 else "No alarm"
         }
 
     def update_from_data(self) -> None:
