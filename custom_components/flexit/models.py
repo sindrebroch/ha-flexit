@@ -81,6 +81,7 @@ class Entity(Enum):
     EXTRACT_FAN_CONTROL_SIGNAL = "extract_fan_control_signal"
     ADDITIONAL_HEATER = "additional_heater"
 
+
 class UtilClass:
     """UtilClass."""
 
@@ -232,7 +233,9 @@ class FlexitSensorsResponse:
             additional_heater=util._int_sensor(ADDITIONAL_HEATER_PATH),
             alarm_code_a=util._int_sensor(ALARM_CODE_A_PATH),
             alarm_code_b=util._int_sensor(ALARM_CODE_B_PATH),
-            calendar_temporary_override=util._bool_sensor(CALENDAR_TEMPORARY_OVERRIDE_PATH),
+            calendar_temporary_override=util._bool_sensor(
+                CALENDAR_TEMPORARY_OVERRIDE_PATH
+            ),
         )
 
 
