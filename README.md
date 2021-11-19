@@ -57,6 +57,7 @@ Tested with:
 - Unit needs to be registered in the Flexit Go-app
 
 ## Roadmap
+- [ ] Fix binary_sensors from updating correctly
 - [ ] Be able to set all modes (Fireplace, Calendar missing)
 - [ ] Service to set modes with modifications (delay, duration, override etc)
 
