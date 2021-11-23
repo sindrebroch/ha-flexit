@@ -46,11 +46,8 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the Flexit sensor."""
-
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
-
-    for description in CLIMATES:
-        async_add_entities([FlexitClimate(coordinator, description)])
+    async_add_entities(FlexitClimate(coordinator, description) for description in CLIMATES)
 
 
 class FlexitClimate(CoordinatorEntity, ClimateEntity):
