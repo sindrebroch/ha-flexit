@@ -1,0 +1,112 @@
+{
+  "totalCount": 11,
+  "values": {
+    "PLANT_ID;1!000000001000055": {
+      "value": {
+        "value": 18.02,
+        "statusFlags": 0,
+        "reliability": 0,
+        "eventState": 0,
+        "minValue": -50.0,
+        "maxValue": 50.0
+      }
+    },
+    "PLANT_ID;1!000000004000055": {
+      "value": {
+        "value": 20.29,
+        "statusFlags": 0,
+        "reliability": 0,
+        "eventState": 0,
+        "minValue": -50.0,
+        "maxValue": 80.0
+      }
+    },
+    "PLANT_ID;1!00000000B000055": {
+      "value": {
+        "value": 24.5,
+        "statusFlags": 0,
+        "reliability": 0,
+        "eventState": 0,
+        "minValue": -50.0,
+        "maxValue": 80.0
+      }
+    },
+    "PLANT_ID;1!00000003B000055": {
+      "value": {
+        "value": 25.49,
+        "statusFlags": 0,
+        "reliability": 0,
+        "eventState": 0,
+        "minValue": -50.0,
+        "maxValue": 80.0
+      }
+    },
+    "PLANT_ID;1!00000004B000055": {
+      "value": {
+        "value": 26.5,
+        "statusFlags": 0,
+        "reliability": 0,
+        "eventState": 0,
+        "minValue": 0.0,
+        "maxValue": 50.0
+      }
+    },
+    "PLANT_ID;1!00200011D000055": {
+      "value": {
+        "value": 2348.0,
+        "statusFlags": 0,
+        "reliability": 0,
+        "eventState": 0,
+        "minValue": 0.0,
+        "maxValue": 99999.0
+      }
+    },
+    "PLANT_ID;1!00200011E000055": {
+      "value": {
+        "value": 4380.0,
+        "statusFlags": 0,
+        "reliability": 0,
+        "eventState": 0,
+        "minValue": 0.0,
+        "maxValue": 99990.0
+      }
+    },
+    "PLANT_ID;1!0020007C1000055": {
+      "value": {
+        "value": 16.0,
+        "statusFlags": 0,
+        "reliability": 0,
+        "eventState": 0,
+        "minValue": 10.0,
+        "maxValue": 30.0
+      }
+    },
+    "PLANT_ID;1!0020007CA000055": {
+      "value": {
+        "value": 16.0,
+        "statusFlags": 0,
+        "reliability": 0,
+        "eventState": 0,
+        "minValue": 10.0,
+        "maxValue": 30.0
+      }
+    },
+    "PLANT_ID;1!0050001BD000055": {
+      "value": {
+        "value": 0,
+        "statusFlags": 0,
+        "reliability": 0,
+        "presentPriority": 13,
+        "eventState": 0
+      }
+    },
+    "PLANT_ID;1!013000169000055": {
+      "value": {
+        "value": 3,
+        "statusFlags": 0,
+        "reliability": 0,
+        "eventState": 0
+      }
+    }
+  }
+}

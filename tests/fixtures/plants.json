@@ -1,0 +1,41 @@
+{
+  "totalCount": 1,
+  "items": [
+    {
+      "id": "PLANT_ID",
+      "activationKey": "ACTIVATION_KEY",
+      "address": "",
+      "alarmStatus": 0,
+      "applicationSetDescription": "POS4.6705/414 & POS4.6705/514 = Device ID 47",
+      "applicationSetId": "APP_SET_ID",
+      "applicationSetVersionId": "APP_VERSION_APP",
+      "applicationSetName": "POS4.6705/414 Nordic",
+      "asn": "ASN",
+      "assigned": "True",
+      "city": "",
+      "country": "",
+      "description": "",
+      "energyIndicator": 0,
+      "isOnline": "True",
+      "name": "NAME",
+      "phone": "",
+      "serialNumber": "SERIAL_NUMBER",
+      "state": "",
+      "taskStatus": 0,
+      "tenant": "Flexit POS",
+      "tenantId": "TENANT_ID",
+      "timezone": "",
+      "timezoneDisplayName": "",
+      "timezoneBaseUtcOffsetInMinutes": 0,
+      "zipCode": "",
+      "imsi": "",
+      "customerPlantId": "111111-222222",
+      "enhancedPrivileges": "False",
+      "isVirtual": "False",
+      "servicePlusDurationInMonths": 0,
+      "servicePlusExpiresAfter": 0,
+      "installDate": 0,
+      "lastContactDate": 0
+    }
+  ]
+}

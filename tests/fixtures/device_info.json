@@ -1,0 +1,32 @@
+{
+  "totalCount": 9,
+  "values": {
+    "PLANT_ID;0!0083FFFFF00000C": {
+      "value": "AAS-20:SU=SiUn;APT=HvacFnct21y_A;APTV=1.329;"
+    },
+    "PLANT_ID;0!0083FFFFF00001C": {
+      "value": "111111-222222"
+    },
+    "PLANT_ID;0!0083FFFFF00002C": {
+      "value": "FW=02.31.02.20:BL=00.05.02.0010;SVS-300.1:SBC=13.22;I"
+    },
+    "PLANT_ID;0!0083FFFFF000046": {
+      "value": "SOC19A"
+    },
+    "PLANT_ID;0!0083FFFFF000070": {
+      "value": 0
+    },
+    "PLANT_ID;0!0083FFFFF0000C4": {
+      "value": 4
+    },
+    "PLANT_ID;0!0083FFFFF0012DB": {
+      "value": "MDL:ASN= POS4.6705/414;HW=1.0.0;"
+    },
+    "PLANT_ID;0!0083FFFFF0013EC": {
+      "value": "0"
+    },
+    "PLANT_ID;0!Online": {
+      "value": 1
+    }
+  }
+}
