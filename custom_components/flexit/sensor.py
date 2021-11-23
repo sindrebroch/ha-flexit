@@ -110,11 +110,8 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the Flexit sensor."""
-
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
-
-    for description in SENSORS:
-        async_add_entities([FlexitSensor(coordinator, description)])
+    async_add_entities(FlexitSensor(coordinator, description) for description in SENSORS)
 
 
 class FlexitSensor(CoordinatorEntity, SensorEntity):
