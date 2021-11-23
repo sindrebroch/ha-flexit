@@ -113,7 +113,6 @@ async def async_setup_entry(
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
     async_add_entities(FlexitSensor(coordinator, description) for description in SENSORS)
 
-
 class FlexitSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Flexit sensor."""
 

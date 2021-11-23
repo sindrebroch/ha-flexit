@@ -44,12 +44,9 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ):
     """Set up the Flexit sensor."""
-
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
-        
     async_add_entities(FlexitFilterBinarySensor(coordinator, description) for description in FILTER_BINARY_SENSORS)
     async_add_entities(FlexitAlarmBinarySensor(coordinator, description) for description in ALARM_BINARY_SENSORS)
-
 
 class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
     """Representation of a Flexit binary sensor."""
