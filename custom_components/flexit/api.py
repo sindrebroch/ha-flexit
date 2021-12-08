@@ -95,7 +95,7 @@ class FlexitApiClient:
         )
 
         try:
-            async with async_timeout.timeout(10, loop=asyncio.get_event_loop()):
+            async with async_timeout.timeout(10):
                 response = await self._session.request(
                     method=method,
                     url=url,
