@@ -5,12 +5,13 @@ from __future__ import annotations
 from typing import Any, cast
 
 from homeassistant.components.sensor import (
-    STATE_CLASS_MEASUREMENT,
     SensorEntity,
     SensorEntityDescription,
+    SensorDeviceClass,
+    SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import DEVICE_CLASS_TEMPERATURE, PERCENTAGE, TEMP_CELSIUS
+from homeassistant.const import PERCENTAGE, TEMP_CELSIUS
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
@@ -30,40 +31,40 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         key=Entity.ROOM_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
-        device_class=DEVICE_CLASS_TEMPERATURE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         name="Outside temperature",
         key=Entity.OUTSIDE_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
-        device_class=DEVICE_CLASS_TEMPERATURE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         name="Supply temperature",
         key=Entity.SUPPLY_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
-        device_class=DEVICE_CLASS_TEMPERATURE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         name="Exhaust temperature",
         key=Entity.EXHAUST_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
-        device_class=DEVICE_CLASS_TEMPERATURE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         name="Extract temperature",
         key=Entity.EXTRACT_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
-        device_class=DEVICE_CLASS_TEMPERATURE,
-        state_class=STATE_CLASS_MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         name="Supply Fan Speed",
