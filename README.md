@@ -1,5 +1,8 @@
 # Flexit for HomeAssistant
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/sindrebroch/ha-flexit?style=flat-square)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+
 HomeAssistant-integration for controlling your Flexit ventilation unit. 
 
 This integration uses an undocumented API, use at your own risk. This integration uses the same domain name as the official Flexit-integration, so in its current state you can't use both at the same time.
