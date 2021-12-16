@@ -1,0 +1,46 @@
+Number entities:
+    - Home temp     ?
+    - Away temp     ?
+
+Select entity:
+    - Mode          ?
+
+Away with delay:
+    Number entity: Away_delay   (0 - 300 min)
+
+High modifiers:
+    Switch:     Boost Temporary
+    Number:     Duration    (1 - 360 min)
+
+Fireplace:
+    Number: Fireplace Duration  (0-360 min)
+
+Calendar:
+    New mode? - Where can we check if Calendar is being used
+    Switch:     Temporary override?
+    Type:       Edit Calendar Schedule?
+
+# Calendar Temporary Override
+plant_id;1!0050001DA000055
+
+
+-----
+
+BINARY_SENSOR:
+    - CALENDAR_TEMPORARY_OVERRIDE (Switch?)
+
+NUMBER:
+    - AWAY_DELAY
+    - BOOST_DURATION
+    - FIREPLACE_DURATION
+
+SWITCH:
+    - BOOST_TEMPORARY
+
+MODES:
+    - HOME
+    - AWAY
+    - AWAY_DELAY
+    - HIGH
+    - FIREPLACE
+    - CALENDAR

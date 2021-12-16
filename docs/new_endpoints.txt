@@ -1,0 +1,54 @@
+#	Result	Protocol	Host	URL	Body	Caching	Content-Type	Process	Comments	Custom
+308	200	HTTPS	api.climatixic.com	/DataPoints/plant_id%3B1%21005000032000055?language=en	155	no-cache; Expires: -1	application/json; charset=utf-8
+
+# Away now
+{"value":0,"priority":13}
+
+# Home
+{"value":3,"priority":13}
+
+# Away delay
+{"Value":5.0} ## minutes
+
+PUT https://api.climatixic.com/DataPoints/plant_id%3B1%2103000013E000055?language=en HTTP/1.1
+
+# Temporary boost
+PUT https://api.climatixic.com/DataPoints/plant_id%3B1%21013000165000055?language=en HTTP/1.1
+{"Value":2} # 90
+PUT https://api.climatixic.com/DataPoints/plant_id%3B1%21030000125000055?language=en HTTP/1.1
+{"Value":46.0} # 46 min
+PUT https://api.climatixic.com/DataPoints/plant_id%3B1%21030000125000055?language=en HTTP/1.1
+{"Value":90.0}
+
+# High now
+PUT https://api.climatixic.com/DataPoints/plant_id%3B1%2101300002A000055?language=en HTTP/1.1
+{"value":4,"priority":13}
+
+# Fireplace delay 30 ## OBS reverts back to previous
+PUT https://api.climatixic.com/DataPoints/plant_id%3B1%21013000168000055?language=en HTTP/1.1
+{"Value":2}
+
+PUT https://api.climatixic.com/DataPoints/plant_id%3B1%2103000010E000055?language=en HTTP/1.1
+{"Value":63.0} # minutes
+
+# Activate calendar
+PUT https://api.climatixic.com/DataPoints/plant_id%3B1%2101300002A000055?language=en HTTP/1.1
+{"value":null,"priority":13}
+
+# save calendar?
+PUT https://api.climatixic.com/DataPoints/plant_id%3B1%210050001DA000055?language=en HTTP/1.1
+{"Value":1}
+
+# Set home
+PUT https://api.climatixic.com/DataPoints/plant_id%3B1%2101300002A000055?language=en HTTP/1.1
+{"value":3,"priority":13}
+
+# Get general info?
+GET https://api.climatixic.com/Plants/?tenantId=Te8ec9106-8d77-4eba-b2c8-545702854dda HTTP/1.1
+
+# Save Calendar
+PUT https://api.climatixic.com/DataPoints/plant_id%3B2%21011000005000055?language=en HTTP/1.1
+
+{"Value":{"schedStart":0,"schedEnd":null,"days":[[[7682,2],[6,0],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null]],[[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null]],[[7684,4],[6,0],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null]],[[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null]],[[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null]],[[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null]],[[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null]],[[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null],[4294967295,null]]]}}
+
+# Halvtimer
