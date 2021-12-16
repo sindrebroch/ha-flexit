@@ -188,6 +188,22 @@ class FlexitApiClient:
 
         return False if mode_int == -1 else await self.update(MODE_PUT_PATH, mode_int)
 
+    async def set_delay(self, mode: str, delay) -> bool:
+
+        # AWAY
+
+        return False
+
+    async def set_duration(self, mode: str, duration) -> bool:
+
+        # FIREPLACE
+        # HIGH
+
+        return False
+
+    async def set_calendar_temp_override(self) -> bool:
+        return False
+
     async def set_heater_state(self, heater_bool: bool) -> bool:
         """Set heater state."""
         return await self.update(HEATER_PATH, 1 if heater_bool else 0)
@@ -197,7 +213,7 @@ class FlexitApiClient:
 
         stateTexts = FlexitSensorsResponseStatus.from_dict(response).stateTexts
         return stateTexts[path_with_plant] == "Success"
-    
+
     def path(self, path: str) -> str:
         """Return path with plant_id prefixed."""
         assert self._plant_id is not None
