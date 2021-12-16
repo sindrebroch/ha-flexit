@@ -24,11 +24,13 @@ from .const import (
     DOMAIN as FLEXIT_DOMAIN,
     LOGGER,
     MODE_AWAY,
+    MODE_CALENDAR,
     MODE_COOKER_HOOD,
     MODE_FIREPLACE,
-    MODE_FORCED_VENTILATION,
     MODE_HIGH,
     MODE_HOME,
+    PRESET_CALENDAR,
+    PRESET_FIREPLACE,
     PRESETS,
 )
 from .coordinator import FlexitDataUpdateCoordinator
@@ -50,7 +52,10 @@ async def async_setup_entry(
 ) -> None:
     """Set up the Flexit sensor."""
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
-    async_add_entities(FlexitClimate(coordinator, description) for description in CLIMATES)
+    async_add_entities(
+        FlexitClimate(coordinator, description) for description in CLIMATES
+    )
+
 
 class FlexitClimate(CoordinatorEntity, ClimateEntity):
     """Representation of a Flexit ventilation unit."""
@@ -108,7 +113,10 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         float_temp = float(temperature)
         if float_temp == self.target_temperature:
             return
-        elif coordinator.data.ventilation_mode == MODE_AWAY and await coordinator.api.set_away_temp(str(float_temp)):
+        elif (
+            coordinator.data.ventilation_mode == MODE_AWAY
+            and await coordinator.api.set_away_temp(str(float_temp))
+        ):
             coordinator.data.away_air_temperature = float_temp
         elif await coordinator.api.set_home_temp(str(float_temp)):
             coordinator.data.home_air_temperature = float_temp
@@ -133,9 +141,13 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
 
         if hvac_mode == self.hvac_mode:
             return
-        elif hvac_mode == HVAC_MODE_HEAT and await coordinator.api.set_heater_state(True):
+        elif hvac_mode == HVAC_MODE_HEAT and await coordinator.api.set_heater_state(
+            True
+        ):
             coordinator.data.electric_heater = True
-        elif hvac_mode == HVAC_MODE_FAN_ONLY and await coordinator.api.set_heater_state(False):
+        elif hvac_mode == HVAC_MODE_FAN_ONLY and await coordinator.api.set_heater_state(
+            False
+        ):
             coordinator.data.electric_heater = False
         else:
             return
@@ -163,9 +175,12 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
             return PRESET_AWAY
         elif current_mode in (MODE_HIGH, MODE_COOKER_HOOD):
             return PRESET_BOOST
+        elif current_mode == MODE_FIREPLACE:
+            return PRESET_FIREPLACE
+        elif current_mode == MODE_CALENDAR:
+            return PRESET_CALENDAR
 
-        if current_mode not in (MODE_FIREPLACE, MODE_FORCED_VENTILATION)
-            LOGGER.warning("Unknown preset mode %s", current_mode)
+        LOGGER.warning("Unknown preset mode %s", current_mode)
         return current_mode
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
@@ -181,7 +196,15 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
             coordinator.data.ventilation_mode = MODE_AWAY
         elif preset_mode == PRESET_BOOST and await coordinator.api.set_mode(MODE_HIGH):
             coordinator.data.ventilation_mode = MODE_HIGH
+        elif preset_mode == PRESET_CALENDAR and await coordinator.api.set_mode(
+            MODE_CALENDAR
+        ):
+            coordinator.data.ventilation_mode = MODE_CALENDAR
+        elif preset_mode == PRESET_FIREPLACE and await coordinator.api.set_mode(
+            MODE_FIREPLACE
+        ):
+            coordinator.data.ventilation_mode = MODE_FIREPLACE
         else:
             return
-        
+
         self.async_write_ha_state()

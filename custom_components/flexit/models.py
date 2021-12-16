@@ -190,7 +190,12 @@ class FlexitSensorsResponse:
     filter_time_for_exchange: str
     alarm_code_a: int
     alarm_code_b: int
+
     calendar_temporary_override: bool
+    boost_temporary: bool
+    boost_duration: int
+    fireplace_duration: int
+    away_delay: int
 
     heat_exchanger_speed: int
     supply_fan_speed: int
@@ -236,6 +241,10 @@ class FlexitSensorsResponse:
             calendar_temporary_override=util._bool_sensor(
                 CALENDAR_TEMPORARY_OVERRIDE_PATH
             ),
+            boost_temporary=False,
+            boost_duration=0,
+            fireplace_duration=0,
+            away_delay=0,
         )
 
 

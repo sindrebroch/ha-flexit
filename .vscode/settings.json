@@ -1,4 +1,8 @@
 {
+    "python.formatting.provider": "black",
+    "python.testing.pytestArgs": [
+        "--no-cov"
+    ],
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
     "python.pythonPath": "/usr/local/bin/python",

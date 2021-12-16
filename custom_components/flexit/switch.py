@@ -9,7 +9,12 @@ from homeassistant.components.switch import (
     SwitchEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import DEVICE_CLASS_TEMPERATURE, PERCENTAGE, TEMP_CELSIUS, ENTITY_CATEGORY_CONFIG
+from homeassistant.const import (
+    DEVICE_CLASS_TEMPERATURE,
+    PERCENTAGE,
+    TEMP_CELSIUS,
+    ENTITY_CATEGORY_CONFIG,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
@@ -67,7 +72,9 @@ class FlexitSwitch(CoordinatorEntity, SwitchEntity):
 
     def update_from_data(self) -> None:
         """Update attributes based on new data."""
-        self.sensor_data = self.coordinator.data.__getattribute__(self.entity_description.key)
+        self.sensor_data = self.coordinator.data.__getattribute__(
+            self.entity_description.key
+        )
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -77,10 +84,10 @@ class FlexitSwitch(CoordinatorEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
-        #await self.coordinator.api.monitor_on()
+        # await self.coordinator.api.monitor_on()
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the entity off."""
-        #await self.coordinator.api.monitor_off()
+        # await self.coordinator.api.monitor_off()
         await self.coordinator.async_request_refresh()

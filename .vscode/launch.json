@@ -2,7 +2,19 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Attach Local",
+      "name": "Home Assistant",
+      "type": "python",
+      "request": "launch",
+      "module": "homeassistant",
+      "justMyCode": false,
+      "args": [
+        "--debug",
+        "-c",
+        "config"
+      ]
+    },
+    {
+      "name": "Home Assistant: Attach Local",
       "type": "python",
       "request": "attach",
       "port": 5678,
@@ -15,7 +27,7 @@
       ]
     },
     {
-      "name": "Python: Attach Remote",
+      "name": "Home Assistant: Attach Remote",
       "type": "python",
       "request": "attach",
       "port": 5678,
