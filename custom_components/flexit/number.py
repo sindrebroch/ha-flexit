@@ -96,7 +96,7 @@ async def async_setup_entry(
     for description in NUMBERS:
         if description.entity == "Away":
             async_add_entities([FlexitAwayTempNumber(coordinator, description)])
-        if description.entity == "Home":
+        elif description.entity == "Home":
             async_add_entities([FlexitHomeTempNumber(coordinator, description)])
         else:
             async_add_entities([FlexitNumber(coordinator, description)])
