@@ -14,7 +14,7 @@ from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN as FLEXIT_DOMAIN, LOGGER, PRESETS
+from .const import DOMAIN as FLEXIT_DOMAIN, PRESETS
 from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity
 

@@ -127,6 +127,8 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
 
 
 class FlexitFilterBinarySensor(FlexitBinarySensor):
+    """Binary sensor for filter."""
+
     @property
     def extra_state_attributes(self):
         """Return the state attributes."""
@@ -142,6 +144,8 @@ class FlexitFilterBinarySensor(FlexitBinarySensor):
 
 
 class FlexitAlarmBinarySensor(FlexitBinarySensor):
+    """Binary sensor for Alarm."""
+
     @property
     def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
