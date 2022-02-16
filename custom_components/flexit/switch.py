@@ -2,22 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Any, Tuple, cast
+from typing import Any, Tuple
 
 from homeassistant.components.switch import (
     SwitchEntity,
     SwitchEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    DEVICE_CLASS_TEMPERATURE,
-    PERCENTAGE,
-    TEMP_CELSIUS,
-    ENTITY_CATEGORY_CONFIG,
-)
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN as FLEXIT_DOMAIN
@@ -28,9 +22,10 @@ SWITCHES: Tuple[SwitchEntityDescription, ...] = (
     SwitchEntityDescription(
         key=Entity.BOOST_TEMPORARY.value,
         name="High Temporary",
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
     ),
 )
+
 
 async def async_setup_entry(
     hass: HomeAssistant,

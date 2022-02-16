@@ -18,9 +18,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     TIME_MINUTES,
     TEMP_CELSIUS,
-    ENTITY_CATEGORY_CONFIG,
 )
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -43,7 +43,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
         key=Entity.AWAY_DELAY.value,
         name="Away Mode Delay",
         unit_of_measurement=TIME_MINUTES,
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         min_value=0.0,
         max_value=300.0,
     ),
@@ -51,7 +51,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
         key=Entity.BOOST_DURATION.value,
         name="Boost Duration",
         unit_of_measurement=TIME_MINUTES,
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         min_value=1.0,
         max_value=360.0,
     ),
@@ -59,7 +59,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
         key=Entity.FIREPLACE_DURATION.value,
         name="Fireplace Duration",
         unit_of_measurement=TIME_MINUTES,
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         min_value=0.0,
         max_value=360.0,
     ),
@@ -67,7 +67,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
         key=Entity.HOME_TEMPERATURE.value,
         name="Home Temperature",
         unit_of_measurement=TEMP_CELSIUS,
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         min_value=10.0,
         max_value=30.0,
         entity="Home",
@@ -76,7 +76,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
         key=Entity.AWAY_TEMPERATURE.value,
         name="Away Temperature",
         unit_of_measurement=TEMP_CELSIUS,
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         min_value=10.0,
         max_value=30.0,
         entity="Away",

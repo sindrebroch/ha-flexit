@@ -8,8 +8,8 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ENTITY_CATEGORY_DIAGNOSTIC
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -38,12 +38,12 @@ BINARY_SENSORS: Tuple[FlexitBinarySensorEntityDescription, ...] = (
     FlexitBinarySensorEntityDescription(
         name="Calendar Temporary Override",
         key=Entity.CALENDAR_TEMPORARY_OVERRIDE.value,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     FlexitBinarySensorEntityDescription(
         name="Alarm",
         key=Entity.ALARM.value,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity="Alarm",
         icon_on="mdi:alarm-light",
         icon_off="mdi:alarm-light-off",
@@ -51,12 +51,13 @@ BINARY_SENSORS: Tuple[FlexitBinarySensorEntityDescription, ...] = (
     FlexitBinarySensorEntityDescription(
         name="Dirty filter",
         key=Entity.DIRTY_FILTER.value,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity="Filter",
         icon_on="mdi:hvac",
         icon_off="mdi:hvac-off",
     ),
 )
+
 
 async def async_setup_entry(
     hass: HomeAssistant,

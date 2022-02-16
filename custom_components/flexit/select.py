@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Tuple, cast
+from typing import Any, Tuple
 
 from homeassistant.components.select import (
     SelectEntity,
@@ -10,7 +10,7 @@ from homeassistant.components.select import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.const import ENTITY_CATEGORY_CONFIG
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -22,9 +22,10 @@ SELECTS: Tuple[SelectEntityDescription, ...] = (
     SelectEntityDescription(
         key=Entity.VENTILATION_MODE.value,
         name="Ventilation Mode",
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
     ),
 )
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -37,6 +38,7 @@ async def async_setup_entry(
 
     for description in SELECTS:
         async_add_entities([FlexitSelect(coordinator, description)])
+
 
 class FlexitSelect(CoordinatorEntity, SelectEntity):
     """Define a Flexit entity."""
@@ -56,19 +58,21 @@ class FlexitSelect(CoordinatorEntity, SelectEntity):
         self.entity_description = description
         self._attr_unique_id = f"{description.key}"
         self._attr_device_info = coordinator._attr_device_info
-        
+
         self._attr_options = PRESETS
-        
+
         self.update_from_data()
 
     def update_from_data(self) -> None:
         """Update attributes based on new data."""
-        self.sensor_data = self.coordinator.data.__getattribute__(self.entity_description.key)
+        self.sensor_data = self.coordinator.data.__getattribute__(
+            self.entity_description.key
+        )
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
-        
+
         self.update_from_data()
         super()._handle_coordinator_update()
 
@@ -79,6 +83,6 @@ class FlexitSelect(CoordinatorEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        
-        #await self.coordinator.api.monitor_off()
+
+        # await self.coordinator.api.monitor_off()
         await self.coordinator.async_request_refresh()
