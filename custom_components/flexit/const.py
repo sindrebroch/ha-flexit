@@ -3,6 +3,7 @@
 from logging import Logger, getLogger
 from typing import List
 
+from homeassistant.const import Platform
 from homeassistant.components.climate.const import (
     PRESET_AWAY,
     PRESET_BOOST,
@@ -33,15 +34,16 @@ API_HEADERS = {
     "Ocp-Apim-Subscription-Key": "c3fc1f14ce8747588212eda5ae3b439e",
 }
 
-BINARY_SENSOR = "binary_sensor"
-CLIMATE = "climate"
-SENSOR = "sensor"
-NUMBER = "number"
-PLATFORMS: List[str] = [BINARY_SENSOR, CLIMATE, NUMBER, SENSOR]
+PLATFORMS: List[str] = [
+    Platform.BINARY_SENSOR,
+    Platform.CLIMATE,
+    Platform.NUMBER,
+    Platform.SENSOR,
+    Platform.SWITCH,
+]
 
 PRESET_FIREPLACE = "Fireplace"
 PRESETS = [PRESET_HOME, PRESET_AWAY, PRESET_BOOST, PRESET_FIREPLACE]
-
 
 # Attributes
 ATTR_UNTIL_DIRTY = "hours_until_dirty"
