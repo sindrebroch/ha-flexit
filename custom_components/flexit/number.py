@@ -38,7 +38,7 @@ class FlexitNumberEntityDescription(NumberEntityDescription):
 NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
     FlexitNumberEntityDescription(
         key=Entity.AWAY_DELAY.value,
-        name="Away Mode Delay",
+        name="Delay Away Mode",
         unit_of_measurement=TIME_MINUTES,
         entity_category=EntityCategory.CONFIG,
         min_value=0.0,
@@ -47,7 +47,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
     ),
     FlexitNumberEntityDescription(
         key=Entity.BOOST_DURATION.value,
-        name="Boost Duration",
+        name="Duration Boost",
         unit_of_measurement=TIME_MINUTES,
         entity_category=EntityCategory.CONFIG,
         min_value=1.0,
@@ -56,7 +56,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
     ),
     FlexitNumberEntityDescription(
         key=Entity.FIREPLACE_DURATION.value,
-        name="Fireplace Duration",
+        name="Duration Fireplace",
         unit_of_measurement=TIME_MINUTES,
         entity_category=EntityCategory.CONFIG,
         min_value=0.0,

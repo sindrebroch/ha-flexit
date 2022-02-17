@@ -27,7 +27,7 @@ HEATING_ICON = "mdi:radiator"
 
 SENSORS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
-        name="Room temperature",
+        name="Temperature Room",
         key=Entity.ROOM_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
@@ -35,7 +35,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        name="Outside temperature",
+        name="Temperature Outside",
         key=Entity.OUTSIDE_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
@@ -43,7 +43,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        name="Supply temperature",
+        name="Temperature Supply",
         key=Entity.SUPPLY_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
@@ -51,7 +51,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        name="Exhaust temperature",
+        name="Temperature Exhaust",
         key=Entity.EXHAUST_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
@@ -59,7 +59,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        name="Extract temperature",
+        name="Temperature Extract",
         key=Entity.EXTRACT_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
@@ -67,31 +67,31 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        name="Supply Fan Speed",
+        name="Fan Speed Supply",
         key=Entity.SUPPLY_FAN_SPEED.value,
         icon=FAN_ICON,
         native_unit_of_measurement="rev/min",
     ),
     SensorEntityDescription(
-        name="Supply Fan Control Signal",
+        name="Fan Control Signal Supply",
         key=Entity.SUPPLY_FAN_CONTROL_SIGNAL.value,
         icon=FAN_ICON,
         native_unit_of_measurement=PERCENTAGE,
     ),
     SensorEntityDescription(
-        name="Extract Fan Speed",
+        name="Fan Speed Extract",
         key=Entity.EXTRACT_FAN_SPEED.value,
         icon=FAN_ICON,
         native_unit_of_measurement="rev/min",
     ),
     SensorEntityDescription(
-        name="Extract Fan Control Signal",
+        name="Fan Control Signal Extract",
         key=Entity.EXTRACT_FAN_CONTROL_SIGNAL.value,
         icon=FAN_ICON,
         native_unit_of_measurement=PERCENTAGE,
     ),
     SensorEntityDescription(
-        name="Heat Exchanger Speed",
+        name="Speed Heat Exchanger",
         key=Entity.HEAT_EXCHANGER_SPEED.value,
         icon=FAN_ICON,
         native_unit_of_measurement=PERCENTAGE,
