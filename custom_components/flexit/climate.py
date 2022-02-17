@@ -180,17 +180,23 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         """Set preset mode async."""
 
         coordinator: FlexitDataUpdateCoordinator = self.coordinator
+        api = coordinator.api
 
-        if coordinator.data.ventilation_mode == preset_mode:
+        current_mode = coordinator.data.ventilation_mode
+
+        if current_mode == preset_mode:
             return
-        elif preset_mode == PRESET_HOME and await coordinator.api.set_mode(MODE_HOME):
+
+        # Toggle fireplace off
+        if current_mode == PRESET_FIREPLACE:
+            await api.set_mode(MODE_FIREPLACE)
+
+        if preset_mode == PRESET_HOME and await api.set_mode(MODE_HOME):
             coordinator.data.ventilation_mode = MODE_HOME
-        elif preset_mode == PRESET_AWAY and await coordinator.api.set_mode(MODE_AWAY):
+        elif preset_mode == PRESET_AWAY and await api.set_mode(MODE_AWAY):
             coordinator.data.ventilation_mode = MODE_AWAY
-        elif preset_mode == PRESET_BOOST and await coordinator.api.set_mode(MODE_HIGH):
+        elif preset_mode == PRESET_BOOST and await api.set_mode(MODE_HIGH):
             coordinator.data.ventilation_mode = MODE_HIGH
-        elif preset_mode == PRESET_FIREPLACE and await coordinator.api.set_mode(
-            MODE_FIREPLACE
-        ):
+        elif preset_mode == PRESET_FIREPLACE and await api.set_mode(MODE_FIREPLACE):
             coordinator.data.ventilation_mode = MODE_FIREPLACE
         self.async_write_ha_state()

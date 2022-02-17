@@ -194,7 +194,6 @@ class FlexitApiClient:
             return await self.update(MODE_HOME_HIGH_PUT_PATH, mode_int)
         if mode == MODE_FIREPLACE:
             return await self.update(MODE_FIREPLACE_PUT_PATH, 2)
-        # if mode == MODE_CALENDAR:
         return
 
     async def set_fireplace_duration(self, duration) -> bool:
