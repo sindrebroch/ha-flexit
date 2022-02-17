@@ -18,9 +18,9 @@ async def async_get_config_entry_diagnostics(
     """Return diagnostics for a config entry."""
 
     coordinator: FlexitDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]
-    api: FlexitApiClient = coordinator.api
     data: FlexitSensorsResponse = coordinator.data
 
     return {
         "data": str(data),
+        # "device": str(coordinator.device_info), # TODO redact
     }
