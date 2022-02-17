@@ -81,6 +81,8 @@ class Entity(Enum):
     BOOST_DURATION = "boost_duration"
     AWAY_DELAY = "away_delay"
 
+    BOOST_TEMPORARY = "boost_temporary"
+
 
 class UtilClass:
     """UtilClass."""

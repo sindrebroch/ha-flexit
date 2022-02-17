@@ -19,6 +19,7 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching from Flexit data API."""
 
     data: FlexitSensorsResponse
+    temporary_boost: bool
 
     def __init__(
         self,
@@ -34,6 +35,8 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
         self.name = name
         self.device_info = device_info
 
+        self.temporary_boost = False
+
         self._attr_device_info = DeviceInfo(
             name=self.name,
             manufacturer="Flexit",
@@ -48,6 +51,10 @@ class FlexitDataUpdateCoordinator(DataUpdateCoordinator):
             name=FLEXIT_DOMAIN,
             update_interval=timedelta(minutes=update_interval),
         )
+
+    async def async_set_temporary_boost(self, value: bool):
+        """Update temporary boost-value."""
+        self.temporary_boost = value
 
     async def _async_update_data(self) -> FlexitSensorsResponse:
         """Update data via library."""
