@@ -13,8 +13,11 @@ from aiohttp.client import ClientSession
 from .const import (
     API_HEADERS,
     AWAY_AIR_TEMPERATURE_PATH,
+    AWAY_DELAY_PATH,
+    BOOST_DURATION_PATH,
     DATAPOINTS_PATH,
     DEVICE_INFO_PATH_LIST,
+    FIREPLACE_DURATION_PATH,
     HEATER_PATH,
     FILTER_PATH,
     HOME_AIR_TEMPERATURE_PATH,
@@ -89,13 +92,13 @@ class FlexitApiClient:
     ) -> dict[str, Any] or None:
         """Wrap request."""
 
-        LOGGER.debug(
-            "%s-request to url=%s. data=%s. headers=%s",
-            method,
-            url,
-            data,
-            headers,
-        )
+        # LOGGER.debug(
+        #     "%s-request to url=%s. data=%s. headers=%s",
+        #     method,
+        #     url,
+        #     data,
+        #     headers,
+        # )
 
         try:
             async with async_timeout.timeout(10):
@@ -193,6 +196,18 @@ class FlexitApiClient:
             return await self.update(MODE_FIREPLACE_PUT_PATH, 2)
         # if mode == MODE_CALENDAR:
         return
+
+    async def set_fireplace_duration(self, duration) -> bool:
+        """Set fireplace duration."""
+        return await self.update(FIREPLACE_DURATION_PATH, duration)
+
+    async def set_boost_duration(self, duration) -> bool:
+        """Set fireplace duration."""
+        return await self.update(BOOST_DURATION_PATH, duration)
+
+    async def set_away_delay(self, delay) -> bool:
+        """Set fireplace duration."""
+        return await self.update(AWAY_DELAY_PATH, delay)
 
     async def set_heater_state(self, heater_bool: bool) -> bool:
         """Set heater state."""

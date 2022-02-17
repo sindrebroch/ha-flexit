@@ -10,7 +10,10 @@ from .const import (
     ALARM_CODE_B_PATH,
     APPLICATION_SOFTWARE_VERSION_PATH,
     AWAY_AIR_TEMPERATURE_PATH,
+    AWAY_DELAY_PATH,
+    BOOST_DURATION_PATH,
     DEVICE_DESCRIPTION_PATH,
+    FIREPLACE_DURATION_PATH,
     HEATER_PATH,
     EXHAUST_AIR_TEMPERATURE_PATH,
     EXTRACT_AIR_TEMPERATURE_PATH,
@@ -73,6 +76,11 @@ class Entity(Enum):
     EXTRACT_FAN_SPEED = "extract_fan_speed"
     EXTRACT_FAN_CONTROL_SIGNAL = "extract_fan_control_signal"
     ADDITIONAL_HEATER = "additional_heater"
+
+    FIREPLACE_DURATION = "fireplace_duration"
+    BOOST_DURATION = "boost_duration"
+    AWAY_DELAY = "away_delay"
+
 
 class UtilClass:
     """UtilClass."""
@@ -190,6 +198,10 @@ class FlexitSensorsResponse:
     extract_fan_control_signal: int
     additional_heater: int
 
+    fireplace_duration: int
+    boost_duration: int
+    away_delay: int
+
     @staticmethod
     def from_dict(plant: str, data: Dict[str, Any]) -> "FlexitSensorsResponse":
         """Transform response to FlexitSensorsResponse."""
@@ -223,7 +235,10 @@ class FlexitSensorsResponse:
             ),
             additional_heater=util._int_sensor(ADDITIONAL_HEATER_PATH),
             alarm_code_a=util._int_sensor(ALARM_CODE_A_PATH),
-            alarm_code_b=util._int_sensor(ALARM_CODE_B_PATH)
+            alarm_code_b=util._int_sensor(ALARM_CODE_B_PATH),
+            fireplace_duration=util._int_sensor(FIREPLACE_DURATION_PATH),
+            boost_duration=util._int_sensor(BOOST_DURATION_PATH),
+            away_delay=util._int_sensor(AWAY_DELAY_PATH),
         )
 
 
