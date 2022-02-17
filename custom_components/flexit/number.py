@@ -43,6 +43,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
         entity_category=EntityCategory.CONFIG,
         min_value=0.0,
         max_value=300.0,
+        icon="mdi:timer",
     ),
     FlexitNumberEntityDescription(
         key=Entity.BOOST_DURATION.value,
@@ -51,6 +52,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
         entity_category=EntityCategory.CONFIG,
         min_value=1.0,
         max_value=360.0,
+        icon="mdi:timer",
     ),
     FlexitNumberEntityDescription(
         key=Entity.FIREPLACE_DURATION.value,
@@ -59,6 +61,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
         entity_category=EntityCategory.CONFIG,
         min_value=0.0,
         max_value=360.0,
+        icon="mdi:timer",
     ),
 )
 
