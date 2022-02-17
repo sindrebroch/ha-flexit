@@ -47,7 +47,10 @@ async def async_setup_entry(
 ) -> None:
     """Set up the Flexit sensor."""
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
-    async_add_entities(FlexitClimate(coordinator, description) for description in CLIMATES)
+    async_add_entities(
+        FlexitClimate(coordinator, description) for description in CLIMATES
+    )
+
 
 class FlexitClimate(CoordinatorEntity, ClimateEntity):
     """Representation of a Flexit ventilation unit."""
@@ -105,7 +108,7 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         if float_temp == self.target_temperature:
             return
 
-        elif (
+        if (
             coordinator.data.ventilation_mode == MODE_AWAY
             and await coordinator.api.set_away_temp(str(float_temp))
         ):
@@ -133,9 +136,7 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
 
         if hvac_mode == self.hvac_mode:
             return
-        elif hvac_mode == HVAC_MODE_HEAT and await coordinator.api.set_heater_state(
-            True
-        ):
+        if hvac_mode == HVAC_MODE_HEAT and await coordinator.api.set_heater_state(True):
             coordinator.data.electric_heater = True
         elif hvac_mode == HVAC_MODE_FAN_ONLY and await coordinator.api.set_heater_state(
             False
