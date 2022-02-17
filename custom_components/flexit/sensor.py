@@ -101,7 +101,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         key=Entity.ADDITIONAL_HEATER.value,
         icon=HEATING_ICON,
         native_unit_of_measurement=PERCENTAGE,
-    )
+    ),
 )
 
 
@@ -112,7 +112,10 @@ async def async_setup_entry(
 ) -> None:
     """Set up the Flexit sensor."""
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
-    async_add_entities(FlexitSensor(coordinator, description) for description in SENSORS)
+    async_add_entities(
+        FlexitSensor(coordinator, description) for description in SENSORS
+    )
+
 
 class FlexitSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Flexit sensor."""
@@ -142,7 +145,9 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
 
     def update_from_data(self) -> None:
         """Update attributes based on new data."""
-        self.sensor_data = self.coordinator.data.__getattribute__(self.entity_description.key)
+        self.sensor_data = self.coordinator.data.__getattribute__(
+            self.entity_description.key
+        )
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -150,4 +155,3 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
 
         self.update_from_data()
         super()._handle_coordinator_update()
-
