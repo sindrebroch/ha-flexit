@@ -10,7 +10,10 @@ from .const import (
     ALARM_CODE_B_PATH,
     APPLICATION_SOFTWARE_VERSION_PATH,
     AWAY_AIR_TEMPERATURE_PATH,
+    BOOST_DURATION_PATH,
+    BOOST_TEMPORARY_PATH,
     DEVICE_DESCRIPTION_PATH,
+    FIREPLACE_DURATION_PATH,
     HEATER_PATH,
     EXHAUST_AIR_TEMPERATURE_PATH,
     EXTRACT_AIR_TEMPERATURE_PATH,
@@ -241,9 +244,9 @@ class FlexitSensorsResponse:
             calendar_temporary_override=util._bool_sensor(
                 CALENDAR_TEMPORARY_OVERRIDE_PATH
             ),
-            boost_temporary=False,
-            boost_duration=0,
-            fireplace_duration=0,
+            boost_temporary=util._bool_sensor(BOOST_TEMPORARY_PATH),
+            boost_duration=util._int_sensor(BOOST_DURATION_PATH),
+            fireplace_duration=util._int_sensor(FIREPLACE_DURATION_PATH),
             away_delay=0,
         )
 

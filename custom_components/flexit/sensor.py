@@ -27,7 +27,7 @@ HEATING_ICON = "mdi:radiator"
 
 SENSORS: Tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
-        name="Room temperature",
+        name="Temperature room",
         key=Entity.ROOM_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
@@ -35,7 +35,7 @@ SENSORS: Tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        name="Outside temperature",
+        name="Temperature outside",
         key=Entity.OUTSIDE_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
@@ -43,7 +43,7 @@ SENSORS: Tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        name="Supply temperature",
+        name="Temperature supply",
         key=Entity.SUPPLY_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
@@ -51,7 +51,7 @@ SENSORS: Tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        name="Exhaust temperature",
+        name="Temperature exhaust",
         key=Entity.EXHAUST_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
@@ -59,7 +59,7 @@ SENSORS: Tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        name="Extract temperature",
+        name="Temperature external",
         key=Entity.EXTRACT_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
         native_unit_of_measurement=TEMP_CELSIUS,
@@ -67,31 +67,31 @@ SENSORS: Tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        name="Supply Fan Speed",
+        name="Fan Speed Supply",
         key=Entity.SUPPLY_FAN_SPEED.value,
         icon=FAN_ICON,
         native_unit_of_measurement="rev/min",
     ),
     SensorEntityDescription(
-        name="Supply Fan Control Signal",
+        name="Fan Control Signal Supply",
         key=Entity.SUPPLY_FAN_CONTROL_SIGNAL.value,
         icon=FAN_ICON,
         native_unit_of_measurement=PERCENTAGE,
     ),
     SensorEntityDescription(
-        name="Extract Fan Speed",
+        name="Fan Speed Extract",
         key=Entity.EXTRACT_FAN_SPEED.value,
         icon=FAN_ICON,
         native_unit_of_measurement="rev/min",
     ),
     SensorEntityDescription(
-        name="Extract Fan Control Signal",
+        name="Fan Control Signal Extract",
         key=Entity.EXTRACT_FAN_CONTROL_SIGNAL.value,
         icon=FAN_ICON,
         native_unit_of_measurement=PERCENTAGE,
     ),
     SensorEntityDescription(
-        name="Heat Exchanger Speed",
+        name="Speed Heat Exchanger",
         key=Entity.HEAT_EXCHANGER_SPEED.value,
         icon=FAN_ICON,
         native_unit_of_measurement=PERCENTAGE,
@@ -101,7 +101,19 @@ SENSORS: Tuple[SensorEntityDescription, ...] = (
         key=Entity.ADDITIONAL_HEATER.value,
         icon=HEATING_ICON,
         native_unit_of_measurement=PERCENTAGE,
-    )
+    ),
+    SensorEntityDescription(  # new
+        name="Duration boost",
+        key=Entity.BOOST_DURATION.value,
+    ),
+    SensorEntityDescription(
+        name="Duration fireplace",
+        key=Entity.FIREPLACE_DURATION.value,
+    ),
+    SensorEntityDescription(
+        name="Temporary Boost",
+        key=Entity.BOOST_TEMPORARY.value,
+    ),
 )
 
 
@@ -112,7 +124,10 @@ async def async_setup_entry(
 ) -> None:
     """Set up the Flexit sensor."""
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
-    async_add_entities(FlexitSensor(coordinator, description) for description in SENSORS)
+    async_add_entities(
+        FlexitSensor(coordinator, description) for description in SENSORS
+    )
+
 
 class FlexitSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Flexit sensor."""
@@ -142,12 +157,13 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
 
     def update_from_data(self) -> None:
         """Update attributes based on new data."""
-        self.sensor_data = self.coordinator.data.__getattribute__(self.entity_description.key)
+        self.sensor_data = self.coordinator.data.__getattribute__(
+            self.entity_description.key
+        )
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
-        
+
         self.update_from_data()
         super()._handle_coordinator_update()
-

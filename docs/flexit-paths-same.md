@@ -23,7 +23,7 @@ Calendar activate 1
 
 Away
 Away with delay
-Calenar activate 2
+Calendar activate 2
 <plant_id>%3B1%21 005000032000055
 
 Away delay

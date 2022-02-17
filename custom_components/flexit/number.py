@@ -41,45 +41,30 @@ class FlexitNumberEntityDescription(NumberEntityDescription):
 NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
     FlexitNumberEntityDescription(
         key=Entity.AWAY_DELAY.value,
-        name="Away Mode Delay",
+        name="Delay Away",
         unit_of_measurement=TIME_MINUTES,
         entity_category=EntityCategory.CONFIG,
         min_value=0.0,
         max_value=300.0,
+        step=1,
     ),
     FlexitNumberEntityDescription(
         key=Entity.BOOST_DURATION.value,
-        name="Boost Duration",
+        name="Duration boost",
         unit_of_measurement=TIME_MINUTES,
         entity_category=EntityCategory.CONFIG,
-        min_value=1.0,
+        min_value=0.0,  # actually 1.0
         max_value=360.0,
+        step=1,
     ),
     FlexitNumberEntityDescription(
         key=Entity.FIREPLACE_DURATION.value,
-        name="Fireplace Duration",
+        name="Duration fireplace",
         unit_of_measurement=TIME_MINUTES,
         entity_category=EntityCategory.CONFIG,
         min_value=0.0,
         max_value=360.0,
-    ),
-    FlexitNumberEntityDescription(
-        key=Entity.HOME_TEMPERATURE.value,
-        name="Home Temperature",
-        unit_of_measurement=TEMP_CELSIUS,
-        entity_category=EntityCategory.CONFIG,
-        min_value=10.0,
-        max_value=30.0,
-        entity="Home",
-    ),
-    FlexitNumberEntityDescription(
-        key=Entity.AWAY_TEMPERATURE.value,
-        name="Away Temperature",
-        unit_of_measurement=TEMP_CELSIUS,
-        entity_category=EntityCategory.CONFIG,
-        min_value=10.0,
-        max_value=30.0,
-        entity="Away",
+        step=1,
     ),
 )
 
@@ -94,10 +79,14 @@ async def async_setup_entry(
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
 
     for description in NUMBERS:
-        if description.entity == "Away":
-            async_add_entities([FlexitAwayTempNumber(coordinator, description)])
-        elif description.entity == "Home":
-            async_add_entities([FlexitHomeTempNumber(coordinator, description)])
+        if description.key == Entity.FIREPLACE_DURATION.value:
+            async_add_entities(
+                [FlexitFireplaceDurationNumber(coordinator, description)]
+            )
+        elif description.key == Entity.BOOST_DURATION.value:
+            async_add_entities([FlexitBoostDurationNumber(coordinator, description)])
+        elif description.key == Entity.AWAY_DELAY.value:
+            async_add_entities([FlexitAwayDelayNumber(coordinator, description)])
         else:
             async_add_entities([FlexitNumber(coordinator, description)])
 
@@ -153,7 +142,7 @@ class FlexitNumber(CoordinatorEntity, NumberEntity):
         super()._handle_coordinator_update()
 
 
-class FlexitAwayTempNumber(FlexitNumber):
+class FlexitFireplaceDurationNumber(FlexitNumber):
     """Define a Flexit entity."""
 
     async def async_set_value(self, value: float) -> None:
@@ -162,7 +151,16 @@ class FlexitAwayTempNumber(FlexitNumber):
         await self.coordinator.async_request_refresh()
 
 
-class FlexitHomeTempNumber(FlexitNumber):
+class FlexitBoostDurationNumber(FlexitNumber):
+    """Define a Flexit entity."""
+
+    async def async_set_value(self, value: float) -> None:
+        """Update the current value."""
+        # await self.coordinator.api.brightness(int(value))
+        await self.coordinator.async_request_refresh()
+
+
+class FlexitAwayDelayNumber(FlexitNumber):
     """Define a Flexit entity."""
 
     async def async_set_value(self, value: float) -> None:

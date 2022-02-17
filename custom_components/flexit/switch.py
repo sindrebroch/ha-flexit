@@ -21,7 +21,7 @@ from .models import Entity
 SWITCHES: Tuple[SwitchEntityDescription, ...] = (
     SwitchEntityDescription(
         key=Entity.BOOST_TEMPORARY.value,
-        name="High Temporary",
+        name="Temporary Boost",
         entity_category=EntityCategory.CONFIG,
     ),
 )
