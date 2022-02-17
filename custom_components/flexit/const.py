@@ -3,6 +3,12 @@
 from logging import Logger, getLogger
 from typing import List
 
+from homeassistant.components.climate.const import (
+    PRESET_AWAY,
+    PRESET_BOOST,
+    PRESET_HOME,
+)
+
 LOGGER: Logger = getLogger(__package__)
 
 DOMAIN = "flexit"
@@ -32,6 +38,9 @@ CLIMATE = "climate"
 SENSOR = "sensor"
 PLATFORMS: List[str] = [BINARY_SENSOR, CLIMATE, SENSOR]
 
+PRESET_FIREPLACE = "Fireplace"
+PRESETS = [PRESET_HOME, PRESET_AWAY, PRESET_BOOST, PRESET_FIREPLACE]
+
 
 # Attributes
 ATTR_UNTIL_DIRTY = "hours_until_dirty"
@@ -50,6 +59,11 @@ MODE_COOKER_HOOD = "Cooker hood"
 MODE_FIREPLACE = "Fireplace"
 MODE_FORCED_VENTILATION = "Forced Ventilation"
 
+# Put paths
+MODE_AWAY_PUT_PATH = ";1!005000032000055"
+MODE_HOME_HIGH_PUT_PATH = ";1!01300002A000055"
+MODE_FIREPLACE_PUT_PATH = ";1!013000168000055"
+
 # Paths
 HOME_AIR_TEMPERATURE_PATH = ";1!0020007CA000055"
 AWAY_AIR_TEMPERATURE_PATH = ";1!0020007C1000055"
@@ -57,8 +71,6 @@ ROOM_TEMPERATURE_PATH = ";1!00000004B000055"
 
 # Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
 MODE_PATH = ";1!013000169000055"
-# Null*Stop*Away*Home*High
-MODE_PUT_PATH = ";1!01300002A000055"
 OUTSIDE_AIR_TEMPERATURE_PATH = ";1!000000001000055"  # Uteluft
 SUPPLY_AIR_TEMPERATURE_PATH = ";1!000000004000055"  # Tilluft
 EXTRACT_AIR_TEMPERATURE_PATH = ";1!00000003B000055"  # Avtrekk

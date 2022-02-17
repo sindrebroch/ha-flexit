@@ -20,12 +20,15 @@ from .const import (
     HOME_AIR_TEMPERATURE_PATH,
     LOGGER,
     MODE_AWAY,
+    MODE_AWAY_PUT_PATH,
+    MODE_FIREPLACE,
+    MODE_FIREPLACE_PUT_PATH,
     MODE_HIGH,
     MODE_HOME,
+    MODE_HOME_HIGH_PUT_PATH,
     PLANTS_PATH,
     SENSOR_DATA_PATH_LIST,
     TOKEN_PATH,
-    MODE_PUT_PATH,
 )
 from .models import (
     FlexitDeviceInfo,
@@ -179,14 +182,17 @@ class FlexitApiClient:
     async def set_mode(self, mode: str) -> bool:
         """Set ventilation mode."""
 
-        # Null*Stop*Away*Home*High
-        mode_int = {
-            MODE_AWAY: 2,
-            MODE_HOME: 3,
-            MODE_HIGH: 4,
-        }.get(mode, -1)
-
-        return False if mode_int == -1 else await self.update(MODE_PUT_PATH, mode_int)
+        if mode == MODE_AWAY:
+            return await self.update(MODE_AWAY_PUT_PATH, 0)
+        if mode in (MODE_HOME, MODE_HIGH):
+            mode_int = {MODE_HOME: 3, MODE_HIGH: 4}.get(mode, -1)
+            if mode_int == -1:
+                return
+            return await self.update(MODE_HOME_HIGH_PUT_PATH, mode_int)
+        if mode == MODE_FIREPLACE:
+            return await self.update(MODE_FIREPLACE_PUT_PATH, 2)
+        # if mode == MODE_CALENDAR:
+        return
 
     async def set_heater_state(self, heater_bool: bool) -> bool:
         """Set heater state."""

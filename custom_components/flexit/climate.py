@@ -25,8 +25,11 @@ from .const import (
     LOGGER,
     MODE_AWAY,
     MODE_COOKER_HOOD,
+    MODE_FIREPLACE,
     MODE_HIGH,
     MODE_HOME,
+    PRESET_FIREPLACE,
+    PRESETS,
 )
 from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity, FlexitSensorsResponse
@@ -74,7 +77,7 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         self._attr_temperature_unit = TEMP_CELSIUS
         self._attr_hvac_modes = [HVAC_MODE_HEAT, HVAC_MODE_FAN_ONLY]
         self._attr_supported_features = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
-        self._attr_preset_modes = [PRESET_HOME, PRESET_AWAY, PRESET_BOOST]
+        self._attr_preset_modes = PRESETS
         self._attr_device_info = coordinator._attr_device_info
 
     @property
@@ -163,13 +166,15 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
 
         if current_mode == MODE_HOME:
             return PRESET_HOME
-        elif current_mode == MODE_AWAY:
+        if current_mode == MODE_AWAY:
             return PRESET_AWAY
-        elif current_mode in (MODE_HIGH, MODE_COOKER_HOOD):
+        if current_mode in (MODE_HIGH, MODE_COOKER_HOOD):
             return PRESET_BOOST
-        else:
-            LOGGER.warning("Unknown preset mode %s", current_mode)
-            return current_mode
+        if current_mode == MODE_FIREPLACE:
+            return PRESET_FIREPLACE
+
+        LOGGER.warning("Unknown preset mode %s", current_mode)
+        return current_mode
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set preset mode async."""
@@ -184,4 +189,8 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
             coordinator.data.ventilation_mode = MODE_AWAY
         elif preset_mode == PRESET_BOOST and await coordinator.api.set_mode(MODE_HIGH):
             coordinator.data.ventilation_mode = MODE_HIGH
+        elif preset_mode == PRESET_FIREPLACE and await coordinator.api.set_mode(
+            MODE_FIREPLACE
+        ):
+            coordinator.data.ventilation_mode = MODE_FIREPLACE
         self.async_write_ha_state()
