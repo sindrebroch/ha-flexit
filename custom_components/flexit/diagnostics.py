@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 from custom_components.flexit.api import FlexitApiClient
 
 from custom_components.flexit.coordinator import FlexitDataUpdateCoordinator
-from custom_components.flexit.models import Entity, FlexitSensorsResponse
+from custom_components.flexit.models import FlexitSensorsResponse
 
 from .const import DOMAIN
 

@@ -81,8 +81,8 @@ class FlexitApiClient:
         self,
         method: str,
         url: str,
-        data: dict[str, Any] = {},
-        headers: dict = {},
+        data: dict[str, Any] = None,
+        headers: dict = None,
     ) -> dict[str, Any] or None:
         """Wrap request."""
 
@@ -195,9 +195,9 @@ class FlexitApiClient:
     async def is_success(self, response: Dict[str, Any], path_with_plant: str) -> bool:
         """Check if response is successful."""
 
-        stateTexts = FlexitSensorsResponseStatus.from_dict(response).stateTexts
-        return stateTexts[path_with_plant] == "Success"
-    
+        state_texts = FlexitSensorsResponseStatus.from_dict(response).stateTexts
+        return state_texts[path_with_plant] == "Success"
+
     def path(self, path: str) -> str:
         """Return path with plant_id prefixed."""
         assert self._plant_id is not None
@@ -214,9 +214,9 @@ class FlexitApiClient:
         """Util for adding FILTER_PATH."""
         return f"{FILTER_PATH}{urllib.parse.quote(path)}"
 
-    def escaped_datapoints_url(self, id: str) -> str:
+    def escaped_datapoints_url(self, path: str) -> str:
         """Util for adding DATAPOINTS_PATH."""
-        return f"{DATAPOINTS_PATH}/{urllib.parse.quote(id)}"
+        return f"{DATAPOINTS_PATH}/{urllib.parse.quote(path)}"
 
     def headers_with_token(self) -> Dict[str, str]:
         """Get headers with token added."""
