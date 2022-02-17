@@ -21,4 +21,6 @@ async def async_get_config_entry_diagnostics(
     api: FlexitApiClient = coordinator.api
     data: FlexitSensorsResponse = coordinator.data
 
-    return dict()
+    return {
+        "data": str(data),
+    }
