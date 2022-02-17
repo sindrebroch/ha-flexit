@@ -120,15 +120,6 @@ class FlexitFilterBinarySensor(FlexitBinarySensor):
 class FlexitAlarmBinarySensor(FlexitBinarySensor):
     """Binary sensor for alarm."""
 
-    def __init__(
-        self,
-        coordinator: FlexitDataUpdateCoordinator,
-        description: BinarySensorEntityDescription,
-    ) -> None:
-        """Initialize a Flexit binary sensor."""
-
-        super().__init__(coordinator, description)
-
     @property
     def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
