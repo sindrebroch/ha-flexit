@@ -13,19 +13,27 @@ from aiohttp.client import ClientSession
 from .const import (
     API_HEADERS,
     AWAY_AIR_TEMPERATURE_PATH,
+    AWAY_DELAY_PATH,
+    BOOST_DURATION_PATH,
     DATAPOINTS_PATH,
     DEVICE_INFO_PATH_LIST,
+    FIREPLACE_DURATION_PATH,
     HEATER_PATH,
     FILTER_PATH,
     HOME_AIR_TEMPERATURE_PATH,
     LOGGER,
     MODE_AWAY,
+    MODE_AWAY_PUT_PATH,
+    MODE_FIREPLACE,
+    MODE_FIREPLACE_PUT_PATH,
+    MODE_FORCED_VENTILATION,
     MODE_HIGH,
+    MODE_HIGH_TEMP_PUT_PATH,
     MODE_HOME,
+    MODE_HOME_HIGH_PUT_PATH,
     PLANTS_PATH,
     SENSOR_DATA_PATH_LIST,
     TOKEN_PATH,
-    MODE_PUT_PATH,
 )
 from .models import (
     FlexitDeviceInfo,
@@ -86,13 +94,13 @@ class FlexitApiClient:
     ) -> dict[str, Any] or None:
         """Wrap request."""
 
-        LOGGER.debug(
-            "%s-request to url=%s. data=%s. headers=%s",
-            method,
-            url,
-            data,
-            headers,
-        )
+        # LOGGER.debug(
+        #     "%s-request to url=%s. data=%s. headers=%s",
+        #     method,
+        #     url,
+        #     data,
+        #     headers,
+        # )
 
         try:
             async with async_timeout.timeout(10):
@@ -179,14 +187,29 @@ class FlexitApiClient:
     async def set_mode(self, mode: str) -> bool:
         """Set ventilation mode."""
 
-        # Null*Stop*Away*Home*High
-        mode_int = {
-            MODE_AWAY: 2,
-            MODE_HOME: 3,
-            MODE_HIGH: 4,
-        }.get(mode, -1)
+        if mode == MODE_AWAY:
+            return await self.update(MODE_AWAY_PUT_PATH, 0)
+        if mode == MODE_HOME:
+            return await self.update(MODE_HOME_HIGH_PUT_PATH, 3)
+        if mode == MODE_HIGH:
+            return await self.update(MODE_HOME_HIGH_PUT_PATH, 4)
+        if mode == MODE_FORCED_VENTILATION:
+            return await self.update(MODE_HIGH_TEMP_PUT_PATH, 2)
+        if mode == MODE_FIREPLACE:
+            return await self.update(MODE_FIREPLACE_PUT_PATH, 2)
+        return
 
-        return False if mode_int == -1 else await self.update(MODE_PUT_PATH, mode_int)
+    async def set_fireplace_duration(self, duration) -> bool:
+        """Set fireplace duration."""
+        return await self.update(FIREPLACE_DURATION_PATH, duration)
+
+    async def set_boost_duration(self, duration) -> bool:
+        """Set fireplace duration."""
+        return await self.update(BOOST_DURATION_PATH, duration)
+
+    async def set_away_delay(self, delay) -> bool:
+        """Set fireplace duration."""
+        return await self.update(AWAY_DELAY_PATH, delay)
 
     async def set_heater_state(self, heater_bool: bool) -> bool:
         """Set heater state."""

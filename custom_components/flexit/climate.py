@@ -25,8 +25,13 @@ from .const import (
     LOGGER,
     MODE_AWAY,
     MODE_COOKER_HOOD,
+    MODE_FIREPLACE,
+    MODE_FORCED_VENTILATION,
     MODE_HIGH,
     MODE_HOME,
+    PRESET_BOOST_TEMP,
+    PRESET_FIREPLACE,
+    PRESETS,
 )
 from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity, FlexitSensorsResponse
@@ -74,7 +79,7 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         self._attr_temperature_unit = TEMP_CELSIUS
         self._attr_hvac_modes = [HVAC_MODE_HEAT, HVAC_MODE_FAN_ONLY]
         self._attr_supported_features = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
-        self._attr_preset_modes = [PRESET_HOME, PRESET_AWAY, PRESET_BOOST]
+        self._attr_preset_modes = PRESETS
         self._attr_device_info = coordinator._attr_device_info
 
     @property
@@ -163,25 +168,45 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
 
         if current_mode == MODE_HOME:
             return PRESET_HOME
-        elif current_mode == MODE_AWAY:
+        if current_mode == MODE_AWAY:
             return PRESET_AWAY
-        elif current_mode in (MODE_HIGH, MODE_COOKER_HOOD):
+        if current_mode in (MODE_HIGH, MODE_COOKER_HOOD):
             return PRESET_BOOST
-        else:
-            LOGGER.warning("Unknown preset mode %s", current_mode)
-            return current_mode
+        if current_mode == MODE_FORCED_VENTILATION:
+            return PRESET_BOOST_TEMP
+        if current_mode == MODE_FIREPLACE:
+            return PRESET_FIREPLACE
+
+        LOGGER.warning("Unknown preset mode %s", current_mode)
+        return current_mode
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set preset mode async."""
 
         coordinator: FlexitDataUpdateCoordinator = self.coordinator
+        api = coordinator.api
 
-        if coordinator.data.ventilation_mode == preset_mode:
+        current_mode = coordinator.data.ventilation_mode
+
+        if current_mode == preset_mode:
             return
-        elif preset_mode == PRESET_HOME and await coordinator.api.set_mode(MODE_HOME):
+
+        # Toggle modes that requires toggle
+        if current_mode == MODE_FIREPLACE:
+            await api.set_mode(MODE_FIREPLACE)
+        if current_mode == MODE_FORCED_VENTILATION:
+            await api.set_mode(MODE_FORCED_VENTILATION)
+
+        if preset_mode == PRESET_HOME and await api.set_mode(MODE_HOME):
             coordinator.data.ventilation_mode = MODE_HOME
-        elif preset_mode == PRESET_AWAY and await coordinator.api.set_mode(MODE_AWAY):
+        elif preset_mode == PRESET_AWAY and await api.set_mode(MODE_AWAY):
             coordinator.data.ventilation_mode = MODE_AWAY
-        elif preset_mode == PRESET_BOOST and await coordinator.api.set_mode(MODE_HIGH):
+        elif preset_mode == PRESET_BOOST and await api.set_mode(MODE_HIGH):
             coordinator.data.ventilation_mode = MODE_HIGH
+        elif preset_mode == PRESET_BOOST_TEMP and await api.set_mode(
+            MODE_FORCED_VENTILATION
+        ):
+            coordinator.data.ventilation_mode = MODE_FORCED_VENTILATION
+        elif preset_mode == PRESET_FIREPLACE and await api.set_mode(MODE_FIREPLACE):
+            coordinator.data.ventilation_mode = MODE_FIREPLACE
         self.async_write_ha_state()

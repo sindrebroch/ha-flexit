@@ -10,7 +10,12 @@ from .const import (
     ALARM_CODE_B_PATH,
     APPLICATION_SOFTWARE_VERSION_PATH,
     AWAY_AIR_TEMPERATURE_PATH,
+    AWAY_DELAY_PATH,
+    BOOST_DURATION_PATH,
+    CURRENT_BOOST_DURATION_PATH,
+    CURRENT_FIREPLACE_DURATION_PATH,
     DEVICE_DESCRIPTION_PATH,
+    FIREPLACE_DURATION_PATH,
     HEATER_PATH,
     EXHAUST_AIR_TEMPERATURE_PATH,
     EXTRACT_AIR_TEMPERATURE_PATH,
@@ -74,6 +79,15 @@ class Entity(Enum):
     EXTRACT_FAN_CONTROL_SIGNAL = "extract_fan_control_signal"
     ADDITIONAL_HEATER = "additional_heater"
 
+    FIREPLACE_DURATION = "fireplace_duration"
+    BOOST_DURATION = "boost_duration"
+    AWAY_DELAY = "away_delay"
+
+    BOOST_TEMPORARY = "boost_temporary"
+    CURRENT_FIREPLACE_DURATION = "current_fireplace_duration"
+    CURRENT_BOOST_DURATION = "current_boost_duration"
+
+
 class UtilClass:
     """UtilClass."""
 
@@ -118,23 +132,18 @@ class UtilClass:
         """Get ventilation mode from integer."""
 
         # Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
-        if ventilation_int == 0:
-            return MODE_NULL
-        elif ventilation_int == 1:
-            return MODE_OFF
-        elif ventilation_int == 2:
-            return MODE_AWAY
-        elif ventilation_int == 3:
-            return MODE_HOME
-        elif ventilation_int == 4:
-            return MODE_HIGH
-        elif ventilation_int == 5:
-            return MODE_COOKER_HOOD
-        elif ventilation_int == 6:
-            return MODE_FIREPLACE
-        elif ventilation_int == 7:
-            return MODE_FORCED_VENTILATION
-        return f"Unknown mode: {str(ventilation_int)}"
+        mode = {
+            0: MODE_NULL,
+            1: MODE_OFF,
+            2: MODE_AWAY,
+            3: MODE_HOME,
+            4: MODE_HIGH,
+            5: MODE_COOKER_HOOD,
+            6: MODE_FIREPLACE,
+            7: MODE_FORCED_VENTILATION,
+        }
+
+        return mode.get(ventilation_int, f"Unknown mode: {str(ventilation_int)}")
 
 
 @attr.s(auto_attribs=True)
@@ -190,6 +199,10 @@ class FlexitSensorsResponse:
     extract_fan_control_signal: int
     additional_heater: int
 
+    fireplace_duration: int
+    boost_duration: int
+    away_delay: int
+
     @staticmethod
     def from_dict(plant: str, data: Dict[str, Any]) -> "FlexitSensorsResponse":
         """Transform response to FlexitSensorsResponse."""
@@ -223,7 +236,10 @@ class FlexitSensorsResponse:
             ),
             additional_heater=util._int_sensor(ADDITIONAL_HEATER_PATH),
             alarm_code_a=util._int_sensor(ALARM_CODE_A_PATH),
-            alarm_code_b=util._int_sensor(ALARM_CODE_B_PATH)
+            alarm_code_b=util._int_sensor(ALARM_CODE_B_PATH),
+            fireplace_duration=util._int_sensor(FIREPLACE_DURATION_PATH),
+            boost_duration=util._int_sensor(BOOST_DURATION_PATH),
+            away_delay=util._int_sensor(AWAY_DELAY_PATH),
         )
 
 

@@ -3,7 +3,8 @@
     "domains": [
         "binary_sensor",
         "climate",
-        "sensor"
+        "number",
+        "sensor",
     ],
     "homeassistant": "2021.12.0",
     "render_readme": true
