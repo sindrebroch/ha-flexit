@@ -7,8 +7,8 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ENTITY_CATEGORY_DIAGNOSTIC
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -27,14 +27,14 @@ ALARM_BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         name="Alarm",
         key=Entity.ALARM.value,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
 )
 FILTER_BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         name="Dirty filter",
         key=Entity.DIRTY_FILTER.value,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
 )
 
