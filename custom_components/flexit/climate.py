@@ -195,7 +195,9 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
             coordinator.data.ventilation_mode = MODE_HOME
         elif preset_mode == PRESET_AWAY and await api.set_mode(MODE_AWAY):
             coordinator.data.ventilation_mode = MODE_AWAY
-        elif preset_mode == PRESET_BOOST and await api.set_mode(MODE_HIGH):
+        elif preset_mode == PRESET_BOOST and await api.set_mode(
+            MODE_HIGH, coordinator.temporary_boost
+        ):
             coordinator.data.ventilation_mode = MODE_HIGH
         elif preset_mode == PRESET_FIREPLACE and await api.set_mode(MODE_FIREPLACE):
             coordinator.data.ventilation_mode = MODE_FIREPLACE

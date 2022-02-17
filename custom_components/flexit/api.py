@@ -27,6 +27,7 @@ from .const import (
     MODE_FIREPLACE,
     MODE_FIREPLACE_PUT_PATH,
     MODE_HIGH,
+    MODE_HIGH_TEMP_PUT_PATH,
     MODE_HOME,
     MODE_HOME_HIGH_PUT_PATH,
     PLANTS_PATH,
@@ -182,16 +183,17 @@ class FlexitApiClient:
         """Set away temp."""
         return await self.update(AWAY_AIR_TEMPERATURE_PATH, temp)
 
-    async def set_mode(self, mode: str) -> bool:
+    async def set_mode(self, mode: str, temporary_boost: bool = False) -> bool:
         """Set ventilation mode."""
 
         if mode == MODE_AWAY:
             return await self.update(MODE_AWAY_PUT_PATH, 0)
+        if mode == MODE_HOME:
+            return await self.update(MODE_HOME_HIGH_PUT_PATH, 3)
         if mode in (MODE_HOME, MODE_HIGH):
-            mode_int = {MODE_HOME: 3, MODE_HIGH: 4}.get(mode, -1)
-            if mode_int == -1:
-                return
-            return await self.update(MODE_HOME_HIGH_PUT_PATH, mode_int)
+            if temporary_boost:
+                return await self.update(MODE_HIGH_TEMP_PUT_PATH, 2)
+            return await self.update(MODE_HOME_HIGH_PUT_PATH, 4)
         if mode == MODE_FIREPLACE:
             return await self.update(MODE_FIREPLACE_PUT_PATH, 2)
         return

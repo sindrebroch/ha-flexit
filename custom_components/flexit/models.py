@@ -12,6 +12,8 @@ from .const import (
     AWAY_AIR_TEMPERATURE_PATH,
     AWAY_DELAY_PATH,
     BOOST_DURATION_PATH,
+    CURRENT_BOOST_DURATION_PATH,
+    CURRENT_FIREPLACE_DURATION_PATH,
     DEVICE_DESCRIPTION_PATH,
     FIREPLACE_DURATION_PATH,
     HEATER_PATH,
@@ -82,6 +84,8 @@ class Entity(Enum):
     AWAY_DELAY = "away_delay"
 
     BOOST_TEMPORARY = "boost_temporary"
+    CURRENT_FIREPLACE_DURATION = "current_fireplace_duration"
+    CURRENT_BOOST_DURATION = "current_boost_duration"
 
 
 class UtilClass:
@@ -128,23 +132,18 @@ class UtilClass:
         """Get ventilation mode from integer."""
 
         # Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
-        if ventilation_int == 0:
-            return MODE_NULL
-        elif ventilation_int == 1:
-            return MODE_OFF
-        elif ventilation_int == 2:
-            return MODE_AWAY
-        elif ventilation_int == 3:
-            return MODE_HOME
-        elif ventilation_int == 4:
-            return MODE_HIGH
-        elif ventilation_int == 5:
-            return MODE_COOKER_HOOD
-        elif ventilation_int == 6:
-            return MODE_FIREPLACE
-        elif ventilation_int == 7:
-            return MODE_FORCED_VENTILATION
-        return f"Unknown mode: {str(ventilation_int)}"
+        mode = {
+            0: MODE_NULL,
+            1: MODE_OFF,
+            2: MODE_AWAY,
+            3: MODE_HOME,
+            4: MODE_HIGH,
+            5: MODE_COOKER_HOOD,
+            6: MODE_FIREPLACE,
+            7: MODE_FORCED_VENTILATION,
+        }
+
+        return mode.get(ventilation_int, f"Unknown mode: {str(ventilation_int)}")
 
 
 @attr.s(auto_attribs=True)
