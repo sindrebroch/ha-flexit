@@ -147,7 +147,7 @@ class FlexitSensor(CoordinatorEntity, SensorEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data update."""
-        
+
         self.update_from_data()
         super()._handle_coordinator_update()
 
