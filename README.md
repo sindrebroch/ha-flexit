@@ -22,6 +22,7 @@ Tested with:
   - Home
   - Away
   - Boost
+  - Fireplace
 - Operation modes:
   - Fan only
   - Heat
@@ -50,6 +51,12 @@ Tested with:
 - Supply Fan Speed
 - Additional Heater
 
+### Number-entities
+
+- Away mode delay
+- Boost duration
+- Fireplace duration
+
 ### Binary sensor-entity
 
 - Dirty filter
@@ -68,8 +75,13 @@ Tested with:
 ## Roadmap
 
 - [ ] Fix binary_sensors not updating
-- [ ] Be able to set all modes (Fireplace, Calendar missing)
-- [ ] Service to set modes with modifications (delay, duration, override etc)
+- [ ] Be able to set Calendar-mode
+- [ ] Entities to set modifications
+  - [ ] Temporary Boost-switch
+  - [X] Duration Boost
+  - [X] Duration Fireplace
+  - [X] Away Delay
+  - [ ] Calendar Temporary override
 
 ## Installation
 
@@ -119,3 +131,7 @@ logger:
 ```
 
 PS: This will log various details, including all HTTP-requests for the Flexit-integration to your home-assistant.log. This includes your username and password in cleartext in your Token-requests.
+
+Have started work on diagnostics. This will be expanded on in the future as it is more clear what is needed to include to resolve issues.
+To download diagnostics, go into your device and press DOWNLOAD DIAGNOSTICS.
+This downloads a txt-file you can post in you issue. All sensitive data should be redacted here, so no need to worry, but you can inspect it if you want.
