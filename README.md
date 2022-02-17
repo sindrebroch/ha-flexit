@@ -77,10 +77,9 @@ Tested with:
 - [ ] Fix binary_sensors not updating
 - [ ] Be able to set Calendar-mode
 - [ ] Entities to set modifications
-  - [ ] Temporary Boost-switch
-  - [X] Duration Boost
-  - [X] Duration Fireplace
-  - [X] Away Delay
+  - [x] Duration Boost
+  - [x] Duration Fireplace
+  - [x] Away Delay
   - [ ] Calendar Temporary override
 
 ## Installation
