@@ -26,6 +26,7 @@ from .const import (
     MODE_AWAY,
     MODE_COOKER_HOOD,
     MODE_FIREPLACE,
+    MODE_FORCED_VENTILATION,
     MODE_HIGH,
     MODE_HOME,
     PRESET_FIREPLACE,
@@ -170,6 +171,8 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
             return PRESET_AWAY
         if current_mode in (MODE_HIGH, MODE_COOKER_HOOD):
             return PRESET_BOOST
+        if current_mode == MODE_FORCED_VENTILATION:
+            return PRESET_BOOST_TEMP
         if current_mode == MODE_FIREPLACE:
             return PRESET_FIREPLACE
 
@@ -190,15 +193,18 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         # Toggle fireplace off
         if current_mode == PRESET_FIREPLACE:
             await api.set_mode(MODE_FIREPLACE)
+        if current_mode == MODE_FORCED_VENTILATION:
+            await api.set_mode(MODE_FORCED_VENTILATION)
 
         if preset_mode == PRESET_HOME and await api.set_mode(MODE_HOME):
             coordinator.data.ventilation_mode = MODE_HOME
         elif preset_mode == PRESET_AWAY and await api.set_mode(MODE_AWAY):
             coordinator.data.ventilation_mode = MODE_AWAY
-        elif preset_mode == PRESET_BOOST and await api.set_mode(
-            MODE_HIGH, coordinator.temporary_boost
-        ):
-            coordinator.data.ventilation_mode = MODE_HIGH
+        elif preset_mode == PRESET_BOOST:
+            if coordinator.temporary_boost and await api.set_mode(MODE_HIGH):
+                coordinator.data.ventilation_mode = MODE_HIGH
+            elif await api.set_mode(MODE_FORCED_VENTILATION):
+                coordinator.data.ventilation_mode = MODE_FORCED_VENTILATION
         elif preset_mode == PRESET_FIREPLACE and await api.set_mode(MODE_FIREPLACE):
             coordinator.data.ventilation_mode = MODE_FIREPLACE
         self.async_write_ha_state()
