@@ -192,9 +192,9 @@ class FlexitApiClient:
         if mode == MODE_HOME:
             return await self.update(MODE_HOME_HIGH_PUT_PATH, 3)
         if mode == MODE_HIGH:
-            return await self.update(MODE_HIGH_TEMP_PUT_PATH, 2)
-        if mode == MODE_FORCED_VENTILATION:
             return await self.update(MODE_HOME_HIGH_PUT_PATH, 4)
+        if mode == MODE_FORCED_VENTILATION:
+            return await self.update(MODE_HIGH_TEMP_PUT_PATH, 2)
         if mode == MODE_FIREPLACE:
             return await self.update(MODE_FIREPLACE_PUT_PATH, 2)
         return
