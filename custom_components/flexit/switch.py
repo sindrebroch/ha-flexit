@@ -131,5 +131,5 @@ class FlexitCalendarActiveSwitch(FlexitSwitch):
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the entity off."""
-        # TODO
         self.sensor_data = False
+        await self.coordinator.async_request_refresh()
