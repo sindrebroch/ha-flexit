@@ -14,14 +14,20 @@ from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN as FLEXIT_DOMAIN
+from .const import DOMAIN as FLEXIT_DOMAIN, LOGGER
 from .coordinator import FlexitDataUpdateCoordinator
 from .models import Entity
 
 SWITCHES: Tuple[SwitchEntityDescription, ...] = (
     SwitchEntityDescription(
         key=Entity.CALENDAR_TEMPORARY_OVERRIDE.value,
-        name="Override Calendar Temporary",
+        name="Calendar Temporary Override",
+        entity_category=EntityCategory.CONFIG,
+        icon="mdi:calendar",
+    ),
+    SwitchEntityDescription(
+        key=Entity.CALENDAR_ACTIVE.value,
+        name="Calendar Active",
         entity_category=EntityCategory.CONFIG,
         icon="mdi:calendar",
     ),
@@ -38,7 +44,14 @@ async def async_setup_entry(
     coordinator: FlexitDataUpdateCoordinator = hass.data[FLEXIT_DOMAIN][entry.entry_id]
 
     for description in SWITCHES:
-        async_add_entities([FlexitSwitch(coordinator, description)])
+        if description.key == Entity.CALENDAR_TEMPORARY_OVERRIDE.value:
+            async_add_entities(
+                [FlexitCalendarTemporaryOverrideSwitch(coordinator, description)]
+            )
+        elif description.key == Entity.CALENDAR_ACTIVE.value:
+            async_add_entities([FlexitCalendarActiveSwitch(coordinator, description)])
+        else:
+            async_add_entities([FlexitSwitch(coordinator, description)])
 
 
 class FlexitSwitch(CoordinatorEntity, SwitchEntity):
@@ -80,12 +93,43 @@ class FlexitSwitch(CoordinatorEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
-        if await self.coordinator.api.set_temporary_override(1):
+        LOGGER.warning("Switch not implemented")
+        self.sensor_data = True
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Turn the entity off."""
+        LOGGER.warning("Switch not implemented")
+        self.sensor_data = False
+        await self.coordinator.async_request_refresh()
+
+
+class FlexitCalendarTemporaryOverrideSwitch(FlexitSwitch):
+    """Switch for CalendarTemporaryOverride."""
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn the entity on."""
+        if await self.coordinator.api.set_calendar_temporary_override(1):
             self.sensor_data = True
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the entity off."""
-        if await self.coordinator.api.set_temporary_override(0):
+        if await self.coordinator.api.set_calendar_temporary_override(0):
             self.sensor_data = False
         await self.coordinator.async_request_refresh()
+
+
+class FlexitCalendarActiveSwitch(FlexitSwitch):
+    """Switch for CalendarActive."""
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn the entity on."""
+        if await self.coordinator.api.set_calendar_active():
+            self.sensor_data = True
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Turn the entity off."""
+        # TODO
+        self.sensor_data = False

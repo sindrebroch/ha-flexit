@@ -41,6 +41,7 @@ from .const import (
     SUPPLY_AIR_TEMPERATURE_PATH,
     SYSTEM_STATUS_PATH,
     MODE_PATH,
+    MODE_HOME_HIGH_CAL_PUT_PATH,
     HEAT_EXCHANGER_SPEED_PATH,
     SUPPLY_FAN_SPEED_PATH,
     SUPPLY_FAN_CONTROL_SIGNAL_PATH,
@@ -51,6 +52,7 @@ from .const import (
 
 VALUE = "value"
 VALUES = "values"
+PRESENT_PRIORITY = "presentPriority"
 
 
 class Entity(Enum):
@@ -85,6 +87,7 @@ class Entity(Enum):
     CURRENT_FIREPLACE_DURATION = "current_fireplace_duration"
     CURRENT_BOOST_DURATION = "current_boost_duration"
 
+    CALENDAR_ACTIVE = "calendar_active"
     CALENDAR_TEMPORARY_OVERRIDE = "calendar_temporary_override"
 
 
@@ -111,6 +114,14 @@ class UtilClass:
     def _str_sensor(self, path: str) -> str:
         """Get string from path."""
         return self.data[VALUES][f"{self.plant}{path}"][VALUE][VALUE]
+
+    def present_priority(self, path: str) -> str:
+        """Get present priority."""
+        return self.data[VALUES][f"{self.plant}{path}"][VALUE][PRESENT_PRIORITY]
+
+    def calendar_active(self, path: str) -> str:
+        """Get state of calendar."""
+        return {13: False, 15: True}.get(self.present_priority(path), "Unknown")
 
     def int_sensor(self, path: str) -> int:
         """Get int from path."""
@@ -207,6 +218,7 @@ class FlexitSensorsResponse:
     boost_duration: int
     away_delay: int
 
+    calendar_active: bool
     calendar_temporary_override: bool
 
     @staticmethod
@@ -247,6 +259,7 @@ class FlexitSensorsResponse:
             calendar_temporary_override=util.bool_sensor(
                 CALENDAR_TEMPORARY_OVERRIDE_PATH
             ),
+            calendar_active=util.calendar_active(MODE_HOME_HIGH_CAL_PUT_PATH),
         )
 
 

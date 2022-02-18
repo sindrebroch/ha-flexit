@@ -1,6 +1,7 @@
 """Asynchronous Python client for Flexit."""
 
 from datetime import date, timedelta
+import json
 from typing import Any, Dict, List
 
 import socket
@@ -32,7 +33,7 @@ from .const import (
     MODE_HIGH,
     MODE_HIGH_TEMP_PUT_PATH,
     MODE_HOME,
-    MODE_HOME_HIGH_PUT_PATH,
+    MODE_HOME_HIGH_CAL_PUT_PATH,
     PLANTS_PATH,
     SENSOR_DATA_PATH_LIST,
     TOKEN_PATH,
@@ -80,10 +81,17 @@ class FlexitApiClient:
 
     async def put(self, path: str, body: Any) -> Any:
         """Put request."""
+
+        if body is None:
+            null = None
+            data_body = null
+        else:
+            data_body = str(body)
+
         return await self.api_wrapper(
             method="PUT",
             url=self.escaped_datapoints_url(self.path(path)),
-            data='{"Value": "' + str(body) + '"}',
+            data=json.dumps({"Value": data_body}),
             headers=self.headers_with_token(),
         )
 
@@ -176,7 +184,7 @@ class FlexitApiClient:
 
     async def update(self, path: str, value: Any) -> bool:
         """Update path with value."""
-        return await self.is_success(await self.put(path, str(value)), self.path(path))
+        return await self.is_success(await self.put(path, value), self.path(path))
 
     async def set_home_temp(self, temp) -> bool:
         """Set home temp."""
@@ -194,9 +202,9 @@ class FlexitApiClient:
         if mode == MODE_AWAY_DELAYED:
             return await self.update(MODE_AWAY_PUT_PATH, 1)
         if mode == MODE_HOME:
-            return await self.update(MODE_HOME_HIGH_PUT_PATH, 3)
+            return await self.update(MODE_HOME_HIGH_CAL_PUT_PATH, 3)
         if mode == MODE_HIGH:
-            return await self.update(MODE_HOME_HIGH_PUT_PATH, 4)
+            return await self.update(MODE_HOME_HIGH_CAL_PUT_PATH, 4)
         if mode == MODE_FORCED_VENTILATION:
             return await self.update(MODE_HIGH_TEMP_PUT_PATH, 2)
         if mode == MODE_FIREPLACE:
@@ -219,7 +227,12 @@ class FlexitApiClient:
         """Set heater state."""
         return await self.update(HEATER_PATH, 1 if heater_bool else 0)
 
-    async def set_temporary_override(self, value) -> bool:
+    async def set_calendar_active(self) -> bool:
+        """Set temporary override"""
+        null = None
+        return await self.update(MODE_HOME_HIGH_CAL_PUT_PATH, null)
+
+    async def set_calendar_temporary_override(self, value) -> bool:
         """Set temporary override"""
         return await self.update(CALENDAR_TEMPORARY_OVERRIDE_PATH, value)
 
