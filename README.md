@@ -12,6 +12,37 @@ Tested with:
 - Nordic S4
 - Nordic CL4
 
+## Requirements
+
+- Your Flexit-unit needs to be connected to the Internet
+- Unit needs to be registered in the Flexit Go-app
+
+## Installation
+
+<details>
+  <summary>HACS (Recommanded)</summary>
+
+1. Ensure that [HACS](https://hacs.xyz/) is installed.
+2. Add this repository as a custom repository
+3. Search for and install the "Flexit" integration.
+4. Restart Home Assistant.
+5. Add the `Flexit` integration to HA from the integration-page
+6. Username and password is the same as in Flexit Go
+</details>
+
+<details>
+  <summary>Manual installation</summary>
+
+1. Download the `Source code (zip)` file from the
+   [latest release](https://github.com/sindrebroch/ha-flexit/releases/latest).
+2. Unpack the release and copy the `custom_components/flexit` directory
+   into the `custom_components` directory of your Home Assistant
+   installation.
+3. Restart Home Assistant.
+4. Add the `Flexit` integration to HA from the integration-page
+5. Username and password is the same as in Flexit Go
+</details>
+
 ## Features
 
 ### Climate-entity
@@ -71,11 +102,6 @@ For instance, if you set a duration_fireplace to 5 minutes and change the mode t
 
 This also goes for away_delay. If this is set, the integration switches to Away right away, but it only activates after the delay has passed.
 
-## Requirements
-
-- Your Flexit-unit needs to be connected to the Internet
-- Unit needs to be registered in the Flexit Go-app
-
 ## Known issues
 
 - [ ] Stuck in Away-mode.
@@ -88,32 +114,6 @@ This also goes for away_delay. If this is set, the integration switches to Away 
 - [ ] Entities to set modifications
   - [ ] Calendar Temporary override
 
-## Installation
-
-<details>
-  <summary>HACS (Recommanded)</summary>
-
-1. Ensure that [HACS](https://hacs.xyz/) is installed.
-2. Add this repository as a custom repository
-3. Search for and install the "Flexit" integration.
-4. Restart Home Assistant.
-5. Add the `Flexit` integration to HA from the integration-page
-6. Username and password is the same as in Flexit Go
-</details>
-
-<details>
-  <summary>Manual installation</summary>
-
-1. Download the `Source code (zip)` file from the
-   [latest release](https://github.com/sindrebroch/ha-flexit/releases/latest).
-2. Unpack the release and copy the `custom_components/flexit` directory
-   into the `custom_components` directory of your Home Assistant
-   installation.
-3. Restart Home Assistant.
-4. Add the `Flexit` integration to HA from the integration-page
-5. Username and password is the same as in Flexit Go
-</details>
-
 ## Service information
 
 ### Service status
@@ -122,7 +122,7 @@ Service status can be found [here](https://status.climatixic.com/)
 
 ### API limitation
 
-API is restricted to 50 calls/min or 500 calls/week. Defaults to polling every 30 minutes, this can be configured but be aware of API restrictions.
+API is restricted to 50 calls/min or 500 calls/week. The integration calls the API at least twice per action, depending on the endpoint. Defaults to polling every 30 minutes, this can be configured but be aware of API restrictions.
 
 ## Debugging
 
