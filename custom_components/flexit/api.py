@@ -101,13 +101,9 @@ class FlexitApiClient:
     ) -> dict[str, Any] or None:
         """Wrap request."""
 
-        LOGGER.debug(
-            "%s-request to url=%s. data=%s. headers=%s",
-            method,
-            url,
-            data,
-            headers,
-        )
+        # LOGGER.debug(
+        #     "%s-request to url=%s. data=%s. headers=%s", method, url, data, headers
+        # )
 
         try:
             async with async_timeout.timeout(10):
