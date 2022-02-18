@@ -82,11 +82,8 @@ class FlexitApiClient:
     async def put(self, path: str, body: Any) -> Any:
         """Put request."""
 
-        if body is None:
-            null = None
-            data_body = null
-        else:
-            data_body = str(body)
+        null = None
+        data_body = null if body is None else str(body)
 
         return await self.api_wrapper(
             method="PUT",
