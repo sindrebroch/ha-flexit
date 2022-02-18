@@ -55,13 +55,13 @@ Tested with:
 
 ### Binary sensor-entity
 
+- Alarm
+  - Alarm Code A
+  - Alarm Code B
 - Dirty filter
   - Hours since change
   - Hours until dirty
   - Filter change interval hours
-- Alarm
-  - Alarm Code A
-  - Alarm Code B
 
 ## Keep in mind
 
