@@ -39,11 +39,13 @@ PLATFORMS: List[str] = [
     Platform.CLIMATE,
     Platform.NUMBER,
     Platform.SENSOR,
-    Platform.SWITCH,
 ]
 
 PRESET_FIREPLACE = "Fireplace"
 PRESET_BOOST_TEMP = "Boost Temporary"
+PRESET_CALENDAR_HOME = "Calendar Home"
+PRESET_CALENDAR_AWAY = "Calendar Away"
+PRESET_CALENDAR_BOOST = "Calendar Boost"
 PRESETS = [
     PRESET_HOME,
     PRESET_AWAY,
@@ -69,6 +71,9 @@ MODE_COOKER_HOOD = "Cooker hood"
 MODE_FIREPLACE = "Fireplace"
 MODE_FORCED_VENTILATION = "Boost Temporary"
 MODE_AWAY_DELAYED = "Away Delayed"
+MODE_CAL_HOME = "Calendar Home"
+MODE_CAL_AWAY = "Calendar Away"
+MODE_CAL_BOOST = "Calendar Boost"
 
 # Put paths
 MODE_AWAY_PUT_PATH = ";1!005000032000055"

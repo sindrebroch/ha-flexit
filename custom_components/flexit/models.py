@@ -24,6 +24,9 @@ from .const import (
     HOME_AIR_TEMPERATURE_PATH,
     LAST_RESTART_REASON_PATH,
     LOGGER,
+    MODE_CAL_AWAY,
+    MODE_CAL_BOOST,
+    MODE_CAL_HOME,
     MODEL_INFORMATION_PATH,
     MODEL_NAME_PATH,
     MODE_NULL,
@@ -121,7 +124,7 @@ class UtilClass:
 
     def calendar_active(self, path: str) -> str:
         """Get state of calendar."""
-        return {13: False, 15: True}.get(self.present_priority(path), "Unknown")
+        return {15: True}.get(self.present_priority(path), False)
 
     def int_sensor(self, path: str) -> int:
         """Get int from path."""
@@ -143,22 +146,32 @@ class UtilClass:
         """Get electric heater status from integer."""
         return True if heater_int == 1 else False
 
-    def ventilation_mode(self, ventilation_int: int) -> str:
+    def ventilation_mode(self, ventilation_int: int, calendar_active: bool) -> str:
         """Get ventilation mode from integer."""
 
-        # Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
-        mode = {
-            0: MODE_NULL,
-            1: MODE_OFF,
-            2: MODE_AWAY,
-            3: MODE_HOME,
-            4: MODE_HIGH,
-            5: MODE_COOKER_HOOD,
-            6: MODE_FIREPLACE,
-            7: MODE_FORCED_VENTILATION,
-        }
+        if calendar_active:
+            mode = {
+                2: MODE_CAL_AWAY,
+                3: MODE_CAL_HOME,
+                4: MODE_CAL_BOOST,
+            }
+        else:
+            # Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
+            mode = {
+                0: MODE_NULL,
+                1: MODE_OFF,
+                2: MODE_AWAY,
+                3: MODE_HOME,
+                4: MODE_HIGH,
+                5: MODE_COOKER_HOOD,
+                6: MODE_FIREPLACE,
+                7: MODE_FORCED_VENTILATION,
+            }
 
-        return mode.get(ventilation_int, f"Unknown mode: {str(ventilation_int)}")
+        return mode.get(
+            ventilation_int,
+            f"Unknown mode: {str(ventilation_int)} Calendar: {str(calendar_active)}",
+        )
 
 
 @attr.s(auto_attribs=True)
@@ -238,7 +251,10 @@ class FlexitSensorsResponse:
             extract_air_temperature=util.float_sensor(EXTRACT_AIR_TEMPERATURE_PATH),
             room_temperature=util.float_sensor(ROOM_TEMPERATURE_PATH),
             electric_heater=util.is_heating(util.int_sensor(HEATER_PATH)),
-            ventilation_mode=util.ventilation_mode(util.int_sensor(MODE_PATH)),
+            ventilation_mode=util.ventilation_mode(
+                util.int_sensor(MODE_HOME_HIGH_CAL_PUT_PATH),
+                util.calendar_active(MODE_HOME_HIGH_CAL_PUT_PATH),
+            ),
             filter_operating_time=util.int_sensor(FILTER_OPERATING_TIME_PATH),
             filter_time_for_exchange=util.int_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
             dirty_filter=util.dirty_filter(

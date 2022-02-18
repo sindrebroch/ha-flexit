@@ -4,8 +4,7 @@
         "binary_sensor",
         "climate",
         "number",
-        "sensor",
-        "switch"
+        "sensor"
     ],
     "homeassistant": "2021.12.0",
     "render_readme": true
