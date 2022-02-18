@@ -76,6 +76,12 @@ This also goes for away_delay. If this is set, the integration switches to Away 
 - Your Flexit-unit needs to be connected to the Internet
 - Unit needs to be registered in the Flexit Go-app
 
+## Known issues
+
+- [ ] Stuck in Away-mode.
+
+  If you turn on away-mode with delay set, and set the delay to 0 before switching modes it will be stuck in away-mode. This is because the API "toggles" these modes on and off, and I haven't found any good ways of reading from the API if the mode is set with delay or not. Therefore we use the delay-variable at runtime to check if we should toggle it off.
+
 ## Roadmap
 
 - [ ] Be able to set Calendar-mode
