@@ -20,40 +20,38 @@ Tested with:
   - Home
   - Away
   - Boost
+  - Boost Temporary
   - Fireplace
 - Operation modes:
   - Fan only
   - Heat
 - Viewable modes:
-  - Null
-  - Off
-  - Away
   - Home
-  - High
+  - Away
+  - Boost
+  - Boost Temporary
   - Cooker hood
   - Fireplace
-  - Forced ventilation
 
 ### Sensor-entities
 
-- Extract temperature
-- Exhaust temperature
-- Outside temperature
-- Supply temperature
-- Room temperature
-
-- Extract Fan Control Signal
-- Extract Fan Speed
-- Heat Exchanger Speed
-- Supply Fan Control Signal
-- Supply Fan Speed
 - Additional Heater
+- Fan Control Signal Extract
+- Fan Control Signal Supply
+- Fan Speed Extract
+- Fan Speed Supply
+- Temperature Extract
+- Temperature Exhaust
+- Temperature Outside
+- Temperature Supply
+- Temperature Room
+- Speed Heat Exchanger
 
 ### Number-entities
 
-- Away mode delay
-- Boost duration
-- Fireplace duration
+- Delay Away Mode
+- Duration Boost
+- Duration Fireplace
 
 ### Binary sensor-entity
 
@@ -72,12 +70,8 @@ Tested with:
 
 ## Roadmap
 
-- [ ] Fix binary_sensors not updating
 - [ ] Be able to set Calendar-mode
 - [ ] Entities to set modifications
-  - [x] Duration Boost
-  - [x] Duration Fireplace
-  - [x] Away Delay
   - [ ] Calendar Temporary override
 
 ## Installation
