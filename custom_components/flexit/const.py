@@ -40,6 +40,7 @@ PLATFORMS: List[str] = [
     Platform.CLIMATE,
     Platform.NUMBER,
     Platform.SENSOR,
+    Platform.SWITCH,
 ]
 
 PRESET_FIREPLACE = "Fireplace"
