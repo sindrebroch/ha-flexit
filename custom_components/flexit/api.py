@@ -15,6 +15,7 @@ from .const import (
     AWAY_AIR_TEMPERATURE_PATH,
     AWAY_DELAY_PATH,
     BOOST_DURATION_PATH,
+    CALENDAR_TEMPORARY_OVERRIDE_PATH,
     DATAPOINTS_PATH,
     DEVICE_INFO_PATH_LIST,
     FIREPLACE_DURATION_PATH,
@@ -95,13 +96,13 @@ class FlexitApiClient:
     ) -> dict[str, Any] or None:
         """Wrap request."""
 
-        # LOGGER.debug(
-        #     "%s-request to url=%s. data=%s. headers=%s",
-        #     method,
-        #     url,
-        #     data,
-        #     headers,
-        # )
+        LOGGER.debug(
+            "%s-request to url=%s. data=%s. headers=%s",
+            method,
+            url,
+            data,
+            headers,
+        )
 
         try:
             async with async_timeout.timeout(10):
@@ -217,6 +218,10 @@ class FlexitApiClient:
     async def set_heater_state(self, heater_bool: bool) -> bool:
         """Set heater state."""
         return await self.update(HEATER_PATH, 1 if heater_bool else 0)
+
+    async def set_temporary_override(self, value) -> bool:
+        """Set temporary override"""
+        return await self.update(CALENDAR_TEMPORARY_OVERRIDE_PATH, value)
 
     async def is_success(self, response: Dict[str, Any], path_with_plant: str) -> bool:
         """Check if response is successful."""

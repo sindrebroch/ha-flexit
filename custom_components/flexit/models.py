@@ -12,6 +12,7 @@ from .const import (
     AWAY_AIR_TEMPERATURE_PATH,
     AWAY_DELAY_PATH,
     BOOST_DURATION_PATH,
+    CALENDAR_TEMPORARY_OVERRIDE_PATH,
     DEVICE_DESCRIPTION_PATH,
     FIREPLACE_DURATION_PATH,
     HEATER_PATH,
@@ -81,9 +82,10 @@ class Entity(Enum):
     BOOST_DURATION = "boost_duration"
     AWAY_DELAY = "away_delay"
 
-    BOOST_TEMPORARY = "boost_temporary"
     CURRENT_FIREPLACE_DURATION = "current_fireplace_duration"
     CURRENT_BOOST_DURATION = "current_boost_duration"
+
+    CALENDAR_TEMPORARY_OVERRIDE = "calendar_temporary_override"
 
 
 class UtilClass:
@@ -113,6 +115,10 @@ class UtilClass:
     def int_sensor(self, path: str) -> int:
         """Get int from path."""
         return int(self._str_sensor(path))
+
+    def bool_sensor(self, path: str) -> int:
+        """Get bool from path."""
+        return bool(self._str_sensor(path))
 
     def float_sensor(self, path: str) -> float:
         """Get float from path."""
@@ -201,6 +207,8 @@ class FlexitSensorsResponse:
     boost_duration: int
     away_delay: int
 
+    calendar_temporary_override: bool
+
     @staticmethod
     def from_dict(plant: str, data: Dict[str, Any]) -> "FlexitSensorsResponse":
         """Transform response to FlexitSensorsResponse."""
@@ -236,6 +244,9 @@ class FlexitSensorsResponse:
             fireplace_duration=util.int_sensor(FIREPLACE_DURATION_PATH),
             boost_duration=util.int_sensor(BOOST_DURATION_PATH),
             away_delay=util.int_sensor(AWAY_DELAY_PATH),
+            calendar_temporary_override=util.bool_sensor(
+                CALENDAR_TEMPORARY_OVERRIDE_PATH
+            ),
         )
 
 
