@@ -40,12 +40,12 @@ Tested with:
 - Fan Control Signal Supply
 - Fan Speed Extract
 - Fan Speed Supply
+- Speed Heat Exchanger
 - Temperature Extract
 - Temperature Exhaust
 - Temperature Outside
 - Temperature Supply
 - Temperature Room
-- Speed Heat Exchanger
 
 ### Number-entities
 
