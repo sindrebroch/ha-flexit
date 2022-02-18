@@ -36,6 +36,7 @@ API_HEADERS = {
 
 PLATFORMS: List[str] = [
     Platform.BINARY_SENSOR,
+    Platform.BUTTON,
     Platform.CLIMATE,
     Platform.NUMBER,
     Platform.SENSOR,

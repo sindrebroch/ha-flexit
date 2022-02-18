@@ -1,5 +1,6 @@
 """Button for Flexit."""
 
+import time
 from custom_components.flexit.models import Entity
 
 from homeassistant.components.button import (
@@ -60,3 +61,5 @@ class FlexitButton(CoordinatorEntity, ButtonEntity):
     async def async_press(self) -> None:
         """Set calendar active."""
         await self.coordinator.api.set_calendar_active()
+        time.sleep(1)  # Give the backend time to react to the update
+        await self.coordinator.async_request_refresh()

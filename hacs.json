@@ -2,6 +2,7 @@
     "name": "Flexit",
     "domains": [
         "binary_sensor",
+        "button",
         "climate",
         "number",
         "sensor"
