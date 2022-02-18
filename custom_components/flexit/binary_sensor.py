@@ -73,14 +73,15 @@ class FlexitBinarySensor(CoordinatorEntity, BinarySensorEntity):
 
         self.entity_description = description
         self.coordinator = coordinator
-        self.data: FlexitSensorsResponse = coordinator.data
         self._attr_unique_id = f"{description.key}"
         self._attr_device_info = coordinator._attr_device_info
         self.update_from_data()
 
     def update_from_data(self) -> None:
         """Update attributes from data."""
-        self.sensor_data = self.data.__getattribute__(self.entity_description.key)
+        self.sensor_data = self.coordinator.data.__getattribute__(
+            self.entity_description.key
+        )
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -107,8 +108,8 @@ class FlexitFilterBinarySensor(FlexitBinarySensor):
     def extra_state_attributes(self):
         """Return the state attributes."""
 
-        operating_time = self.data.filter_operating_time
-        exchange_time = self.data.filter_time_for_exchange
+        operating_time = self.coordinator.data.filter_operating_time
+        exchange_time = self.coordinator.data.filter_time_for_exchange
 
         return {
             ATTR_OPERATING_TIME: operating_time,
@@ -124,8 +125,8 @@ class FlexitAlarmBinarySensor(FlexitBinarySensor):
     def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
         return (
-            self.sensor_data.get("alarm_code_a", 0) > 0
-            or self.sensor_data.get("alarm_code_b", 0) > 0
+            self.sensor_data.get(Entity.ALARM_CODE_A.value, 0) > 0
+            or self.sensor_data.get(Entity.ALARM_CODE_B.value, 0) > 0
         )
 
     @property
@@ -137,8 +138,8 @@ class FlexitAlarmBinarySensor(FlexitBinarySensor):
     def extra_state_attributes(self):
         """Return the state attributes."""
 
-        alarm_code_a = self.sensor_data.get("alarm_code_a", 0)
-        alarm_code_b = self.sensor_data.get("alarm_code_b", 0)
+        alarm_code_a = self.sensor_data.get(Entity.ALARM_CODE_A.value, 0)
+        alarm_code_b = self.sensor_data.get(Entity.ALARM_CODE_B.value, 0)
 
         return {
             ATTR_ALARM_CODE_A: alarm_code_a if alarm_code_a > 0 else "No alarm",
@@ -149,6 +150,10 @@ class FlexitAlarmBinarySensor(FlexitBinarySensor):
         """Update attributes based on new data."""
 
         self.sensor_data = {
-            "alarm_code_a": self.data.__getattribute__(Entity.ALARM_CODE_A.value),
-            "alarm_code_b": self.data.__getattribute__(Entity.ALARM_CODE_B.value),
+            "alarm_code_a": self.coordinator.data.__getattribute__(
+                Entity.ALARM_CODE_A.value
+            ),
+            "alarm_code_b": self.coordinator.data.__getattribute__(
+                Entity.ALARM_CODE_B.value
+            ),
         }
