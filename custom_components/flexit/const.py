@@ -61,6 +61,7 @@ MODE_HIGH = "High"
 MODE_COOKER_HOOD = "Cooker hood"
 MODE_FIREPLACE = "Fireplace"
 MODE_FORCED_VENTILATION = "Boost Temporary"
+MODE_AWAY_DELAYED = "Away Delayed"
 
 # Put paths
 MODE_AWAY_PUT_PATH = ";1!005000032000055"

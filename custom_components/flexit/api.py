@@ -23,6 +23,7 @@ from .const import (
     HOME_AIR_TEMPERATURE_PATH,
     LOGGER,
     MODE_AWAY,
+    MODE_AWAY_DELAYED,
     MODE_AWAY_PUT_PATH,
     MODE_FIREPLACE,
     MODE_FIREPLACE_PUT_PATH,
@@ -189,6 +190,8 @@ class FlexitApiClient:
 
         if mode == MODE_AWAY:
             return await self.update(MODE_AWAY_PUT_PATH, 0)
+        if mode == MODE_AWAY_DELAYED:
+            return await self.update(MODE_AWAY_PUT_PATH, 1)
         if mode == MODE_HOME:
             return await self.update(MODE_HOME_HIGH_PUT_PATH, 3)
         if mode == MODE_HIGH:

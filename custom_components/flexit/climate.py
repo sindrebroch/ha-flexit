@@ -24,6 +24,7 @@ from .const import (
     DOMAIN as FLEXIT_DOMAIN,
     LOGGER,
     MODE_AWAY,
+    MODE_AWAY_DELAYED,
     MODE_COOKER_HOOD,
     MODE_FIREPLACE,
     MODE_FORCED_VENTILATION,
@@ -187,6 +188,7 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         api = coordinator.api
 
         current_mode = coordinator.data.ventilation_mode
+        away_delay = coordinator.data.away_delay
 
         if current_mode == preset_mode:
             return
@@ -196,6 +198,9 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
             await api.set_mode(MODE_FIREPLACE)
         if current_mode == MODE_FORCED_VENTILATION:
             await api.set_mode(MODE_FORCED_VENTILATION)
+        if current_mode == MODE_AWAY and away_delay > 0:
+            # might be an issue if you have changed it since. do it anyways?
+            await api.set_mode(MODE_AWAY_DELAYED)
 
         if preset_mode == PRESET_HOME and await api.set_mode(MODE_HOME):
             coordinator.data.ventilation_mode = MODE_HOME
