@@ -21,7 +21,7 @@ from .const import (
     DOMAIN as FLEXIT_DOMAIN,
 )
 from .coordinator import FlexitDataUpdateCoordinator
-from .models import Entity, FlexitSensorsResponse
+from .models import Entity
 
 ALARM_BINARY_SENSORS: Tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
