@@ -24,6 +24,9 @@ from .const import (
     HOME_AIR_TEMPERATURE_PATH,
     LAST_RESTART_REASON_PATH,
     LOGGER,
+    MODE_CAL_AWAY,
+    MODE_CAL_BOOST,
+    MODE_CAL_HOME,
     MODEL_INFORMATION_PATH,
     MODEL_NAME_PATH,
     MODE_NULL,
@@ -40,7 +43,7 @@ from .const import (
     SERIAL_NUMBER_PATH,
     SUPPLY_AIR_TEMPERATURE_PATH,
     SYSTEM_STATUS_PATH,
-    MODE_PATH,
+    MODE_HOME_HIGH_CAL_PUT_PATH,
     HEAT_EXCHANGER_SPEED_PATH,
     SUPPLY_FAN_SPEED_PATH,
     SUPPLY_FAN_CONTROL_SIGNAL_PATH,
@@ -51,6 +54,7 @@ from .const import (
 
 VALUE = "value"
 VALUES = "values"
+PRESENT_PRIORITY = "presentPriority"
 
 
 class Entity(Enum):
@@ -85,6 +89,7 @@ class Entity(Enum):
     CURRENT_FIREPLACE_DURATION = "current_fireplace_duration"
     CURRENT_BOOST_DURATION = "current_boost_duration"
 
+    CALENDAR_ACTIVE = "calendar_active"
     CALENDAR_TEMPORARY_OVERRIDE = "calendar_temporary_override"
 
 
@@ -112,6 +117,14 @@ class UtilClass:
         """Get string from path."""
         return self.data[VALUES][f"{self.plant}{path}"][VALUE][VALUE]
 
+    def present_priority(self, path: str) -> str:
+        """Get present priority."""
+        return self.data[VALUES][f"{self.plant}{path}"][VALUE][PRESENT_PRIORITY]
+
+    def calendar_active(self, path: str) -> str:
+        """Get state of calendar."""
+        return {15: True}.get(self.present_priority(path), False)
+
     def int_sensor(self, path: str) -> int:
         """Get int from path."""
         return int(self._str_sensor(path))
@@ -132,22 +145,32 @@ class UtilClass:
         """Get electric heater status from integer."""
         return True if heater_int == 1 else False
 
-    def ventilation_mode(self, ventilation_int: int) -> str:
+    def ventilation_mode(self, ventilation_int: int, calendar_active: bool) -> str:
         """Get ventilation mode from integer."""
 
-        # Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
-        mode = {
-            0: MODE_NULL,
-            1: MODE_OFF,
-            2: MODE_AWAY,
-            3: MODE_HOME,
-            4: MODE_HIGH,
-            5: MODE_COOKER_HOOD,
-            6: MODE_FIREPLACE,
-            7: MODE_FORCED_VENTILATION,
-        }
+        if calendar_active:
+            mode = {
+                2: MODE_CAL_AWAY,
+                3: MODE_CAL_HOME,
+                4: MODE_CAL_BOOST,
+            }
+        else:
+            # Null*Off*Away*Home*High*Cocker hood*Fire place*Forced ventilation
+            mode = {
+                0: MODE_NULL,
+                1: MODE_OFF,
+                2: MODE_AWAY,
+                3: MODE_HOME,
+                4: MODE_HIGH,
+                5: MODE_COOKER_HOOD,
+                6: MODE_FIREPLACE,
+                7: MODE_FORCED_VENTILATION,
+            }
 
-        return mode.get(ventilation_int, f"Unknown mode: {str(ventilation_int)}")
+        return mode.get(
+            ventilation_int,
+            f"Unknown mode: {str(ventilation_int)} Calendar: {str(calendar_active)}",
+        )
 
 
 @attr.s(auto_attribs=True)
@@ -207,6 +230,7 @@ class FlexitSensorsResponse:
     boost_duration: int
     away_delay: int
 
+    calendar_active: bool
     calendar_temporary_override: bool
 
     @staticmethod
@@ -226,7 +250,10 @@ class FlexitSensorsResponse:
             extract_air_temperature=util.float_sensor(EXTRACT_AIR_TEMPERATURE_PATH),
             room_temperature=util.float_sensor(ROOM_TEMPERATURE_PATH),
             electric_heater=util.is_heating(util.int_sensor(HEATER_PATH)),
-            ventilation_mode=util.ventilation_mode(util.int_sensor(MODE_PATH)),
+            ventilation_mode=util.ventilation_mode(
+                util.int_sensor(MODE_HOME_HIGH_CAL_PUT_PATH),
+                util.calendar_active(MODE_HOME_HIGH_CAL_PUT_PATH),
+            ),
             filter_operating_time=util.int_sensor(FILTER_OPERATING_TIME_PATH),
             filter_time_for_exchange=util.int_sensor(FILTER_TIME_FOR_EXCHANGE_PATH),
             dirty_filter=util.dirty_filter(
@@ -247,6 +274,7 @@ class FlexitSensorsResponse:
             calendar_temporary_override=util.bool_sensor(
                 CALENDAR_TEMPORARY_OVERRIDE_PATH
             ),
+            calendar_active=util.calendar_active(MODE_HOME_HIGH_CAL_PUT_PATH),
         )
 
 

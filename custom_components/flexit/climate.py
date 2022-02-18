@@ -1,5 +1,6 @@
 """Platform for Flexit AC units."""
 
+from calendar import calendar
 from typing import Any, Optional, Tuple
 
 from homeassistant.components.climate import ClimateEntity, ClimateEntityDescription
@@ -25,12 +26,18 @@ from .const import (
     LOGGER,
     MODE_AWAY,
     MODE_AWAY_DELAYED,
+    MODE_CAL_AWAY,
+    MODE_CAL_BOOST,
+    MODE_CAL_HOME,
     MODE_COOKER_HOOD,
     MODE_FIREPLACE,
     MODE_FORCED_VENTILATION,
     MODE_HIGH,
     MODE_HOME,
     PRESET_BOOST_TEMP,
+    PRESET_CALENDAR_AWAY,
+    PRESET_CALENDAR_BOOST,
+    PRESET_CALENDAR_HOME,
     PRESET_FIREPLACE,
     PRESETS,
 )
@@ -166,20 +173,17 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         """Return the current_hvac_mode preset mode."""
 
         current_mode = self.coordinator.data.ventilation_mode
-
-        if current_mode == MODE_HOME:
-            return PRESET_HOME
-        if current_mode == MODE_AWAY:
-            return PRESET_AWAY
-        if current_mode in (MODE_HIGH, MODE_COOKER_HOOD):
-            return PRESET_BOOST
-        if current_mode == MODE_FORCED_VENTILATION:
-            return PRESET_BOOST_TEMP
-        if current_mode == MODE_FIREPLACE:
-            return PRESET_FIREPLACE
-
-        LOGGER.warning("Unknown preset mode %s", current_mode)
-        return current_mode
+        return {
+            MODE_CAL_HOME: PRESET_CALENDAR_HOME,
+            MODE_CAL_AWAY: PRESET_CALENDAR_AWAY,
+            MODE_CAL_BOOST: PRESET_CALENDAR_BOOST,
+            MODE_HOME: PRESET_HOME,
+            MODE_AWAY: PRESET_AWAY,
+            MODE_HIGH: PRESET_BOOST,
+            MODE_COOKER_HOOD: PRESET_BOOST,
+            MODE_FORCED_VENTILATION: PRESET_BOOST_TEMP,
+            MODE_FIREPLACE: PRESET_FIREPLACE,
+        }.get(current_mode, f"Unknown preset {current_mode}")
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set preset mode async."""
@@ -187,8 +191,8 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         coordinator: FlexitDataUpdateCoordinator = self.coordinator
         api = coordinator.api
 
-        current_mode = coordinator.data.ventilation_mode
         away_delay = coordinator.data.away_delay
+        current_mode = coordinator.data.ventilation_mode
 
         if current_mode == preset_mode:
             return
@@ -199,7 +203,7 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
         if current_mode == MODE_FORCED_VENTILATION:
             await api.set_mode(MODE_FORCED_VENTILATION)
         if current_mode == MODE_AWAY and away_delay > 0:
-            # might be an issue if you have changed it since. do it anyways?
+            # TODO might be an issue if you have changed delay before mode. possible to do it always?
             await api.set_mode(MODE_AWAY_DELAYED)
 
         if preset_mode == PRESET_HOME and await api.set_mode(MODE_HOME):
@@ -214,4 +218,6 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
             coordinator.data.ventilation_mode = MODE_FORCED_VENTILATION
         elif preset_mode == PRESET_FIREPLACE and await api.set_mode(MODE_FIREPLACE):
             coordinator.data.ventilation_mode = MODE_FIREPLACE
+        else:
+            return
         self.async_write_ha_state()

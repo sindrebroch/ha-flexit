@@ -1,6 +1,7 @@
 """Switch platform for Flexit."""
 
 from __future__ import annotations
+import time
 
 from typing import Any, Tuple
 
@@ -80,12 +81,14 @@ class FlexitSwitch(CoordinatorEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
-        if await self.coordinator.api.set_temporary_override(1):
+        if await self.coordinator.api.set_calendar_temporary_override(1):
             self.sensor_data = True
+        time.sleep(1)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the entity off."""
-        if await self.coordinator.api.set_temporary_override(0):
+        if await self.coordinator.api.set_calendar_temporary_override(0):
             self.sensor_data = False
+        time.sleep(1)
         await self.coordinator.async_request_refresh()
