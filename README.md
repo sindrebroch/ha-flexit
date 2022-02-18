@@ -63,6 +63,14 @@ Tested with:
   - Alarm Code A
   - Alarm Code B
 
+## Keep in mind
+
+The integration only polls every 30 min by default. When durations and delays are set, the integration and the app might become out of sync. Not sure how to avoid this without polling a lot more.
+
+For instance, if you set a duration_fireplace to 5 minutes and change the mode to Fireplace, then HA will think the state is Fireplace until the next poll, when in reality it changed back after 5 minutes.
+
+This also goes for away_delay. If this is set, the integration switches to Away right away, but it only activates after the delay has passed.
+
 ## Requirements
 
 - Your Flexit-unit needs to be connected to the Internet
