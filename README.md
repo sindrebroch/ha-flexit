@@ -81,7 +81,7 @@ Tested with:
 ### Number-entities
 
 - Delay Away Mode
-- Duration Boost
+- Duration Boost Temporary
 - Duration Fireplace
 
 ### Binary sensor-entity
