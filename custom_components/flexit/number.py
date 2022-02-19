@@ -47,7 +47,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
     ),
     FlexitNumberEntityDescription(
         key=Entity.BOOST_DURATION.value,
-        name="Duration Boost",
+        name="Duration Boost Temporary",
         unit_of_measurement=TIME_MINUTES,
         entity_category=EntityCategory.CONFIG,
         min_value=1.0,
