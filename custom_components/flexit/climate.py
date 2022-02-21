@@ -202,8 +202,7 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
             await api.set_mode(MODE_FIREPLACE)
         if current_mode == MODE_FORCED_VENTILATION:
             await api.set_mode(MODE_FORCED_VENTILATION)
-        if current_mode == MODE_AWAY and away_delay > 0:
-            # TODO might be an issue if you have changed delay before mode. possible to do it always?
+        if current_mode == MODE_AWAY:
             await api.set_mode(MODE_AWAY_DELAYED)
 
         if preset_mode == PRESET_HOME and await api.set_mode(MODE_HOME):
