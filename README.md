@@ -102,18 +102,6 @@ For instance, if you set a duration_fireplace to 5 minutes and change the mode t
 
 This also goes for away_delay. If this is set, the integration switches to Away right away, but it only activates after the delay has passed.
 
-## Known issues
-
-- [ ] Stuck in Away-mode.
-
-  If you turn on away-mode with delay set, and set the delay to 0 before switching modes it will be stuck in away-mode. This is because the API "toggles" these modes on and off, and I haven't found any good ways of reading from the API if the mode is set with delay or not. Therefore we use the delay-variable at runtime to check if we should toggle it off.
-
-## Roadmap
-
-- [ ] Be able to set Calendar-mode
-- [ ] Entities to set modifications
-  - [ ] Calendar Temporary override
-
 ## Service information
 
 ### Service status
