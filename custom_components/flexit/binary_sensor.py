@@ -2,6 +2,8 @@
 
 from typing import Any, Tuple, cast
 
+import math
+
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
@@ -15,6 +17,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import (
     ATTR_ALARM_CODE_A,
     ATTR_ALARM_CODE_B,
+    ATTR_DAYS_UNTIL_DIRTY,
+    ATTR_DAYS_OPERATING_TIME,
+    ATTR_DAYS_TIME_TO_CHANGE,
     ATTR_UNTIL_DIRTY,
     ATTR_OPERATING_TIME,
     ATTR_TIME_TO_CHANGE,
@@ -110,11 +115,16 @@ class FlexitFilterBinarySensor(FlexitBinarySensor):
 
         operating_time = self.coordinator.data.filter_operating_time
         exchange_time = self.coordinator.data.filter_time_for_exchange
+        operating_time_days = math.floor(operating_time / 24)
+        exchange_time_days = math.floor(exchange_time / 24)
 
         return {
             ATTR_OPERATING_TIME: operating_time,
             ATTR_TIME_TO_CHANGE: exchange_time,
             ATTR_UNTIL_DIRTY: exchange_time - operating_time,
+            ATTR_DAYS_OPERATING_TIME: operating_time_days,
+            ATTR_DAYS_TIME_TO_CHANGE: exchange_time_days,
+            ATTR_DAYS_UNTIL_DIRTY: exchange_time_days - operating_time_days
         }
 
 

@@ -60,6 +60,9 @@ PRESETS = [
 ATTR_UNTIL_DIRTY = "hours_until_dirty"
 ATTR_OPERATING_TIME = "hours_since_change"
 ATTR_TIME_TO_CHANGE = "filter_change_interval_hours"
+ATTR_DAYS_UNTIL_DIRTY = "days_until_dirty"
+ATTR_DAYS_OPERATING_TIME = "days_since_change"
+ATTR_DAYS_TIME_TO_CHANGE = "filter_change_interval_days"
 ATTR_ALARM_CODE_A = "alarm_code_a"
 ATTR_ALARM_CODE_B = "alarm_code_b"
 
