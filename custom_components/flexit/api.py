@@ -12,6 +12,7 @@ import async_timeout
 from aiohttp.client import ClientSession
 
 from .const import (
+    ACKNOWLEDGE_FILTER_ALARM_CODE_PATH,
     API_HEADERS,
     AWAY_AIR_TEMPERATURE_PATH,
     AWAY_DELAY_PATH,
@@ -19,6 +20,7 @@ from .const import (
     CALENDAR_TEMPORARY_OVERRIDE_PATH,
     DATAPOINTS_PATH,
     DEVICE_INFO_PATH_LIST,
+    FILTER_OPERATING_TIME_PATH,
     FIREPLACE_DURATION_PATH,
     HEATER_PATH,
     FILTER_PATH,
@@ -228,6 +230,18 @@ class FlexitApiClient:
     async def set_calendar_temporary_override(self, value) -> bool:
         """Set temporary override"""
         return await self.update(CALENDAR_TEMPORARY_OVERRIDE_PATH, value)
+
+    async def reset_dirty_filter(self, value) -> bool:
+        """Reset dirty filter."""
+        # Reset filter operating time
+        reset_operating_time_success = await self.update(FILTER_OPERATING_TIME_PATH, 0)
+        # Acknowledge alarm
+        ack_alarm_success = await self.acknowledge_alarm(ACKNOWLEDGE_FILTER_ALARM_CODE_PATH)
+        return reset_operating_time_success and ack_alarm_success
+
+    async def acknowledge_alarm(self, path: str) -> bool:
+        """Acknowledge alarm at path."""
+        return await self.update(path, 2)
 
     async def is_success(self, response: Dict[str, Any], path_with_plant: str) -> bool:
         """Check if response is successful."""
