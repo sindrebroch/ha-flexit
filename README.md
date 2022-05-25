@@ -93,6 +93,9 @@ Tested with:
   - Hours since change
   - Hours until dirty
   - Filter change interval hours
+  - Days since change
+  - Days until dirty
+  - Filter change interval days
 
 ## Keep in mind
 
