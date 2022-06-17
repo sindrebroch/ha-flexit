@@ -1,13 +1,5 @@
 {
     "name": "Flexit",
-    "domains": [
-        "binary_sensor",
-        "button",
-        "climate",
-        "number",
-        "sensor",
-        "switch"
-    ],
     "homeassistant": "2022.5.0",
     "render_readme": true
 }
