@@ -120,7 +120,7 @@ class FlexitNumber(CoordinatorEntity, NumberEntity):
         )
 
     @property
-    def value(self) -> float:
+    def native_value(self) -> float:
         return self.sensor_data
 
     @callback
@@ -134,7 +134,7 @@ class FlexitNumber(CoordinatorEntity, NumberEntity):
 class FlexitFireplaceDurationNumber(FlexitNumber):
     """Define a Flexit entity."""
 
-    async def async_set_value(self, value: float) -> None:
+    async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
         if await self.coordinator.api.set_fireplace_duration(int(value)):
             self.sensor_data = value
@@ -144,7 +144,7 @@ class FlexitFireplaceDurationNumber(FlexitNumber):
 class FlexitBoostDurationNumber(FlexitNumber):
     """Define a Flexit entity."""
 
-    async def async_set_value(self, value: float) -> None:
+    async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
         if await self.coordinator.api.set_boost_duration(int(value)):
             self.sensor_data = value
@@ -154,7 +154,7 @@ class FlexitBoostDurationNumber(FlexitNumber):
 class FlexitAwayDelayNumber(FlexitNumber):
     """Define a Flexit entity."""
 
-    async def async_set_value(self, value: float) -> None:
+    async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
         if await self.coordinator.api.set_away_delay(int(value)):
             self.sensor_data = value
