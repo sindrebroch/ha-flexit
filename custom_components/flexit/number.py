@@ -30,8 +30,8 @@ from .models import Entity
 class FlexitNumberEntityDescription(NumberEntityDescription):
     """A class that describes number entities."""
 
-    min_value: float | None = None
-    max_value: float | None = None
+    native_min_value: float | None = None
+    native_max_value: float | None = None
     entity: str | None = None
 
 
@@ -39,28 +39,28 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
     FlexitNumberEntityDescription(
         key=Entity.AWAY_DELAY.value,
         name="Delay Away Mode",
-        unit_of_measurement=TIME_MINUTES,
+        native_unit_of_measurement=TIME_MINUTES,
         entity_category=EntityCategory.CONFIG,
-        min_value=0.0,
-        max_value=300.0,
+        native_min_value=0.0,
+        native_max_value=300.0,
         icon="mdi:timer",
     ),
     FlexitNumberEntityDescription(
         key=Entity.BOOST_DURATION.value,
         name="Duration Boost Temporary",
-        unit_of_measurement=TIME_MINUTES,
+        native_unit_of_measurement=TIME_MINUTES,
         entity_category=EntityCategory.CONFIG,
-        min_value=1.0,
-        max_value=360.0,
+        native_min_value=1.0,
+        native_max_value=360.0,
         icon="mdi:timer",
     ),
     FlexitNumberEntityDescription(
         key=Entity.FIREPLACE_DURATION.value,
         name="Duration Fireplace",
-        unit_of_measurement=TIME_MINUTES,
+        native_unit_of_measurement=TIME_MINUTES,
         entity_category=EntityCategory.CONFIG,
-        min_value=0.0,
-        max_value=360.0,
+        native_min_value=0.0,
+        native_max_value=360.0,
         icon="mdi:timer",
     ),
 )
@@ -106,10 +106,10 @@ class FlexitNumber(CoordinatorEntity, NumberEntity):
         self._attr_unique_id = f"{description.key}"
         self._attr_device_info = coordinator._attr_device_info
 
-        self._attr_step = 1
+        self._attr_native_step = 1
         self._attr_mode: Literal["auto", "slider", "box"] = MODE_AUTO
-        self._attr_min_value = description.min_value or DEFAULT_MIN_VALUE
-        self._attr_max_value = description.max_value or DEFAULT_MAX_VALUE
+        self._attr_native_min_value = description.native_min_value or DEFAULT_MIN_VALUE
+        self._attr_native_max_value = description.native_max_value or DEFAULT_MAX_VALUE
 
         self.update_from_data()
 
