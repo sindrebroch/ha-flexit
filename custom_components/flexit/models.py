@@ -364,5 +364,9 @@ class FlexitSensorsResponseStatus:
         """Transform response to FlexitSensorsResponseStatus."""
 
         LOGGER.debug("FlexitSensorsResponseStatus=%s", data)
+        if "stateTexts" in data:
+            stateTexts = data["stateTexts"]
+        elif "errorClass" in data:
+            stateTexts = data["error"]["stateTexts"]
 
-        return FlexitSensorsResponseStatus(stateTexts=data["stateTexts"])
+        return FlexitSensorsResponseStatus(stateTexts=stateTexts)
