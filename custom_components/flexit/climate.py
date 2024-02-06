@@ -13,7 +13,7 @@ from homeassistant.components.climate.const import (
     PRESET_HOME
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
+from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -81,7 +81,7 @@ class FlexitClimate(CoordinatorEntity, ClimateEntity):
 
         self._attr_unique_id = f"{description.key}"
         self._attr_assumed_state = True
-        self._attr_temperature_unit = TEMP_CELSIUS
+        self._attr_temperature_unit = UnitOfTemperature.CELSIUS
         self._attr_hvac_modes = [HVACMode.HEAT, HVACMode.FAN_ONLY]
         self._attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
         self._attr_preset_modes = PRESETS

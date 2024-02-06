@@ -12,10 +12,10 @@ from homeassistant.components.number import (
 from homeassistant.components.number.const import (
     DEFAULT_MAX_VALUE,
     DEFAULT_MIN_VALUE,
-    MODE_AUTO,
+    NumberMode,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import TIME_MINUTES
+from homeassistant.const import UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -39,7 +39,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
     FlexitNumberEntityDescription(
         key=Entity.AWAY_DELAY.value,
         name="Delay Away Mode",
-        native_unit_of_measurement=TIME_MINUTES,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
         entity_category=EntityCategory.CONFIG,
         native_min_value=0.0,
         native_max_value=300.0,
@@ -48,7 +48,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
     FlexitNumberEntityDescription(
         key=Entity.BOOST_DURATION.value,
         name="Duration Boost Temporary",
-        native_unit_of_measurement=TIME_MINUTES,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
         entity_category=EntityCategory.CONFIG,
         native_min_value=1.0,
         native_max_value=360.0,
@@ -57,7 +57,7 @@ NUMBERS: Tuple[FlexitNumberEntityDescription, ...] = (
     FlexitNumberEntityDescription(
         key=Entity.FIREPLACE_DURATION.value,
         name="Duration Fireplace",
-        native_unit_of_measurement=TIME_MINUTES,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
         entity_category=EntityCategory.CONFIG,
         native_min_value=0.0,
         native_max_value=360.0,
@@ -107,7 +107,7 @@ class FlexitNumber(CoordinatorEntity, NumberEntity):
         self._attr_device_info = coordinator._attr_device_info
 
         self._attr_native_step = 1
-        self._attr_mode: Literal["auto", "slider", "box"] = MODE_AUTO
+        self._attr_mode: Literal["auto", "slider", "box"] = NumberMode.AUTO
         self._attr_native_min_value = description.native_min_value or DEFAULT_MIN_VALUE
         self._attr_native_max_value = description.native_max_value or DEFAULT_MAX_VALUE
 
