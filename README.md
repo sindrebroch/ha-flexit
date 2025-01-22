@@ -3,9 +3,8 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/sindrebroch/ha-flexit?style=flat-square)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 
-> A local and native Flexit BACnet integration is available in HA now ([docs](https://www.home-assistant.io/integrations/flexit_bacnet/)). For now it only has a climate-entity, but hopefully it will improve with more features over time. I probably won't spend a lot of time on this integrations as a local integrations would be much better.
-> I has some issues setting up the Flexit BACnet-integration with this custom_integration installed, I will probably look at that soon.
-
+> [!WARNING]
+> A local and native Flexit BACnet integration is available now in [HomeAssistant core](https://www.home-assistant.io/integrations/flexit_bacnet/). Because of this I have stopped using this integration myself, and won't do any more work on it.
 
 This integration uses an undocumented API, use at your own risk. This integration uses the same domain name as the official Flexit-integration, so in its current state you can't use both at the same time.
 
