@@ -11,7 +11,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, TEMP_CELSIUS
+from homeassistant.const import PERCENTAGE, UnitOfTemperature
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
@@ -30,7 +30,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Temperature Room",
         key=Entity.ROOM_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
-        native_unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
@@ -38,7 +38,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Temperature Outside",
         key=Entity.OUTSIDE_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
-        native_unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
@@ -46,7 +46,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Temperature Supply",
         key=Entity.SUPPLY_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
-        native_unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
@@ -54,7 +54,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Temperature Exhaust",
         key=Entity.EXHAUST_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
-        native_unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
@@ -62,7 +62,7 @@ SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Temperature Extract",
         key=Entity.EXTRACT_TEMPERATURE.value,
         icon=TEMPERATURE_ICON,
-        native_unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
